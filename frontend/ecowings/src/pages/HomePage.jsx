@@ -8,6 +8,7 @@ import ErrorMessage from '../shared/components/ErrorMessage';
 
 export default function HomePage() {
   const [flights, setFlights] = useState([]);
+  const [allFlights, setAllFlights] = useState([]);
   const [airlines, setAirlines] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loadingFlights, setLoadingFlights] = useState(true);
@@ -23,19 +24,22 @@ export default function HomePage() {
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
 
+  // allFlights: arama için tam liste; flights: featured 6 adet
+
   useEffect(() => {
     // Fetch all data in parallel
     flightService.getFlights()
       .then((res) => {
-        if (res.data?.succeeded) setFlights(res.data.data?.slice(0, 6) || []);
-        else setErrorFlights(res.data?.message || 'Uçuşlar yüklenemedi.');
+        const list = Array.isArray(res.data) ? res.data : [];
+        setAllFlights(list);
+        setFlights(list.slice(0, 6));
       })
       .catch(() => setErrorFlights('Uçuşlar yüklenemedi.'))
       .finally(() => setLoadingFlights(false));
 
     apiClient.get('/api/Airline')
       .then((res) => {
-        if (res.data?.succeeded) setAirlines(res.data.data || []);
+        if (Array.isArray(res.data)) setAirlines(res.data);
         else setErrorAirlines(res.data?.message || 'Havayolları yüklenemedi.');
       })
       .catch(() => setErrorAirlines('Havayolları yüklenemedi.'))
@@ -43,32 +47,42 @@ export default function HomePage() {
 
     apiClient.get('/api/AirlineReview')
       .then((res) => {
-        if (res.data?.succeeded) setReviews(res.data.data?.slice(-4) || []);
+        if (Array.isArray(res.data)) setReviews(res.data.slice(-4));
         else setErrorReviews(res.data?.message || 'Yorumlar yüklenemedi.');
       })
       .catch(() => setErrorReviews('Yorumlar yüklenemedi.'))
       .finally(() => setLoadingReviews(false));
   }, []);
 
-  const handleSearch = async (e) => {
+  const handleSearch = (e) => {
     e.preventDefault();
-    if (!searchForm.from.trim() || !searchForm.to.trim()) {
-      setSearchError('Kalkış ve varış şehri gerekli.'); return;
+    const from = searchForm.from.trim().toLowerCase();
+    const to = searchForm.to.trim().toLowerCase();
+    if (!from && !to) {
+      setSearchError('Kalkış veya varış şehri girin.'); return;
     }
     setSearchError('');
     setSearching(true);
-    try {
-      const res = await flightService.searchFlights(searchForm);
-      if (res.data?.succeeded) {
-        setSearchResults(res.data.data || []);
-      } else {
-        setSearchError(res.data?.message || 'Arama başarısız.');
-      }
-    } catch {
-      setSearchError('Arama sırasında bir hata oluştu.');
-    } finally {
-      setSearching(false);
-    }
+
+    // Backend'de /search endpoint yok — client-side filtrele
+    const results = allFlights.filter((f) => {
+      const dep = f.departureAirport;
+      const arr = f.arrivalAirport;
+      const depMatch = !from ||
+        dep?.name?.toLowerCase().includes(from) ||
+        dep?.code?.toLowerCase().includes(from) ||
+        dep?.city?.toLowerCase().includes(from);
+      const arrMatch = !to ||
+        arr?.name?.toLowerCase().includes(to) ||
+        arr?.code?.toLowerCase().includes(to) ||
+        arr?.city?.toLowerCase().includes(to);
+      const dateMatch = !searchForm.departure ||
+        f.departureTime?.startsWith(searchForm.departure);
+      return depMatch && arrMatch && dateMatch;
+    });
+
+    setSearchResults(results);
+    setSearching(false);
   };
 
   return (
