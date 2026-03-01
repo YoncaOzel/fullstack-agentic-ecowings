@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { PlaneTakeoff, PlaneLanding, ArrowLeftRight, Calendar, Search, Users, ChevronDown } from "lucide-react";
@@ -108,7 +108,8 @@ export default function SearchForm({ state, onTripTypeChange, onFromChange, onTo
       <div style={{ display: "flex", alignItems: "flex-end", gap: "10px", flexWrap: "wrap" }}>
         <FocusInput icon={<PlaneTakeoff size={16} />} label="Flying From" value={state.flyingFrom} onChange={onFromChange} placeholder="City or airport" />
 
-        <button onClick={onSwap} title="Swap cities" style={{ flexShrink: 0, width: "36px", height: "36px", borderRadius: "50%", background: "#f5a623", border: "none", color: "#08080f", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1px", flexShrink: 0, transition: "transform 0.2s ease" }}
+        <button onClick={onSwap} title="Swap cities"
+          style={{ flexShrink: 0, width: "36px", height: "36px", borderRadius: "50%", background: "#f5a623", border: "none", color: "#08080f", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1px", transition: "transform 0.2s ease" }}
           onMouseEnter={e => e.currentTarget.style.transform = "scale(1.08) rotate(180deg)"}
           onMouseLeave={e => e.currentTarget.style.transform = "scale(1) rotate(0deg)"}>
           <ArrowLeftRight size={15} />

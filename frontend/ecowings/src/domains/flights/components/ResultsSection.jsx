@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState } from "react";
 import { Star, DollarSign, Zap, RefreshCw, SlidersHorizontal, X } from "lucide-react";
 import FlightCard from "./FlightCard";
 
@@ -43,14 +43,14 @@ export default function ResultsSection({ flights, isLoading, error, sortBy, onSo
   const parseDuration = d => { const h = parseInt(d?.match(/(\d+)h/)?.[1] || 0); const m = parseInt(d?.match(/(\d+)m/)?.[1] || 0); return h * 60 + m; };
   const sorted = [...flights].sort((a, b) => {
     if (sortBy === "cheapest") return a.price - b.price;
-    if (sortBy === "fastest") return parseDuration(a.outbound.duration) - parseDuration(b.outbound.duration);
+    if (sortBy === "fastest") return parseDuration(a.outbound?.duration) - parseDuration(b.outbound?.duration);
     return (b.isRecommended ? 1 : 0) - (a.isRecommended ? 1 : 0);
   });
 
   return (
     <section style={{ paddingBottom: "60px", paddingTop: "24px" }} className="wrapper">
       {/* Filter bar */}
-      <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "6px", marginBottom: "20px", padding: "12px 16px", background: "#0f0f1a", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.06)", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+      <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: "6px", marginBottom: "20px", padding: "12px 16px", background: "#0f0f1a", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.06)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "13px", fontWeight: 500, color: "#6b7280" }}>
           <SlidersHorizontal size={13} /><span>Filters</span>
         </div>
