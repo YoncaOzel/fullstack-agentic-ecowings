@@ -21,8 +21,9 @@ export default function FlightTrackerPage() {
 
     try {
       const res = await flightService.getFlights();
-      if (res.data?.succeeded) {
-        const found = (res.data.data || []).find(
+      // Backend doğrudan dizi döndürür: [...]
+      if (Array.isArray(res.data)) {
+        const found = res.data.find(
           (f) => f.flightNumber?.toLowerCase() === flightNumber.trim().toLowerCase()
         );
         if (found) setResult(found);

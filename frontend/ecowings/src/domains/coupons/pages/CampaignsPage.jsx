@@ -17,7 +17,8 @@ export default function CampaignsPage() {
     setLoading(true);
     couponService.getMyCoupons()
       .then((res) => {
-        if (res.data?.succeeded) setCoupons(res.data.data || []);
+        // Backend doğrudan dizi döndürür: [...]
+        if (Array.isArray(res.data)) setCoupons(res.data);
         else setError(res.data?.message || 'Kuponlar yüklenemedi.');
       })
       .catch(() => setError('Bir hata oluştu.'))

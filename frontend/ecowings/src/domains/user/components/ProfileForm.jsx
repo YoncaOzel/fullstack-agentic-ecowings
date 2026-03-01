@@ -19,9 +19,11 @@ export default function ProfileForm({ profile, onUpdate }) {
     setSaving(true);
     try {
       const res = await userService.updateProfile(form);
-      if (res.data?.succeeded) {
+      // Backend { message: "..." } döndürür, 2xx ise başarılı
+      if (res.status >= 200 && res.status < 300) {
         setSuccess(true);
-        onUpdate?.(res.data.data);
+        // Güncellenen firstName/lastName/userName'i parent state'e aktar
+        onUpdate?.((prev) => ({ ...prev, ...form }));
         setTimeout(() => setSuccess(false), 3000);
       } else {
         setError(res.data?.message || 'Güncelleme başarısız.');

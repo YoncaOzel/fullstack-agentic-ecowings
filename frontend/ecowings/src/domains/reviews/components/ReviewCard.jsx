@@ -28,7 +28,8 @@ export default function ReviewCard({ review, onUpdate, onDelete }) {
     setSaving(true);
     try {
       const res = await reviewService.updateReview(review.id, { airlineId: review.airlineId, rating: editRating, comment: editComment });
-      if (res.data?.succeeded) {
+      // Backend Ok(updatedId) döndürür
+      if (res.status >= 200 && res.status < 300) {
         onUpdate?.({ ...review, rating: editRating, comment: editComment });
         setEditing(false);
       }

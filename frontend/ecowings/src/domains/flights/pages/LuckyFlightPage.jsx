@@ -21,11 +21,11 @@ export default function LuckyFlightPage() {
   useEffect(() => {
     flightService.getFlights()
       .then((res) => {
-        if (res.data?.succeeded) {
-          const available = (res.data.data || []).filter((f) => f.availableSeats > 0);
-          setAvailableFlights(available);
-          if (available.length > 0) setCurrent(available[Math.floor(Math.random() * available.length)]);
-        }
+        // Backend doğrudan dizi döndürür: [...]
+        const list = Array.isArray(res.data) ? res.data : [];
+        const available = list.filter((f) => f.availableSeats > 0);
+        setAvailableFlights(available);
+        if (available.length > 0) setCurrent(available[Math.floor(Math.random() * available.length)]);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -49,7 +49,8 @@ export default function LuckyFlightPage() {
     setBuyMsg('');
     try {
       const res = await ticketService.buyTicket({ flightId: current.id, travelClass: 'Economy' });
-      if (res.data?.succeeded) {
+      // POST /api/Ticket 201 Created döndürür
+      if (res.status >= 200 && res.status < 300) {
         setBought(true);
         setBuyMsg('Biletiniz satın alındı! ✅');
       } else {

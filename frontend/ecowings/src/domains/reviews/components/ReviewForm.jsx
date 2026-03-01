@@ -21,8 +21,9 @@ export default function ReviewForm({ airlines, onSuccess }) {
         rating: form.rating,
         comment: form.comment,
       });
-      if (res.data?.succeeded) {
-        onSuccess?.(res.data.data);
+      // Backend 201 Created döndürür (doğrudan int reviewId)
+      if (res.status >= 200 && res.status < 300) {
+        onSuccess?.(null); // CommentsPage tüm listeyi yeniler
         setForm({ airlineId: '', rating: 0, comment: '' });
       } else {
         setError(res.data?.message || 'Yorum gönderilemedi.');

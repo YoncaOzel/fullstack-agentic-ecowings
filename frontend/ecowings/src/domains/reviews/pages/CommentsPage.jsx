@@ -21,9 +21,10 @@ export default function CommentsPage() {
       apiClient.get('/api/Airline'),
     ])
       .then(([revRes, airRes]) => {
-        if (revRes.data?.succeeded) setReviews(revRes.data.data || []);
+        // Backend doğrudan dizi döndürür: [...]
+        if (Array.isArray(revRes.data)) setReviews(revRes.data);
         else setError(revRes.data?.message || 'Yorumlar yüklenemedi.');
-        if (airRes.data?.succeeded) setAirlines(airRes.data.data || []);
+        if (Array.isArray(airRes.data)) setAirlines(airRes.data);
       })
       .catch(() => setError('Veriler yüklenirken hata oluştu.'))
       .finally(() => setLoading(false));
@@ -34,9 +35,9 @@ export default function CommentsPage() {
     : reviews;
 
   const handleNewReview = (newReview) => {
-    if (newReview) setReviews((prev) => [newReview, ...prev]);
+    if (newReview && newReview.id) setReviews((prev) => [newReview, ...prev]);
     else reviewService.getReviews().then((res) => {
-      if (res.data?.succeeded) setReviews(res.data.data || []);
+      if (Array.isArray(res.data)) setReviews(res.data);
     });
   };
 

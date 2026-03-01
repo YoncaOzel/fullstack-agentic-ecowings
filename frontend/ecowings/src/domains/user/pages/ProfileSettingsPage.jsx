@@ -20,7 +20,8 @@ export default function ProfileSettingsPage() {
   useEffect(() => {
     userService.getProfile()
       .then((res) => {
-        if (res.data?.succeeded) setProfile(res.data.data);
+        // Backend düz nesne döndürür: { id, firstName, lastName, email, userName }
+        if (res.data?.id || res.data?.email) setProfile(res.data);
         else setProfileError(res.data?.message || 'Profil yüklenemedi.');
       })
       .catch(() => setProfileError('Profil yüklenirken hata oluştu.'))
@@ -32,7 +33,8 @@ export default function ProfileSettingsPage() {
     setLoadingCoupons(true);
     userService.getMyCoupons()
       .then((res) => {
-        if (res.data?.succeeded) setCoupons(res.data.data || []);
+        // Backend düz liste döndürür: [...]
+        if (Array.isArray(res.data)) setCoupons(res.data);
         else setCouponError(res.data?.message || 'Kuponlar yüklenemedi.');
       })
       .catch(() => setCouponError('Kuponlar yüklenirken hata oluştu.'))

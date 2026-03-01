@@ -16,8 +16,9 @@ export default function useTickets(autoFetch = false) {
     setError("");
     try {
       const res = await ticketService.getMyTickets();
-      if (res.data?.succeeded) {
-        setTickets(res.data.data || []);
+      // Backend doğrudan dizi döndürür: [...]
+      if (Array.isArray(res.data)) {
+        setTickets(res.data);
       } else {
         setError(res.data?.message || "Biletler yüklenemedi.");
       }
@@ -34,9 +35,10 @@ export default function useTickets(autoFetch = false) {
     setSuccessMessage("");
     try {
       const res = await ticketService.buyTicket(data);
-      if (res.data?.succeeded) {
+      // POST /api/Ticket 201 Created döndürür
+      if (res.status >= 200 && res.status < 300) {
         setSuccessMessage("Biletiniz başarıyla satın alındı!");
-        return { success: true, data: res.data.data };
+        return { success: true, data: res.data };
       } else {
         const msg = res.data?.message || "Bilet satın alınamadı.";
         setError(msg);
@@ -57,9 +59,10 @@ export default function useTickets(autoFetch = false) {
     setSuccessMessage("");
     try {
       const res = await ticketService.buyTicketWithCoupon(data);
-      if (res.data?.succeeded) {
+      // POST /api/Ticket/with-coupon Ok(result) döndürür
+      if (res.status >= 200 && res.status < 300) {
         setSuccessMessage("Kuponlu biletiniz başarıyla satın alındı!");
-        return { success: true, data: res.data.data };
+        return { success: true, data: res.data };
       } else {
         const msg = res.data?.message || "Bilet satın alınamadı.";
         setError(msg);

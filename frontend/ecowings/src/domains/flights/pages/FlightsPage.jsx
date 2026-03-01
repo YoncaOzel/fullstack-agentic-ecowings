@@ -14,7 +14,8 @@ export default function FlightsPage() {
   useEffect(() => {
     flightService.getFlights()
       .then((res) => {
-        if (res.data?.succeeded) setFlights(res.data.data || []);
+        // Backend doğrudan dizi döndürür: [...]
+        if (Array.isArray(res.data)) setFlights(res.data);
         else setError(res.data?.message || 'Uçuşlar yüklenemedi.');
       })
       .catch(() => setError('Bir hata oluştu.'))

@@ -23,7 +23,8 @@ export default function ChangePasswordForm() {
     setSaving(true);
     try {
       const res = await userService.changePassword(form);
-      if (res.data?.succeeded) {
+      // Backend { message: "..." } döndürür, 2xx ise başarılı
+      if (res.status >= 200 && res.status < 300) {
         setSuccess(true);
         setForm({ currentPassword: '', newPassword: '', confirmNewPassword: '' });
         setTimeout(() => setSuccess(false), 3000);

@@ -17,7 +17,8 @@ export default function GiftTicketPage() {
     if (!isAdmin) { setLoading(false); return; }
     couponService.getAllCoupons()
       .then((res) => {
-        if (res.data?.succeeded) setCoupons(res.data.data || []);
+        // Backend doğrudan dizi döndürür: [...]
+        if (Array.isArray(res.data)) setCoupons(res.data);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -32,7 +33,8 @@ export default function GiftTicketPage() {
     setSubmitting(true);
     try {
       const res = await couponService.giftCoupon({ userId: form.userId.trim(), couponId: Number(form.couponId) });
-      if (res.data?.succeeded) {
+      // Backend Ok(couponCode) döndürür
+      if (res.status >= 200 && res.status < 300) {
         setSuccess('Kupon başarıyla hediye edildi! ✅');
         setForm({ userId: '', couponId: '' });
       } else {
