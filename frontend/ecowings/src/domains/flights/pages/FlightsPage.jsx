@@ -22,22 +22,35 @@ export default function FlightsPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Süreyi dakikaya çevirir (estimatedArrivalTime - departureTime)
+  const durationMins = (f) => {
+    if (!f.departureTime || !(f.estimatedArrivalTime || f.arrivalTime)) return 0;
+    return Math.round((new Date(f.estimatedArrivalTime || f.arrivalTime) - new Date(f.departureTime)) / 60000);
+  };
+
+  // Fiyat alanı: price (DB entity) veya economyPrice (eski alan)
+  const getPrice = (f) => Number(f.price ?? f.economyPrice ?? 0);
+
   const filtered = flights
     .filter((f) => {
       if (!search) return true;
       const q = search.toLowerCase();
       return (
         f.flightNumber?.toLowerCase().includes(q) ||
-        f.departureAirport?.name?.toLowerCase().includes(q) ||
-        f.departureAirport?.code?.toLowerCase().includes(q) ||
-        f.arrivalAirport?.name?.toLowerCase().includes(q) ||
-        f.arrivalAirport?.code?.toLowerCase().includes(q)
+        // DB entity: departure / destination (navigation props, may be null if not included)
+        f.departure?.name?.toLowerCase().includes(q) ||
+        f.departure?.code?.toLowerCase().includes(q) ||
+        f.departure?.city?.toLowerCase().includes(q) ||
+        f.destination?.name?.toLowerCase().includes(q) ||
+        f.destination?.code?.toLowerCase().includes(q) ||
+        f.destination?.city?.toLowerCase().includes(q) ||
+        f.airline?.name?.toLowerCase().includes(q)
       );
     })
     .sort((a, b) => {
-      if (sortBy === 'price-asc') return (a.economyPrice || 0) - (b.economyPrice || 0);
-      if (sortBy === 'price-desc') return (b.economyPrice || 0) - (a.economyPrice || 0);
-      if (sortBy === 'duration') return (a.durationMinutes || 0) - (b.durationMinutes || 0);
+      if (sortBy === 'price-asc')  return getPrice(a) - getPrice(b);
+      if (sortBy === 'price-desc') return getPrice(b) - getPrice(a);
+      if (sortBy === 'duration')   return durationMins(a) - durationMins(b);
       return 0;
     });
 
