@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import apiClient from '../shared/services/apiClient';
 import flightService from '../domains/flights/services/flightService';
 import FlightCard from '../domains/flights/components/FlightCard';
+import AmadeusFlightCard from '../domains/flights/components/AmadeusFlightCard';
+import AirportSelect from '../domains/flights/components/AirportSelect';
 import LoadingSpinner from '../shared/components/LoadingSpinner';
 import ErrorMessage from '../shared/components/ErrorMessage';
 
@@ -17,6 +19,9 @@ export default function HomePage() {
   const [errorFlights, setErrorFlights] = useState('');
   const [errorAirlines, setErrorAirlines] = useState('');
   const [errorReviews, setErrorReviews] = useState('');
+
+  // Airports for dropdowns
+  const [airports, setAirports] = useState([]);
 
   // Search form state
   const [searchForm, setSearchForm] = useState({ from: '', to: '', departure: '', travelClass: 'Economy' });
@@ -45,6 +50,10 @@ export default function HomePage() {
       .catch(() => setErrorAirlines('Havayolları yüklenemedi.'))
       .finally(() => setLoadingAirlines(false));
 
+    apiClient.get('/api/Airport')
+      .then((res) => { if (Array.isArray(res.data)) setAirports(res.data); })
+      .catch(() => {});
+
     apiClient.get('/api/AirlineReview')
       .then((res) => {
         if (Array.isArray(res.data)) setReviews(res.data.slice(-4));
@@ -54,35 +63,46 @@ export default function HomePage() {
       .finally(() => setLoadingReviews(false));
   }, []);
 
-  const handleSearch = (e) => {
+  // travelClass değerini API enum'una çevirir
+  const toApiTravelClass = (cls) => {
+    if (cls === 'Business') return 'BUSINESS';
+    if (cls === 'FirstClass') return 'FIRST';
+    return 'ECONOMY';
+  };
+
+  const handleSearch = async (e) => {
     e.preventDefault();
-    const from = searchForm.from.trim().toLowerCase();
-    const to = searchForm.to.trim().toLowerCase();
-    if (!from && !to) {
-      setSearchError('Kalkış veya varış şehri girin.'); return;
+    const origin = searchForm.from.trim();
+    const destination = searchForm.to.trim();
+    if (!origin || !destination) {
+      setSearchError('Kalkış ve varış şehri / IATA kodunu girin.'); return;
+    }
+    if (!searchForm.departure) {
+      setSearchError('Lütfen kalkış tarihini seçin.'); return;
     }
     setSearchError('');
     setSearching(true);
-
-    // Backend'de /search endpoint yok — client-side filtrele
-    const results = allFlights.filter((f) => {
-      const dep = f.departureAirport;
-      const arr = f.arrivalAirport;
-      const depMatch = !from ||
-        dep?.name?.toLowerCase().includes(from) ||
-        dep?.code?.toLowerCase().includes(from) ||
-        dep?.city?.toLowerCase().includes(from);
-      const arrMatch = !to ||
-        arr?.name?.toLowerCase().includes(to) ||
-        arr?.code?.toLowerCase().includes(to) ||
-        arr?.city?.toLowerCase().includes(to);
-      const dateMatch = !searchForm.departure ||
-        f.departureTime?.startsWith(searchForm.departure);
-      return depMatch && arrMatch && dateMatch;
-    });
-
-    setSearchResults(results);
-    setSearching(false);
+    setSearchResults(null);
+    try {
+      const res = await flightService.searchFlightsApi(
+        origin,
+        destination,
+        searchForm.departure,
+        1,
+        toApiTravelClass(searchForm.travelClass)
+      );
+      const list = Array.isArray(res.data) ? res.data : [];
+      setSearchResults(list);
+    } catch (err) {
+      const msg =
+        err.response?.data?.message ||
+        err.response?.data ||
+        'Uçuş arama sırasında bir hata oluştu.';
+      setSearchError(typeof msg === 'string' ? msg : 'Uçuş arama sırasında bir hata oluştu.');
+      setSearchResults([]);
+    } finally {
+      setSearching(false);
+    }
   };
 
   return (
@@ -111,13 +131,23 @@ export default function HomePage() {
             margin: '0 auto',
             border: '1px solid rgba(255,255,255,0.25)',
           }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px', marginBottom: '16px' }}>
-              <input className="form-input" placeholder="Nereden?" value={searchForm.from}
-                onChange={(e) => setSearchForm((p) => ({ ...p, from: e.target.value }))}
-                style={{ background: 'rgba(255,255,255,0.9)' }} />
-              <input className="form-input" placeholder="Nereye?" value={searchForm.to}
-                onChange={(e) => setSearchForm((p) => ({ ...p, to: e.target.value }))}
-                style={{ background: 'rgba(255,255,255,0.9)' }} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '16px' }}>
+              <AirportSelect
+                label="Nereden?"
+                icon="takeoff"
+                airports={airports}
+                value={searchForm.from}
+                onChange={(code) => setSearchForm((p) => ({ ...p, from: code }))}
+                placeholder="Kalkış havalimanı"
+              />
+              <AirportSelect
+                label="Nereye?"
+                icon="landing"
+                airports={airports}
+                value={searchForm.to}
+                onChange={(code) => setSearchForm((p) => ({ ...p, to: code }))}
+                placeholder="Varış havalimanı"
+              />
               <input type="date" className="form-input" value={searchForm.departure}
                 onChange={(e) => setSearchForm((p) => ({ ...p, departure: e.target.value }))}
                 style={{ background: 'rgba(255,255,255,0.9)' }} />
@@ -148,7 +178,9 @@ export default function HomePage() {
               <p style={{ color: 'var(--text-secondary)' }}>Kriterlere uygun uçuş bulunamadı.</p>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
-                {searchResults.map((f) => <FlightCard key={f.id} flight={f} />)}
+                {searchResults.map((f, i) => (
+                  <AmadeusFlightCard key={f.flightNumber ? `${f.flightNumber}-${i}` : i} flight={f} />
+                ))}
               </div>
             )}
           </div>
