@@ -92,7 +92,16 @@ export default function HomePage() {
         toApiTravelClass(searchForm.travelClass)
       );
       const list = Array.isArray(res.data) ? res.data : [];
-      setSearchResults(list);
+
+      // Amadeus test ortamı bazen farklı kalkış/varışlı uçuşlar döndürebilir.
+      // Seçilen IATA kodlarıyla eşleşmeyenleri frontend'de de filtrele.
+      const filtered = list.filter((f) => {
+        const matchOrigin = f.departure?.toUpperCase() === origin.toUpperCase();
+        const matchDest   = f.arrival?.toUpperCase()   === destination.toUpperCase();
+        return matchOrigin && matchDest;
+      });
+
+      setSearchResults(filtered);
     } catch (err) {
       const msg =
         err.response?.data?.message ||

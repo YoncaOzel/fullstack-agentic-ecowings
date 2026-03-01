@@ -73,9 +73,14 @@ namespace CleanArchitecture.Infrastructure.Services
                 // İlk ve Son Segmentler (Kalkış-Varış için)
                 var firstSegment = segments[0];
                 var lastSegment = segments[segmentCount - 1];
-                var finalArrivalCode = lastSegment.GetProperty("arrival").GetProperty("iataCode").GetString();
+                var firstDepartureCode = firstSegment.GetProperty("departure").GetProperty("iataCode").GetString();
+                var finalArrivalCode   = lastSegment.GetProperty("arrival").GetProperty("iataCode").GetString();
 
-                // Varış noktası kontrolü
+                // Kalkış noktası kontrolü — sadece istenen origin'den kalkan uçuşlar
+                if (!string.Equals(firstDepartureCode, origin, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                // Varış noktası kontrolü — sadece istenen destination'a giden uçuşlar
                 if (!string.Equals(finalArrivalCode, destination, StringComparison.OrdinalIgnoreCase))
                     continue;
 
