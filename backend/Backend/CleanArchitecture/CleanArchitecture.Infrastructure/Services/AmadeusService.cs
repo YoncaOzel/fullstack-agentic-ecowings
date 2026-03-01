@@ -74,7 +74,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 var firstSegment = segments[0];
                 var lastSegment = segments[segmentCount - 1];
                 var firstDepartureCode = firstSegment.GetProperty("departure").GetProperty("iataCode").GetString();
-                var finalArrivalCode   = lastSegment.GetProperty("arrival").GetProperty("iataCode").GetString();
+                var finalArrivalCode = lastSegment.GetProperty("arrival").GetProperty("iataCode").GetString();
 
                 // Kalkış noktası kontrolü — sadece istenen origin'den kalkan uçuşlar
                 if (!string.Equals(firstDepartureCode, origin, StringComparison.OrdinalIgnoreCase))
