@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CleanArchitecture.WebApi</name>
+    </assembly>
+    <members>
+        <member name="M:CleanArchitecture.WebApi.Controllers.PaymentController.Pay(System.Int32,System.Decimal)">
+            <summary>
+            Creates a Stripe Checkout session and returns the payment page URL.
+            </summary>
+        </member>
+        <member name="M:CleanArchitecture.WebApi.Controllers.PaymentController.StripeWebhook">
+            <summary>
+            Stripe webhook to listen for payment confirmation.
+            </summary>
+        </member>
+    </members>
+</doc>

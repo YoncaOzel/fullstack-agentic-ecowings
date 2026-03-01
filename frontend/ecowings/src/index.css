@@ -1,0 +1,101 @@
+﻿@import "tailwindcss";
+
+/* ── Variables ─────────────────────────────────────────── */
+:root {
+  --bg:           #08080f;
+  --card:         #0f0f1a;
+  --border:       rgba(255,255,255,0.06);
+  --border-soft:  rgba(255,255,255,0.1);
+  --accent:       #f5a623;
+  --accent-glow:  rgba(245,166,35,0.15);
+  --text:         #f0f0f0;
+  --muted:        #9ca3af;
+  --faint:        #6b7280;
+
+  font-family: 'Inter', sans-serif;
+  color: var(--text);
+  background-color: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Reset ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--bg);
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ── Wrapper ────────────────────────────────────────────── */
+.wrapper {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── Scrollbar ──────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #1a1a2e; }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 3px; }
+
+/* ── Skeleton shimmer ───────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #0f0f1a 25%, #1a1a2e 50%, #0f0f1a 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.6s infinite linear;
+  border-radius: 6px;
+}
+
+/* ── DatePicker overrides ───────────────────────────────── */
+.react-datepicker {
+  background-color: var(--card) !important;
+  border: 1px solid var(--border-soft) !important;
+  color: var(--text) !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 13px !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6) !important;
+}
+.react-datepicker__header {
+  background-color: var(--bg) !important;
+  border-bottom: 1px solid var(--border) !important;
+  padding-top: 12px !important;
+}
+.react-datepicker__current-month,
+.react-datepicker__day-name { color: var(--text) !important; }
+.react-datepicker__day { color: var(--muted) !important; border-radius: 6px !important; }
+.react-datepicker__day:hover {
+  background-color: var(--accent-glow) !important;
+  color: var(--accent) !important;
+}
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background-color: var(--accent) !important;
+  color: #000 !important;
+  font-weight: 700 !important;
+}
+.react-datepicker__day--outside-month { color: #374151 !important; }
+.react-datepicker__navigation-icon::before { border-color: var(--faint) !important; }
+.react-datepicker__triangle { display: none !important; }
+.react-datepicker-popper { z-index: 9999 !important; }
+.react-datepicker__input-container input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 15px;
+  width: 100%;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+.react-datepicker__input-container input::placeholder { color: var(--faint); }
