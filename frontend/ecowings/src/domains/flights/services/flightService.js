@@ -26,6 +26,15 @@ const flightService = {
     apiClient.get("/api/FlightSearch/search", {
       params: { origin, destination, date, adults, travelClass },
     }),
+
+  /**
+   * Amadeus API üzerinden rastgele şanslı uçuş döndürür.
+   * GET /api/LuckyFlight/search
+   * @param {string} origin  - Kalkış IATA kodu (ör: "IST")
+   * @param {number} userId  - Kullanıcı ID (giriş yapılmamışsa 0)
+   */
+  getLuckyFlight: (origin, userId = 0) =>
+    apiClient.get("/api/LuckyFlight/search", { params: { origin, userId } }),
 };
 
 export default flightService;
