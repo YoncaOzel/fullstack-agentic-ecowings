@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Plane, Star, MapPin, ArrowRight, CheckCircle2, Calendar, Search, ChevronDown } from 'lucide-react';
 import apiClient from '../shared/services/apiClient';
@@ -99,6 +99,7 @@ export default function HomePage() {
   const [searchResults, setSearchResults] = useState(null);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
+  const resultsRef = useRef(null);
 
   // allFlights: arama için tam liste; flights: featured 6 adet
 
@@ -183,6 +184,7 @@ export default function HomePage() {
       });
 
       setSearchResults(filtered);
+      setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
     } catch (err) {
       const msg =
         err.response?.data?.message ||
@@ -368,7 +370,7 @@ export default function HomePage() {
 
       {/* ── Search Results / Skeleton ── */}
       {(searching || searchResults !== null) && (
-        <section style={{ background: 'var(--bg-section-alt)', padding: '52px 0' }}>
+        <section ref={resultsRef} style={{ background: 'var(--bg-section-alt)', padding: '52px 0' }}>
           <div className="container">
             {/* Section heading */}
             <div style={{ marginBottom: '32px' }}>

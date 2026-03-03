@@ -123,14 +123,17 @@ export default function AmadeusFlightCard({ flight }) {
           )}
         </div>
 
-        {/* Route line with duration + plane icon */}
+        {/* Route line with duration + dots + plane icon */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', padding: '0 4px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.69rem', color: '#6b7280' }}>
             <Clock size={10} /><span>{flight.duration || '—'}</span>
           </div>
           <div style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
+            <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'rgba(34,197,94,0.25)', border: '1.5px solid #22c55e', flexShrink: 0 }} />
             <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(34,197,94,0.25), rgba(34,197,94,0.55), rgba(34,197,94,0.25))' }} />
-            <Plane size={14} style={{ color: '#22c55e', flexShrink: 0, transform: 'rotate(45deg)', margin: '0 4px' }} />
+            <Plane size={13} style={{ color: '#22c55e', flexShrink: 0, margin: '0 2px' }} />
+            <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(34,197,94,0.25), rgba(34,197,94,0.55), rgba(34,197,94,0.25))' }} />
+            <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'rgba(34,197,94,0.25)', border: '1.5px solid #22c55e', flexShrink: 0 }} />
           </div>
           <span style={{ fontSize: '0.67rem', color: '#6b7280', letterSpacing: '0.03em' }}>{stopLabel}</span>
         </div>
@@ -181,7 +184,7 @@ export default function AmadeusFlightCard({ flight }) {
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
           <div>
             <div style={{ fontSize: '0.68rem', color: '#6b7280', letterSpacing: '0.07em', textTransform: 'uppercase', fontWeight: 600, marginBottom: '4px' }}>
-              Fiyat
+              FIYAT
             </div>
             <div style={{ fontSize: '1.55rem', fontWeight: 800, color: '#22c55e', lineHeight: 1, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
               {flight.price
@@ -190,11 +193,12 @@ export default function AmadeusFlightCard({ flight }) {
             </div>
           </div>
           {flight.carbonEmission != null && (
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.7rem', color: emissionColor, fontWeight: 700, justifyContent: 'flex-end' }}>
-                <Leaf size={11} />{flight.emissionClass || 'CO₂'}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: `${emissionColor}18`, border: `1px solid ${emissionColor}40`, borderRadius: '20px', padding: '3px 9px', fontSize: '0.68rem', fontWeight: 700, color: emissionColor }}>
+                <Leaf size={10} />
+                {flight.emissionClass === 'Low' ? 'Düşük (Low)' : flight.emissionClass === 'Medium' ? 'Orta (Moderate)' : 'Yüksek (High)'}
               </div>
-              <div style={{ fontSize: '0.69rem', color: '#6b7280', marginTop: '2px' }}>
+              <div style={{ fontSize: '0.67rem', color: '#6b7280' }}>
                 {flight.carbonEmission.toFixed(1)} kg CO₂
               </div>
             </div>

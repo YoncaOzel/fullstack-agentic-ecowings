@@ -87,14 +87,18 @@ export default function FlightCard({ flight }) {
         </div>
 
         {/* Middle */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
           {duration && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: 'var(--text-light)' }}>
               <Clock size={11} />{duration}
             </div>
           )}
-          <div style={{ width: '100%', height: '1px', background: 'var(--border-color)', position: 'relative' }}>
-            <Plane size={13} style={{ position: 'absolute', right: '-4px', top: '-7px', color: 'var(--primary)' }} />
+          <div style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
+            <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'rgba(34,197,94,0.2)', border: '1.5px solid var(--primary)', flexShrink: 0 }} />
+            <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(34,197,94,0.25), rgba(34,197,94,0.55), rgba(34,197,94,0.25))' }} />
+            <Plane size={13} style={{ color: 'var(--primary)', flexShrink: 0, margin: '0 2px' }} />
+            <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(34,197,94,0.25), rgba(34,197,94,0.55), rgba(34,197,94,0.25))' }} />
+            <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'rgba(34,197,94,0.2)', border: '1.5px solid var(--primary)', flexShrink: 0 }} />
           </div>
           <span style={{ fontSize: '0.7rem', color: 'var(--text-light)' }}>Direkt</span>
         </div>
