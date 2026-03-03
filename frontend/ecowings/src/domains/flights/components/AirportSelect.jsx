@@ -73,7 +73,7 @@ export default function AirportSelect({ label, icon = 'takeoff', airports = [], 
         display: 'block',
         fontSize: '11px',
         fontWeight: 600,
-        color: '#6b7280',
+        color: 'rgba(34,197,94,0.7)',
         letterSpacing: '0.6px',
         textTransform: 'uppercase',
         marginBottom: '4px',
@@ -88,17 +88,17 @@ export default function AirportSelect({ label, icon = 'takeoff', airports = [], 
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
-          background: 'rgba(255,255,255,0.05)',
-          border: focused || open ? '1px solid #f5a623' : '1px solid rgba(255,255,255,0.1)',
-          borderRadius: '8px',
+          background: 'rgba(255,255,255,0.04)',
+          border: focused || open ? '1px solid #22c55e' : '1px solid rgba(34,197,94,0.2)',
+          borderRadius: '10px',
           padding: '12px 16px',
-          boxShadow: focused || open ? '0 0 0 3px rgba(245,166,35,0.15)' : 'none',
+          boxShadow: focused || open ? '0 0 0 3px rgba(34,197,94,0.12)' : 'none',
           transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
           cursor: 'pointer',
           userSelect: 'none',
         }}
       >
-        <IconComp size={16} style={{ color: focused || open ? '#f5a623' : '#6b7280', flexShrink: 0, transition: 'color 0.2s ease' }} />
+        <IconComp size={16} style={{ color: focused || open ? '#22c55e' : 'rgba(34,197,94,0.5)', flexShrink: 0, transition: 'color 0.2s ease' }} />
 
         {open ? (
           /* Arama kutusu açık */
@@ -136,12 +136,12 @@ export default function AirportSelect({ label, icon = 'takeoff', airports = [], 
         {selected && !open ? (
           <button
             onClick={handleClear}
-            style={{ background: 'none', border: 'none', padding: '2px', cursor: 'pointer', color: '#6b7280', display: 'flex', alignItems: 'center' }}
+            style={{ background: 'none', border: 'none', padding: '2px', cursor: 'pointer', color: 'rgba(34,197,94,0.5)', display: 'flex', alignItems: 'center' }}
           >
             <X size={14} />
           </button>
         ) : (
-          <ChevronDown size={14} style={{ color: '#6b7280', flexShrink: 0, transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
+          <ChevronDown size={14} style={{ color: 'rgba(34,197,94,0.5)', flexShrink: 0, transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s ease' }} />
         )}
       </div>
 
@@ -153,10 +153,12 @@ export default function AirportSelect({ label, icon = 'takeoff', airports = [], 
           left: 0,
           right: 0,
           zIndex: 100,
-          background: '#0f0f1a',
-          border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: '10px',
-          boxShadow: '0 16px 48px rgba(0,0,0,0.7)',
+          background: 'rgba(5,18,8,0.98)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          border: '1px solid rgba(34,197,94,0.2)',
+          borderRadius: '12px',
+          boxShadow: '0 16px 48px rgba(0,0,0,0.7), 0 0 0 1px rgba(34,197,94,0.06) inset',
           maxHeight: '280px',
           overflowY: 'auto',
         }}>
@@ -177,14 +179,14 @@ export default function AirportSelect({ label, icon = 'takeoff', airports = [], 
                   alignItems: 'center',
                   gap: '12px',
                   padding: '11px 16px',
-                  background: airport.code === value ? 'rgba(245,166,35,0.1)' : 'transparent',
+                  background: airport.code === value ? 'rgba(34,197,94,0.1)' : 'transparent',
                   border: 'none',
-                  borderBottom: '1px solid rgba(255,255,255,0.04)',
+                  borderBottom: '1px solid rgba(34,197,94,0.06)',
                   cursor: 'pointer',
                   textAlign: 'left',
                   transition: 'background 0.12s',
                 }}
-                onMouseEnter={e => { if (airport.code !== value) e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
+                onMouseEnter={e => { if (airport.code !== value) e.currentTarget.style.background = 'rgba(34,197,94,0.06)'; }}
                 onMouseLeave={e => { if (airport.code !== value) e.currentTarget.style.background = 'transparent'; }}
               >
                 {/* IATA badge */}
@@ -194,8 +196,8 @@ export default function AirportSelect({ label, icon = 'takeoff', airports = [], 
                   textAlign: 'center',
                   fontSize: '13px',
                   fontWeight: 700,
-                  color: airport.code === value ? '#f5a623' : '#9ca3af',
-                  background: airport.code === value ? 'rgba(245,166,35,0.15)' : 'rgba(255,255,255,0.06)',
+                  color: airport.code === value ? '#22c55e' : '#6b7280',
+                  background: airport.code === value ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.05)',
                   borderRadius: '6px',
                   padding: '3px 0',
                 }}>
