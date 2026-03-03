@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Plane, Star, MapPin, ArrowRight, CheckCircle2 } from 'lucide-react';
 import apiClient from '../shared/services/apiClient';
 import flightService from '../domains/flights/services/flightService';
 import FlightCard from '../domains/flights/components/FlightCard';
@@ -7,6 +8,76 @@ import AmadeusFlightCard from '../domains/flights/components/AmadeusFlightCard';
 import AirportSelect from '../domains/flights/components/AirportSelect';
 import LoadingSpinner from '../shared/components/LoadingSpinner';
 import ErrorMessage from '../shared/components/ErrorMessage';
+
+/* ── Shimmer skeleton shown while search is running ── */
+function SearchSkeletonCard() {
+  return (
+    <div style={{
+      background: 'linear-gradient(160deg, #111c11 0%, #0e1a0e 100%)',
+      border: '1px solid rgba(34,197,94,0.12)',
+      borderRadius: '18px',
+      overflow: 'hidden',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+    }}>
+      <div style={{ padding: '14px 20px 12px', borderBottom: '1px solid rgba(34,197,94,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div className="skeleton" style={{ width: '38px', height: '38px', borderRadius: '10px' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div className="skeleton" style={{ width: '70px', height: '10px', borderRadius: '4px' }} />
+            <div className="skeleton" style={{ width: '50px', height: '14px', borderRadius: '4px' }} />
+          </div>
+        </div>
+        <div className="skeleton" style={{ width: '60px', height: '24px', borderRadius: '20px' }} />
+      </div>
+      <div style={{ padding: '20px 20px 16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: '82px', alignItems: 'center' }}>
+          <div className="skeleton" style={{ width: '70px', height: '34px', borderRadius: '6px' }} />
+          <div className="skeleton" style={{ width: '44px', height: '16px', borderRadius: '4px' }} />
+          <div className="skeleton" style={{ width: '36px', height: '10px', borderRadius: '4px' }} />
+        </div>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+          <div className="skeleton" style={{ width: '50px', height: '10px', borderRadius: '4px' }} />
+          <div className="skeleton" style={{ width: '100%', height: '1px' }} />
+          <div className="skeleton" style={{ width: '40px', height: '10px', borderRadius: '4px' }} />
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', minWidth: '82px', alignItems: 'center' }}>
+          <div className="skeleton" style={{ width: '70px', height: '34px', borderRadius: '6px' }} />
+          <div className="skeleton" style={{ width: '44px', height: '16px', borderRadius: '4px' }} />
+        </div>
+      </div>
+      <div style={{ padding: '14px 20px 20px', borderTop: '1px solid rgba(34,197,94,0.08)', background: 'rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div className="skeleton" style={{ width: '36px', height: '10px', borderRadius: '4px' }} />
+            <div className="skeleton" style={{ width: '100px', height: '26px', borderRadius: '6px' }} />
+          </div>
+          <div className="skeleton" style={{ width: '60px', height: '30px', borderRadius: '6px' }} />
+        </div>
+        <div className="skeleton" style={{ width: '100%', height: '44px', borderRadius: '10px' }} />
+      </div>
+    </div>
+  );
+}
+
+/* ── Airline initial badge when logoUrl is missing ── */
+function AirlineMonogram({ name }) {
+  const letters = (name || '??').slice(0, 2).toUpperCase();
+  const hue = (name || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
+  return (
+    <div style={{
+      width: '72px', height: '72px',
+      borderRadius: '16px',
+      background: `linear-gradient(135deg, hsla(${hue},55%,22%,1) 0%, hsla(${hue},45%,15%,1) 100%)`,
+      border: `1px solid hsla(${hue},55%,35%,0.4)`,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontSize: '1.1rem', fontWeight: 800,
+      color: `hsl(${hue},70%,70%)`,
+      letterSpacing: '0.05em',
+      fontFamily: "'DM Mono', monospace",
+      flexShrink: 0,
+    }}>{letters}</div>
+  );
+}
 
 export default function HomePage() {
   const [flights, setFlights] = useState([]);
@@ -177,16 +248,41 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Search Results */}
-      {searchResults !== null && (
-        <section className="section" style={{ background: 'var(--bg-section-alt)' }}>
+      {/* ── Search Results / Skeleton ── */}
+      {(searching || searchResults !== null) && (
+        <section style={{ background: 'var(--bg-section-alt)', padding: '52px 0' }}>
           <div className="container">
-            <h2 style={{ marginBottom: '8px' }}>Arama Sonuçları</h2>
-            <p className="subtitle" style={{ marginBottom: '28px' }}>{searchResults.length} uçuş bulundu</p>
-            {searchResults.length === 0 ? (
-              <p style={{ color: 'var(--text-secondary)' }}>Kriterlere uygun uçuş bulunamadı.</p>
+            {/* Section heading */}
+            <div style={{ marginBottom: '32px' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.75rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '12px' }}>
+                <Plane size={11} /> Arama Sonuçları
+              </div>
+              {searching ? (
+                <p style={{ color: '#6b7280', fontSize: '0.9rem', marginTop: '4px' }}>Uçuşlar aranıyor…</p>
+              ) : (
+                <>
+                  <h2 style={{ fontSize: '1.9rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", margin: 0, lineHeight: 1.2 }}>
+                    {searchResults.length} Uçuş Bulundu
+                  </h2>
+                  <p style={{ color: '#6b7280', fontSize: '0.9rem', marginTop: '6px' }}>Arama kriterlerinize uyan sonuçlar</p>
+                </>
+              )}
+            </div>
+
+            {searching ? (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+                <SearchSkeletonCard />
+                <SearchSkeletonCard />
+                <SearchSkeletonCard />
+              </div>
+            ) : searchResults.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '60px 20px', background: 'rgba(34,197,94,0.03)', border: '1px solid rgba(34,197,94,0.08)', borderRadius: '16px' }}>
+                <div style={{ fontSize: '3rem', marginBottom: '12px' }}>✈️</div>
+                <p style={{ fontWeight: 700, fontSize: '1.1rem', color: '#f0fdf4', marginBottom: '6px' }}>Sonuç bulunamadı</p>
+                <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Farklı tarih veya havalimanı deneyin.</p>
+              </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
                 {searchResults.map((f, i) => (
                   <AmadeusFlightCard key={f.flightNumber ? `${f.flightNumber}-${i}` : i} flight={f} />
                 ))}
@@ -196,78 +292,223 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* Featured Flights */}
-      <section className="section">
-        <div className="container">
-          <h2 style={{ marginBottom: '8px' }}>Öne Çıkan Uçuşlar</h2>
-          <p className="subtitle" style={{ marginBottom: '28px' }}>En popüler rotalardan seçtiğimiz uçuşlar</p>
-          {loadingFlights ? <LoadingSpinner /> : errorFlights ? <ErrorMessage message={errorFlights} /> : (
-            <>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px', marginBottom: '28px' }}>
-                {flights.map((f) => <FlightCard key={f.id} flight={f} />)}
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <Link to="/flights" className="btn btn-secondary">Tüm Uçuşları Gör</Link>
-              </div>
-            </>
-          )}
-        </div>
-      </section>
-
-      {/* Airlines */}
-      <section className="section section-alt">
-        <div className="container">
-          <h2 style={{ marginBottom: '8px' }}>Havayolu Ortaklarımız</h2>
-          <p className="subtitle" style={{ marginBottom: '28px' }}>Güvenilir havayolu şirketleriyle uçun</p>
-          {loadingAirlines ? <LoadingSpinner /> : errorAirlines ? <ErrorMessage message={errorAirlines} /> : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
-              {airlines.map((a) => (
-                <div key={a.id} className="card" style={{ textAlign: 'center' }}>
-                  {a.logoUrl ? (
-                    <img src={a.logoUrl} alt={a.name} style={{ height: '48px', objectFit: 'contain', marginBottom: '12px' }} />
-                  ) : (
-                    <div style={{ fontSize: '2.5rem', marginBottom: '12px' }}>✈️</div>
-                  )}
-                  <h3 style={{ fontSize: '1rem', marginBottom: '4px' }}>{a.name}</h3>
-                  <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', margin: 0 }}>{a.country}</p>
-                  {a.averageRating && (
-                    <p style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.85rem', marginTop: '6px' }}>
-                      ★ {a.averageRating?.toFixed(1)}
-                    </p>
-                  )}
-                </div>
-              ))}
+      {/* ── Öne Çıkan Uçuşlar ── */}
+      <section style={{ padding: '72px 0', background: 'var(--bg-base)', position: 'relative', overflow: 'hidden' }}>
+        {/* Decorative radial glow */}
+        <div style={{ position: 'absolute', top: '-120px', left: '50%', transform: 'translateX(-50%)', width: '700px', height: '400px', background: 'radial-gradient(ellipse, rgba(34,197,94,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div className="container" style={{ position: 'relative' }}>
+          {/* Header */}
+          <div style={{ marginBottom: '40px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: '14px' }}>
+              ✦ Seçili Rotalar
             </div>
-          )}
-        </div>
-      </section>
-
-      {/* Recent Reviews */}
-      <section className="section">
-        <div className="container">
-          <h2 style={{ marginBottom: '8px' }}>Son Yorumlar</h2>
-          <p className="subtitle" style={{ marginBottom: '28px' }}>Yolcularımızın deneyimleri</p>
-          {loadingReviews ? <LoadingSpinner /> : errorReviews ? <ErrorMessage message={errorReviews} /> : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '20px' }}>
-              {reviews.map((r) => (
-                <div key={r.id} className="card">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{r.userName}</span>
-                    <span style={{ color: '#ffc107', fontWeight: 700 }}>{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span>
-                  </div>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: '8px' }}>
-                    "{r.comment}"
-                  </p>
-                  <span style={{ fontSize: '0.78rem', color: 'var(--text-light)' }}>
-                    {r.createdDate ? new Date(r.createdDate).toLocaleDateString('tr-TR') : ''}
-                  </span>
-                </div>
-              ))}
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+              <div>
+                <h2 style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.15, margin: 0, background: 'linear-gradient(135deg, #f0fdf4 30%, #4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                  Öne Çıkan Uçuşlar
+                </h2>
+                <p style={{ color: '#6b7280', fontSize: '0.95rem', marginTop: '8px' }}>En popüler rotalardan editörce seçilmiş uçuşlar</p>
+              </div>
+              <Link to="/flights" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 22px', borderRadius: '10px', border: '1px solid rgba(34,197,94,0.3)', color: '#22c55e', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none', background: 'rgba(34,197,94,0.05)', transition: 'all 0.2s ease', whiteSpace: 'nowrap' }}>
+                Tüm Uçuşlar <ArrowRight size={14} />
+              </Link>
             </div>
-          )}
-          <div style={{ textAlign: 'center', marginTop: '28px' }}>
-            <Link to="/comments" className="btn btn-secondary">Tüm Yorumları Gör</Link>
+            <div style={{ marginTop: '20px', height: '1px', background: 'linear-gradient(90deg, rgba(34,197,94,0.4) 0%, rgba(34,197,94,0.1) 60%, transparent 100%)' }} />
           </div>
+
+          {loadingFlights ? <LoadingSpinner /> : errorFlights ? <ErrorMessage message={errorFlights} /> : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
+              {flights.map((f, idx) => (
+                <div key={f.id} style={{ position: 'relative' }}>
+                  {idx < 2 && (
+                    <div style={{ position: 'absolute', top: '-1px', left: '20px', zIndex: 2, background: 'linear-gradient(90deg, #22c55e, #16a34a)', borderRadius: '0 0 8px 8px', padding: '3px 12px', fontSize: '0.65rem', fontWeight: 800, color: '#080e08', letterSpacing: '0.07em', textTransform: 'uppercase' }}>
+                      Popüler
+                    </div>
+                  )}
+                  <div style={idx < 2 ? { boxShadow: '0 0 0 1px rgba(34,197,94,0.35)', borderRadius: '14px' } : {}}>
+                    <FlightCard flight={f} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ── Havayolu Ortaklarımız ── */}
+      <section style={{ padding: '72px 0', background: 'var(--bg-surface, #0e1a0e)' }}>
+        <div className="container">
+          {/* Header */}
+          <div style={{ marginBottom: '40px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: '14px' }}>
+              ✈ Güvenilir Ortaklar
+            </div>
+            <h2 style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.15, margin: 0, background: 'linear-gradient(135deg, #f0fdf4 30%, #4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              Havayolu Ortaklarımız
+            </h2>
+            <p style={{ color: '#6b7280', fontSize: '0.95rem', marginTop: '8px' }}>Seçkin havayolu şirketleriyle güvenli ve konforlu seyahat edin</p>
+            <div style={{ marginTop: '20px', height: '1px', background: 'linear-gradient(90deg, rgba(34,197,94,0.4) 0%, rgba(34,197,94,0.1) 60%, transparent 100%)' }} />
+          </div>
+
+          {loadingAirlines ? <LoadingSpinner /> : errorAirlines ? <ErrorMessage message={errorAirlines} /> : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
+              {airlines.slice(0, 8).map((a) => (
+                <div key={a.id} style={{
+                  background: 'linear-gradient(160deg, #111c11 0%, #0e1a0e 100%)',
+                  border: '1px solid rgba(34,197,94,0.13)',
+                  borderRadius: '16px',
+                  padding: '28px 20px 22px',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px',
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
+                  boxShadow: '0 2px 16px rgba(0,0,0,0.35)',
+                  cursor: 'default',
+                  position: 'relative',
+                }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.transform = 'translateY(-4px)';
+                    e.currentTarget.style.boxShadow = '0 12px 36px rgba(34,197,94,0.12), 0 4px 12px rgba(0,0,0,0.4)';
+                    e.currentTarget.style.borderColor = 'rgba(34,197,94,0.32)';
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = '0 2px 16px rgba(0,0,0,0.35)';
+                    e.currentTarget.style.borderColor = 'rgba(34,197,94,0.13)';
+                  }}
+                >
+                  {/* Partner badge */}
+                  <div style={{ position: 'absolute', top: '12px', right: '12px', display: 'flex', alignItems: 'center', gap: '3px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.15)', borderRadius: '20px', padding: '2px 8px', fontSize: '0.6rem', fontWeight: 700, color: '#4ade80', letterSpacing: '0.05em' }}>
+                    <CheckCircle2 size={9} /> Sertifikalı
+                  </div>
+
+                  {/* Logo or monogram */}
+                  {a.logoUrl ? (
+                    <div style={{ width: '72px', height: '72px', borderRadius: '16px', background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                      <img src={a.logoUrl} alt={a.name} style={{ width: '56px', height: '56px', objectFit: 'contain' }} />
+                    </div>
+                  ) : (
+                    <AirlineMonogram name={a.name} />
+                  )}
+
+                  <div style={{ textAlign: 'center' }}>
+                    <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f0fdf4', marginBottom: '4px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                      {a.name}
+                    </h3>
+                    {a.country && (
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', fontSize: '0.75rem', color: '#6b7280' }}>
+                        <MapPin size={10} />{a.country}
+                      </div>
+                    )}
+                  </div>
+
+                  {a.averageRating && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.15)', borderRadius: '20px', padding: '4px 12px' }}>
+                      <Star size={11} style={{ color: '#22c55e', fill: '#22c55e' }} />
+                      <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#22c55e' }}>{a.averageRating.toFixed(1)}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ── Son Yorumlar ── */}
+      <section style={{ padding: '72px 0', background: 'var(--bg-base)', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', bottom: '-100px', right: '10%', width: '500px', height: '400px', background: 'radial-gradient(ellipse, rgba(34,197,94,0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
+        <div className="container" style={{ position: 'relative' }}>
+          {/* Header */}
+          <div style={{ marginBottom: '40px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: '14px' }}>
+              <Star size={10} /> Yolcu Deneyimleri
+            </div>
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+              <div>
+                <h2 style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.15, margin: 0, background: 'linear-gradient(135deg, #f0fdf4 30%, #4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                  Son Yorumlar
+                </h2>
+                <p style={{ color: '#6b7280', fontSize: '0.95rem', marginTop: '8px' }}>Gerçek yolculardan gerçek deneyimler</p>
+              </div>
+              <Link to="/comments" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 22px', borderRadius: '10px', border: '1px solid rgba(34,197,94,0.3)', color: '#22c55e', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none', background: 'rgba(34,197,94,0.05)', transition: 'all 0.2s ease', whiteSpace: 'nowrap' }}>
+                Tüm Yorumlar <ArrowRight size={14} />
+              </Link>
+            </div>
+            <div style={{ marginTop: '20px', height: '1px', background: 'linear-gradient(90deg, rgba(34,197,94,0.4) 0%, rgba(34,197,94,0.1) 60%, transparent 100%)' }} />
+          </div>
+
+          {loadingReviews ? <LoadingSpinner /> : errorReviews ? <ErrorMessage message={errorReviews} /> : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+              {reviews.map((r) => {
+                const initials = (r.userName || '?').slice(0, 1).toUpperCase();
+                const hue = (r.userName || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
+                const filled = Math.max(0, Math.min(5, Math.round(r.rating)));
+                return (
+                  <div key={r.id} style={{
+                    background: 'linear-gradient(160deg, #111c11 0%, #0e1a0e 100%)',
+                    border: '1px solid rgba(34,197,94,0.12)',
+                    borderLeft: '4px solid rgba(34,197,94,0.5)',
+                    borderRadius: '16px',
+                    padding: '28px 24px 22px',
+                    display: 'flex', flexDirection: 'column', gap: '16px',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.35)',
+                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                    position: 'relative', overflow: 'hidden',
+                  }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.transform = 'translateY(-3px)';
+                      e.currentTarget.style.boxShadow = '0 12px 36px rgba(34,197,94,0.1), 0 4px 12px rgba(0,0,0,0.4)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.35)';
+                    }}
+                  >
+                    {/* Decorative giant quote */}
+                    <div style={{ position: 'absolute', top: '8px', right: '16px', fontSize: '5rem', lineHeight: 1, color: 'rgba(34,197,94,0.07)', fontFamily: 'Georgia, serif', fontWeight: 900, pointerEvents: 'none', userSelect: 'none' }}>&ldquo;</div>
+
+                    {/* Star rating */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill={i < filled ? '#22c55e' : 'none'} stroke={i < filled ? '#22c55e' : '#374151'} strokeWidth="2">
+                          <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
+                        </svg>
+                      ))}
+                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#22c55e', marginLeft: '4px' }}>{filled}/5</span>
+                    </div>
+
+                    {/* Comment */}
+                    <p style={{ color: '#bbf7d0', fontSize: '0.93rem', lineHeight: 1.7, fontStyle: 'italic', margin: 0, position: 'relative', zIndex: 1 }}>
+                      &ldquo;{r.comment}&rdquo;
+                    </p>
+
+                    {/* Divider */}
+                    <div style={{ height: '1px', background: 'rgba(34,197,94,0.1)' }} />
+
+                    {/* Footer: avatar + name + date */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{
+                        width: '36px', height: '36px', borderRadius: '50%',
+                        background: `linear-gradient(135deg, hsl(${hue},55%,22%) 0%, hsl(${hue},45%,15%) 100%)`,
+                        border: `1.5px solid hsl(${hue},55%,35%)`,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '0.8rem', fontWeight: 800, color: `hsl(${hue},70%,70%)`,
+                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        flexShrink: 0,
+                      }}>{initials}</div>
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: '0.875rem', color: '#f0fdf4' }}>{r.userName}</div>
+                        {r.createdDate && (
+                          <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: '1px' }}>
+                            {new Date(r.createdDate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
     </div>
