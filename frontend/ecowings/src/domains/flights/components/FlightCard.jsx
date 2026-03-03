@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
 import ticketService from '../../tickets/services/ticketService';
 import { useState } from 'react';
-import { Plane, Clock } from 'lucide-react';
+import { Plane, Clock, ShoppingCart } from 'lucide-react';
 
 /** Saat farkından süre hesaplar → "1s 25d" */
 function calcDuration(dep, arr) {
@@ -57,83 +57,168 @@ export default function FlightCard({ flight }) {
   };
 
   return (
-    <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+    <div
+      style={{
+        background: 'linear-gradient(135deg, #0d1f0d 0%, #0a1a0e 100%)',
+        border: '1px solid rgba(34,197,94,0.15)',
+        borderRadius: '16px',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'stretch',
+        transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+        width: '100%',
+      }}
+      onMouseEnter={e => {
+        e.currentTarget.style.transform = 'translateY(-2px)';
+        e.currentTarget.style.boxShadow = '0 14px 44px rgba(34,197,94,0.13), 0 4px 16px rgba(0,0,0,0.5)';
+        e.currentTarget.style.borderColor = 'rgba(34,197,94,0.35)';
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.transform = 'translateY(0)';
+        e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
+        e.currentTarget.style.borderColor = 'rgba(34,197,94,0.15)';
+      }}
+    >
+      {/* ── Left accent bar ── */}
+      <div style={{ width: '4px', background: 'linear-gradient(180deg, #22c55e 0%, #16a34a 100%)', flexShrink: 0 }} />
 
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div>
-          {airline && (
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-light)', fontWeight: 500 }}>{airline}</span>
-          )}
-          <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--primary)', marginTop: '2px' }}>
-            {flight.flightNumber || '—'}
-          </div>
+      {/* ── Airline section ── */}
+      <div style={{
+        padding: '20px 18px',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        gap: '6px', minWidth: '88px', maxWidth: '88px', flexShrink: 0,
+        borderRight: '1px solid rgba(34,197,94,0.08)',
+      }}>
+        <div style={{
+          width: '42px', height: '42px', borderRadius: '11px',
+          background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          fontSize: '0.78rem', fontWeight: 800, color: '#22c55e',
+          fontFamily: "'DM Mono', monospace", letterSpacing: '0.05em',
+        }}>
+          {(airline || '??').slice(0, 2).toUpperCase()}
         </div>
-        <span style={{ background: 'rgba(74,222,128,0.1)', color: '#4ade80', borderRadius: '20px', padding: '4px 10px', fontSize: '0.78rem', fontWeight: 600 }}>
-          Direkt
-        </span>
+        {airline && (
+          <div style={{ fontSize: '0.61rem', color: '#6b7280', textAlign: 'center', lineHeight: 1.3, wordBreak: 'break-word' }}>
+            {airline}
+          </div>
+        )}
+        <div style={{
+          fontSize: '0.67rem', fontWeight: 700, color: '#bbf7d0',
+          fontFamily: "'DM Mono', monospace",
+          background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.12)',
+          borderRadius: '6px', padding: '2px 6px',
+        }}>
+          {flight.flightNumber || '—'}
+        </div>
       </div>
 
-      {/* Route */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      {/* ── Route ── */}
+      <div style={{ flex: 1, padding: '20px 28px', display: 'flex', alignItems: 'center', gap: '20px', minWidth: 0 }}>
+
         {/* Departure */}
-        <div style={{ textAlign: 'center', minWidth: '72px' }}>
-          <div style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)' }}>{depTime}</div>
-          <div style={{ fontWeight: 700, color: 'var(--primary)', fontSize: '1rem' }}>
+        <div style={{ textAlign: 'center', minWidth: '76px' }}>
+          {depDate && <div style={{ fontSize: '0.69rem', color: '#6b7280', fontWeight: 500, marginBottom: '3px' }}>{depDate}</div>}
+          <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#f0fdf4', lineHeight: 1, fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '-0.02em' }}>
+            {depTime}
+          </div>
+          <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#22c55e', marginTop: '5px', letterSpacing: '0.08em' }}>
             {dep.code || (flight.departureAirportId ? `#${flight.departureAirportId}` : '—')}
           </div>
-          {dep.city && <div style={{ fontSize: '0.72rem', color: 'var(--text-light)' }}>{dep.city}</div>}
-          {depDate && <div style={{ fontSize: '0.72rem', color: 'var(--text-light)', marginTop: '2px' }}>{depDate}</div>}
+          {dep.city && <div style={{ fontSize: '0.67rem', color: '#6b7280', marginTop: '2px' }}>{dep.city}</div>}
         </div>
 
-        {/* Middle */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+        {/* Route line */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', minWidth: 0 }}>
           {duration && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: 'var(--text-light)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.7rem', color: '#6b7280' }}>
               <Clock size={11} />{duration}
             </div>
           )}
           <div style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
-            <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'rgba(34,197,94,0.2)', border: '1.5px solid var(--primary)', flexShrink: 0 }} />
-            <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(34,197,94,0.25), rgba(34,197,94,0.55), rgba(34,197,94,0.25))' }} />
-            <Plane size={13} style={{ color: 'var(--primary)', flexShrink: 0, margin: '0 2px' }} />
-            <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(34,197,94,0.25), rgba(34,197,94,0.55), rgba(34,197,94,0.25))' }} />
-            <div style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'rgba(34,197,94,0.2)', border: '1.5px solid var(--primary)', flexShrink: 0 }} />
+            <div style={{ width: '9px', height: '9px', borderRadius: '50%', background: 'rgba(34,197,94,0.18)', border: '2px solid #22c55e', flexShrink: 0, boxShadow: '0 0 6px rgba(34,197,94,0.35)' }} />
+            <div style={{ flex: 1, height: '1.5px', background: 'linear-gradient(90deg, rgba(34,197,94,0.3) 0%, rgba(34,197,94,0.75) 50%, rgba(34,197,94,0.3) 100%)' }} />
+            <Plane size={15} style={{ color: '#22c55e', flexShrink: 0, margin: '0 5px' }} />
+            <div style={{ flex: 1, height: '1.5px', background: 'linear-gradient(90deg, rgba(34,197,94,0.3) 0%, rgba(34,197,94,0.75) 50%, rgba(34,197,94,0.3) 100%)' }} />
+            <div style={{ width: '9px', height: '9px', borderRadius: '50%', background: 'rgba(34,197,94,0.18)', border: '2px solid #22c55e', flexShrink: 0, boxShadow: '0 0 6px rgba(34,197,94,0.35)' }} />
           </div>
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-light)' }}>Direkt</span>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '4px',
+            background: 'rgba(34,197,94,0.08)', color: '#4ade80',
+            border: '1px solid rgba(74,222,128,0.2)',
+            borderRadius: '20px', padding: '2px 9px', fontSize: '0.66rem', fontWeight: 700,
+          }}>
+            <Plane size={9} />Direkt
+          </div>
         </div>
 
         {/* Arrival */}
-        <div style={{ textAlign: 'center', minWidth: '72px' }}>
-          <div style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--text-primary)' }}>{arrTime}</div>
-          <div style={{ fontWeight: 700, color: 'var(--primary)', fontSize: '1rem' }}>
+        <div style={{ textAlign: 'center', minWidth: '76px' }}>
+          <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#f0fdf4', lineHeight: 1, fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '-0.02em' }}>
+            {arrTime}
+          </div>
+          <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#22c55e', marginTop: '5px', letterSpacing: '0.08em' }}>
             {arr.code || (flight.destinationAirportId ? `#${flight.destinationAirportId}` : '—')}
           </div>
-          {arr.city && <div style={{ fontSize: '0.72rem', color: 'var(--text-light)' }}>{arr.city}</div>}
+          {arr.city && <div style={{ fontSize: '0.67rem', color: '#6b7280', marginTop: '2px' }}>{arr.city}</div>}
         </div>
+
       </div>
 
-      {/* Price + Buy */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '10px', borderTop: '1px solid var(--border-color)' }}>
-        <div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-light)' }}>Fiyat</div>
-          <div style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)' }}>
+      {/* ── Price + Buy ── */}
+      <div style={{
+        padding: '20px 26px', flexShrink: 0,
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        gap: '12px', minWidth: '190px',
+        background: 'rgba(0,0,0,0.22)',
+        borderLeft: '1px solid rgba(34,197,94,0.1)',
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#6b7280', fontWeight: 600, marginBottom: '4px' }}>
+            Fiyat
+          </div>
+          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#22c55e', lineHeight: 1, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             {price != null
               ? `${Number(price).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺`
               : '—'}
           </div>
         </div>
         {bought ? (
-          <span style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem' }}>✓ Satın Alındı</span>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            padding: '9px 18px', borderRadius: '9px',
+            background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)',
+            color: '#4ade80', fontWeight: 700, fontSize: '0.8rem',
+          }}>
+            <span>✓</span> Satın Alındı
+          </div>
         ) : (
-          <button className="btn btn-primary" onClick={handleBuy} disabled={buying}
-            style={{ padding: '10px 20px', fontSize: '0.875rem' }}>
-            {buying ? 'İşleniyor...' : 'Satın Al'}
+          <button
+            onClick={handleBuy}
+            disabled={buying}
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px',
+              padding: '11px 22px', borderRadius: '9px', border: 'none',
+              cursor: buying ? 'wait' : 'pointer',
+              background: buying ? 'rgba(34,197,94,0.25)' : 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+              color: buying ? '#6b7280' : '#051005',
+              fontWeight: 700, fontSize: '0.82rem',
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              letterSpacing: '0.06em', whiteSpace: 'nowrap',
+              transition: 'all 0.2s ease',
+              boxShadow: buying ? 'none' : '0 4px 16px rgba(34,197,94,0.3)',
+            }}
+            onMouseEnter={e => { if (!buying) e.currentTarget.style.filter = 'brightness(1.1)'; }}
+            onMouseLeave={e => { e.currentTarget.style.filter = 'brightness(1)'; }}
+          >
+            <ShoppingCart size={13} />
+            {buying ? 'İşleniyor...' : 'SATIN AL'}
           </button>
         )}
+        {buyError && <p style={{ color: '#f87171', fontSize: '0.72rem', margin: 0, textAlign: 'center' }}>{buyError}</p>}
       </div>
-
-      {buyError && <p style={{ color: '#ef5350', fontSize: '0.82rem', margin: 0 }}>{buyError}</p>}
     </div>
   );
 }

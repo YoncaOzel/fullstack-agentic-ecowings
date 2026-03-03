@@ -201,7 +201,7 @@ export default function FlightsPage() {
       <div style={{ padding: '52px 0 80px', background: 'var(--bg-base)' }}>
         <div className="container">
           {loading ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(310px,1fr))', gap: '24px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {Array.from({ length: 6 }).map((_, i) => <FlightSkeletonCard key={i} />)}
             </div>
           ) : error ? (
@@ -225,7 +225,7 @@ export default function FlightsPage() {
                 <div style={{ marginTop: '16px', height: '1px', background: 'linear-gradient(90deg,rgba(34,197,94,0.4) 0%,rgba(34,197,94,0.1) 60%,transparent 100%)' }} />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(310px,1fr))', gap: '24px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {filtered.map((f, idx) => (
                   <div key={f.id} style={{ position: 'relative' }}>
                     {idx < 3 && (

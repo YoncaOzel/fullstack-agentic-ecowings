@@ -390,7 +390,7 @@ export default function HomePage() {
             </div>
 
             {searching ? (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <SearchSkeletonCard />
                 <SearchSkeletonCard />
                 <SearchSkeletonCard />
@@ -402,7 +402,7 @@ export default function HomePage() {
                 <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Farklı tarih veya havalimanı deneyin.</p>
               </div>
             ) : (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {searchResults.map((f, i) => (
                   <AmadeusFlightCard key={f.flightNumber ? `${f.flightNumber}-${i}` : i} flight={f} />
                 ))}
@@ -483,7 +483,7 @@ export default function HomePage() {
           </div>
 
           {loadingFlights ? <LoadingSpinner /> : errorFlights ? <ErrorMessage message={errorFlights} /> : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {flights.map((f, idx) => (
                 <div key={f.id} style={{ position: 'relative' }}>
                   {idx < 2 && (
