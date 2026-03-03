@@ -32,6 +32,7 @@ export default function Footer() {
                 { to: '/campaigns', label: 'Kampanyalar' },
                 { to: '/comments', label: 'Yorumlar' },
                 { to: '/lucky-flight', label: 'Şanslı Uçuş' },
+                { to: '/faq', label: 'Sıkça Sorulan Sorular' },
               ].map((l) => (
                 <li key={l.to}>
                   <Link to={l.to} style={{

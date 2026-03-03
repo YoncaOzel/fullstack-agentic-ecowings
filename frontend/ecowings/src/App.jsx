@@ -15,6 +15,7 @@ import CampaignsPage from './domains/coupons/pages/CampaignsPage';
 import CommentsPage from './domains/reviews/pages/CommentsPage';
 import ProfileSettingsPage from './domains/user/pages/ProfileSettingsPage';
 import GiftTicketPage from './domains/tickets/pages/GiftTicketPage';
+import FAQPage from './pages/FAQPage';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -42,6 +43,7 @@ export default function App() {
             <Route path="/lucky-flight" element={<LuckyFlightPage />} />
             <Route path="/campaigns" element={<CampaignsPage />} />
             <Route path="/comments" element={<CommentsPage />} />
+            <Route path="/faq" element={<FAQPage />} />
 
             {/* Protected */}
             <Route path="/profile" element={

@@ -769,6 +769,24 @@ select option {
 }
 .fade-up.visible { opacity: 1; transform: translateY(0); }
 
+/* ── FAQ Chat Animations ───────────────────────────────── */
+@keyframes dotBounce {
+  0%, 60%, 100% { transform: translateY(0);    opacity: 0.8; }
+  30%           { transform: translateY(-7px); opacity: 1;   }
+}
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+@keyframes msgSlideIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+@keyframes statusPulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(74,222,128,0.6); }
+  50%       { box-shadow: 0 0 12px rgba(74,222,128,0.9); }
+}
+
 /* ── Auth split-screen layout ────────────────────────────── */
 .auth-mobile-header { display: block; }
 .auth-desktop-header { display: block; }

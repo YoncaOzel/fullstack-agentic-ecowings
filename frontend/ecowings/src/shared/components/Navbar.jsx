@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Plane, Tag, MapPin, Star, Zap, Gift, X, LogOut, User } from 'lucide-react';
+import { Plane, Tag, MapPin, Star, Zap, Gift, X, LogOut, User, HelpCircle } from 'lucide-react';
 
 /* ── Drawer link definitions ─────────────────────────────── */
 const drawerLinks = [
@@ -46,6 +46,13 @@ const drawerLinks = [
     desc: 'Biletini sevdiklerinle paylaş',
     icon: <Gift size={17} />,
     authRequired: true,
+  },
+  {
+    to: '/faq',
+    label: 'Sıkça Sorulan Sorular',
+    desc: 'Yapay zeka destekli yardım merkezi',
+    icon: <HelpCircle size={17} />,
+    authRequired: false,
   },
 ];
 
@@ -247,6 +254,14 @@ export default function Navbar() {
               style={({ isActive }) => centerLinkStyle(isActive)}
             >
               About Us
+            </NavLink>
+            <NavLink
+              to="/faq"
+              end
+              className="nav-center-link"
+              style={({ isActive }) => centerLinkStyle(isActive)}
+            >
+              SSS
             </NavLink>
           </div>
 
