@@ -137,12 +137,14 @@ export default function FAQPage() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
-  const bottomRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const inputRef = useRef(null);
 
-  /* Scroll to bottom whenever messages change */
+  /* Scroll to bottom inside the chat box (never moves the page window) */
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const el = messagesContainerRef.current;
+    if (!el) return;
+    el.scrollTop = el.scrollHeight;
   }, [messages, loading]);
 
   /* ── Typewriter effect ── */
@@ -387,6 +389,7 @@ export default function FAQPage() {
 
           {/* Messages */}
           <div
+            ref={messagesContainerRef}
             style={{
               flex: 1,
               overflowY: 'auto',
@@ -432,7 +435,6 @@ export default function FAQPage() {
               </div>
             )}
 
-            <div ref={bottomRef} />
           </div>
         </div>
 
