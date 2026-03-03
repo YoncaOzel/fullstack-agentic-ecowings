@@ -6,8 +6,7 @@ import ProtectedRoute from './shared/components/ProtectedRoute';
 // Pages
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
-import LoginPage from './domains/auth/pages/LoginPage';
-import SignupPage from './domains/auth/pages/SignupPage';
+import AuthPage from './domains/auth/pages/AuthPage';
 import FlightsPage from './domains/flights/pages/FlightsPage';
 import FlightTrackerPage from './domains/flights/pages/FlightTrackerPage';
 import LuckyFlightPage from './domains/flights/pages/LuckyFlightPage';
@@ -26,8 +25,8 @@ export default function App() {
             {/* Public */}
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/login" element={<AuthPage />} />
+            <Route path="/signup" element={<AuthPage />} />
             <Route path="/flights" element={<FlightsPage />} />
             <Route path="/flight-tracker" element={<FlightTrackerPage />} />
             <Route path="/lucky-flight" element={<LuckyFlightPage />} />
