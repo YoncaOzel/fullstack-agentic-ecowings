@@ -707,6 +707,43 @@ select option {
 /* ── Spin keyframe (used by loading spinners) ────────────── */
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ── Scroll reveal ───────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(36px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0)    rotate(-4deg) scale(1);    }
+  50%       { transform: translateY(-22px) rotate(4deg)  scale(1.04); }
+}
+@keyframes pulseOrb {
+  0%, 100% { opacity: 0.45; transform: scale(1);    }
+  50%       { opacity: 0.8;  transform: scale(1.12); }
+}
+@keyframes stepPop {
+  from { opacity: 0; transform: translateY(24px) scale(0.94); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+@keyframes countPop {
+  from { opacity: 0; transform: scale(0.6) translateY(12px); }
+  to   { opacity: 1; transform: scale(1)   translateY(0);    }
+}
+@keyframes shimmerSlide {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+.fade-up {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1),
+              transform 0.7s cubic-bezier(0.4,0,0.2,1);
+}
+.fade-up.visible { opacity: 1; transform: translateY(0); }
+
 /* ── Auth split-screen layout ────────────────────────────── */
 .auth-mobile-header { display: block; }
 .auth-desktop-header { display: block; }

@@ -134,6 +134,16 @@ export default function HomePage() {
       .finally(() => setLoadingReviews(false));
   }, []);
 
+  // Scroll-reveal: watch every .fade-up element
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } }),
+      { threshold: 0.1 }
+    );
+    document.querySelectorAll('.fade-up').forEach((el) => obs.observe(el));
+    return () => obs.disconnect();
+  }, [loadingFlights, loadingAirlines, loadingReviews]);
+
   // travelClass değerini API enum'una çevirir
   const toApiTravelClass = (cls) => {
     if (cls === 'Business') return 'BUSINESS';
@@ -187,17 +197,28 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* Hero */}
+      {/* ── Hero ──────────────────────────────────────────────── */}
       <section style={{
-        background: 'linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%)',
-        color: '#fff',
-        padding: '80px 0',
+        position: 'relative', overflow: 'hidden',
+        background: 'linear-gradient(180deg,#060c06 0%,#0a180a 50%,#0d2010 100%)',
+        padding: '100px 0 90px', minHeight: '62vh',
+        display: 'flex', alignItems: 'center',
       }}>
-        <div className="container" style={{ textAlign: 'center' }}>
-          <h1 style={{ color: '#fff', fontSize: '3rem', marginBottom: '16px' }}>
-            🌿 Yeşil Bir Yolculuk Başlıyor
+        {/* Ambient orbs */}
+        <div style={{ position:'absolute', top:'-80px', left:'10%', width:'540px', height:'540px', borderRadius:'50%', background:'radial-gradient(circle,rgba(34,197,94,0.13) 0%,transparent 65%)', animation:'pulseOrb 6s ease-in-out infinite', pointerEvents:'none' }} />
+        <div style={{ position:'absolute', bottom:'-100px', right:'8%', width:'620px', height:'620px', borderRadius:'50%', background:'radial-gradient(circle,rgba(34,197,94,0.08) 0%,transparent 65%)', animation:'pulseOrb 8s ease-in-out infinite 2s', pointerEvents:'none' }} />
+        {/* Grid overlay */}
+        <div style={{ position:'absolute', inset:0, backgroundImage:'linear-gradient(rgba(34,197,94,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,0.03) 1px,transparent 1px)', backgroundSize:'44px 44px', pointerEvents:'none' }} />
+
+        <div className="container" style={{ textAlign:'center', position:'relative', zIndex:2 }}>
+          {/* Floating plane */}
+          <div style={{ fontSize:'4.5rem', lineHeight:1, marginBottom:'28px', display:'inline-block', animation:'heroFloat 5s ease-in-out infinite', filter:'drop-shadow(0 0 28px rgba(34,197,94,0.45))' }}>✈️</div>
+          {/* Badge */}
+          <div style={{ display:'inline-flex', alignItems:'center', gap:'6px', background:'rgba(34,197,94,0.1)', border:'1px solid rgba(34,197,94,0.25)', borderRadius:'100px', padding:'5px 16px', fontSize:'0.72rem', fontWeight:700, color:'#22c55e', letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'20px', animation:'fadeIn 0.8s ease both' }}>🌿 Sürdürülebilir Seyahat</div>
+          <h1 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'clamp(2.4rem,5vw,4rem)', fontWeight:800, letterSpacing:'-0.04em', lineHeight:1.1, margin:'0 auto 20px', background:'linear-gradient(135deg,#f0fdf4 0%,#86efac 50%,#22c55e 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', animation:'fadeUp 0.7s 0.1s cubic-bezier(0.4,0,0.2,1) both' }}>
+            Yeşil Bir Yolculuk<br />Başlıyor
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1.2rem', marginBottom: '40px', maxWidth: '600px', margin: '0 auto 40px' }}>
+          <p style={{ color:'rgba(187,247,208,0.75)', fontSize:'clamp(1rem,2vw,1.15rem)', maxWidth:'560px', margin:'0 auto 44px', lineHeight:1.7, fontFamily:"'Inter',sans-serif", animation:'fadeUp 0.7s 0.22s cubic-bezier(0.4,0,0.2,1) both' }}>
             Sürdürülebilir seyahat için en uygun uçuşları bulun, karbon ayak izinizi azaltın.
           </p>
 
@@ -336,6 +357,12 @@ export default function HomePage() {
               </p>
             )}
           </form>
+
+          {/* Scroll indicator */}
+          <div style={{ marginTop:'48px', display:'flex', flexDirection:'column', alignItems:'center', gap:'8px', animation:'fadeIn 1s 0.9s both', opacity:0 }}>
+            <span style={{ fontSize:'0.7rem', color:'rgba(34,197,94,0.45)', fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase' }}>Keşfet</span>
+            <ChevronDown size={20} style={{ color:'rgba(34,197,94,0.4)', animation:'heroFloat 2s ease-in-out infinite' }} />
+          </div>
         </div>
       </section>
 
@@ -383,8 +410,54 @@ export default function HomePage() {
         </section>
       )}
 
+      {/* ── Stats strip ──────────────────────────────────────── */}
+      <section style={{ padding:'52px 0', background:'var(--bg-surface,#0e1a0e)', borderTop:'1px solid rgba(34,197,94,0.08)', borderBottom:'1px solid rgba(34,197,94,0.08)' }}>
+        <div className="container">
+          <div className="fade-up" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:'20px' }}>
+            {[{value:'2M+',label:'Mutlu Yolcu',emoji:'👥'},{value:'300+',label:'Havalimanı',emoji:'🏢'},{value:'50+',label:'Havayolu Ortağı',emoji:'✈️'},{value:'120K t',label:'CO₂ Tasarrufu',emoji:'🌿'}].map((s) => (
+              <div key={s.label} style={{ textAlign:'center', padding:'28px 16px', background:'rgba(34,197,94,0.04)', border:'1px solid rgba(34,197,94,0.1)', borderRadius:'16px', transition:'background 0.2s,border-color 0.2s,transform 0.2s', cursor:'default' }}
+                onMouseEnter={e=>{e.currentTarget.style.background='rgba(34,197,94,0.09)';e.currentTarget.style.borderColor='rgba(34,197,94,0.28)';e.currentTarget.style.transform='translateY(-3px)';}}
+                onMouseLeave={e=>{e.currentTarget.style.background='rgba(34,197,94,0.04)';e.currentTarget.style.borderColor='rgba(34,197,94,0.1)';e.currentTarget.style.transform='translateY(0)';}}>
+                <div style={{fontSize:'2rem',marginBottom:'8px'}}>{s.emoji}</div>
+                <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:'clamp(1.9rem,3vw,2.8rem)',fontWeight:800,color:'var(--green-primary)',letterSpacing:'-0.04em',lineHeight:1}}>{s.value}</div>
+                <div style={{fontSize:'0.8rem',color:'var(--text-muted)',marginTop:'8px',fontFamily:"'Inter',sans-serif"}}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── How it works ─────────────────────────────────────── */}
+      <section style={{ padding:'88px 0', background:'var(--bg-base)', position:'relative', overflow:'hidden' }}>
+        <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:'800px', height:'400px', background:'radial-gradient(ellipse,rgba(34,197,94,0.05) 0%,transparent 70%)', pointerEvents:'none' }} />
+        <div className="container" style={{ position:'relative' }}>
+          <div className="fade-up" style={{ textAlign:'center', marginBottom:'56px' }}>
+            <div style={{ display:'inline-flex', alignItems:'center', gap:'6px', background:'rgba(34,197,94,0.08)', border:'1px solid rgba(34,197,94,0.18)', borderRadius:'20px', padding:'4px 14px', fontSize:'0.72rem', fontWeight:700, color:'#22c55e', letterSpacing:'0.07em', textTransform:'uppercase', marginBottom:'14px' }}>✦ Nasıl Çalışır?</div>
+            <h2 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'2.2rem', fontWeight:800, letterSpacing:'-0.04em', lineHeight:1.15, margin:'0 auto', background:'linear-gradient(135deg,#f0fdf4 30%,#4ade80 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>3 Adımda Yeşil Seyahat</h2>
+            <p style={{ color:'#6b7280', fontSize:'0.95rem', marginTop:'10px' }}>Sürdürülebilir bir yolculuk planlamak bu kadar kolay</p>
+          </div>
+          <div className="fade-up" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:'28px' }}>
+            {[
+              {step:'01',emoji:'🔍',title:'Rota Seç',desc:'Kalkış ve varış havalimanını belirle, tarih seç. 300+ havalimanına anında erişim.'},
+              {step:'02',emoji:'📊',title:'Uçuşları Karşılaştır',desc:'Fiyat, süre ve karbon etkisine göre en iyi uçuşu seç. Tam şeffaflık.'},
+              {step:'03',emoji:'🌱',title:'Ekolojiyle Uç',desc:'Rezervasyonunu tamamla, karbon dengeleme programlarına katıl ve gezini kaydet.'},
+            ].map((item, i) => (
+              <div key={item.step} style={{ background:'linear-gradient(160deg,#111c11 0%,#0e1a0e 100%)', border:'1px solid rgba(34,197,94,0.13)', borderRadius:'20px', padding:'36px 28px', position:'relative', boxShadow:'0 4px 24px rgba(0,0,0,0.3)', transition:'transform 0.3s ease,box-shadow 0.3s ease,border-color 0.3s ease' }}
+                onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-6px)';e.currentTarget.style.boxShadow='0 20px 48px rgba(34,197,94,0.12),0 8px 16px rgba(0,0,0,0.4)';e.currentTarget.style.borderColor='rgba(34,197,94,0.35)';}}
+                onMouseLeave={e=>{e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='0 4px 24px rgba(0,0,0,0.3)';e.currentTarget.style.borderColor='rgba(34,197,94,0.13)';}}>
+                <div style={{ position:'absolute', top:0, left:'28px', right:'28px', height:'2px', background:'linear-gradient(90deg,rgba(34,197,94,0.6),transparent)', borderRadius:'0 0 2px 2px' }} />
+                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:'0.72rem', fontWeight:700, color:'rgba(34,197,94,0.4)', letterSpacing:'0.1em', marginBottom:'16px' }}>ADIM {item.step}</div>
+                <div style={{ fontSize:'2.4rem', marginBottom:'16px', lineHeight:1 }}>{item.emoji}</div>
+                <h3 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'1.1rem', fontWeight:800, letterSpacing:'-0.02em', color:'var(--text-primary)', marginBottom:'10px' }}>{item.title}</h3>
+                <p style={{ fontSize:'0.875rem', color:'var(--text-muted)', lineHeight:1.7, fontFamily:"'Inter',sans-serif", margin:0 }}>{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Öne Çıkan Uçuşlar ── */}
-      <section style={{ padding: '72px 0', background: 'var(--bg-base)', position: 'relative', overflow: 'hidden' }}>
+      <section className="fade-up" style={{ padding: '72px 0', background: 'var(--bg-base)', position: 'relative', overflow: 'hidden' }}>
         {/* Decorative radial glow */}
         <div style={{ position: 'absolute', top: '-120px', left: '50%', transform: 'translateX(-50%)', width: '700px', height: '400px', background: 'radial-gradient(ellipse, rgba(34,197,94,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <div className="container" style={{ position: 'relative' }}>
@@ -427,7 +500,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Havayolu Ortaklarımız ── */}
-      <section style={{ padding: '72px 0', background: 'var(--bg-surface, #0e1a0e)' }}>
+      <section className="fade-up" style={{ padding: '72px 0', background: 'var(--bg-surface, #0e1a0e)' }}>
         <div className="container">
           {/* Header */}
           <div style={{ marginBottom: '40px' }}>
@@ -505,7 +578,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Son Yorumlar ── */}
-      <section style={{ padding: '72px 0', background: 'var(--bg-base)', position: 'relative', overflow: 'hidden' }}>
+      <section className="fade-up" style={{ padding: '72px 0', background: 'var(--bg-base)', position: 'relative', overflow: 'hidden' }}>
         <div style={{ position: 'absolute', bottom: '-100px', right: '10%', width: '500px', height: '400px', background: 'radial-gradient(ellipse, rgba(34,197,94,0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <div className="container" style={{ position: 'relative' }}>
           {/* Header */}
@@ -600,6 +673,30 @@ export default function HomePage() {
               })}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* ── Bottom CTA ───────────────────────────────────────── */}
+      <section className="fade-up" style={{ padding:'96px 0', background:'linear-gradient(160deg,#0a1a0a 0%,#060e06 100%)', borderTop:'1px solid rgba(34,197,94,0.1)', position:'relative', overflow:'hidden' }}>
+        <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:'700px', height:'500px', background:'radial-gradient(ellipse,rgba(34,197,94,0.1) 0%,transparent 65%)', pointerEvents:'none' }} />
+        <div className="container" style={{ textAlign:'center', position:'relative' }}>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:'6px', background:'rgba(34,197,94,0.1)', border:'1px solid rgba(34,197,94,0.25)', borderRadius:'100px', padding:'5px 16px', fontSize:'0.72rem', fontWeight:700, color:'#22c55e', letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'24px' }}>🌿 Bugün Başla</div>
+          <h2 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'clamp(2rem,4vw,3.2rem)', fontWeight:800, letterSpacing:'-0.04em', lineHeight:1.1, margin:'0 auto 20px', background:'linear-gradient(135deg,#f0fdf4 0%,#86efac 50%,#22c55e 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', maxWidth:'640px' }}>Sürdürülebilir Seyahate Hazır Mısın?</h2>
+          <p style={{ color:'rgba(187,247,208,0.65)', fontSize:'1.05rem', maxWidth:'480px', margin:'0 auto 40px', lineHeight:1.7, fontFamily:"'Inter',sans-serif" }}>Ücretsiz hesap oluştur, karbon ayak izini takip et ve daha yeşil bir dünya için uç.</p>
+          <div style={{ display:'flex', gap:'16px', justifyContent:'center', flexWrap:'wrap' }}>
+            <Link to="/signup"
+              style={{ display:'inline-flex', alignItems:'center', gap:'8px', padding:'15px 36px', borderRadius:'12px', background:'linear-gradient(135deg,#22c55e,#16a34a)', color:'#051005', fontWeight:700, fontSize:'0.95rem', textDecoration:'none', boxShadow:'0 4px 20px rgba(34,197,94,0.35)', transition:'all 0.2s ease' }}
+              onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow='0 8px 28px rgba(34,197,94,0.45)';}}
+              onMouseLeave={e=>{e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='0 4px 20px rgba(34,197,94,0.35)';}}>
+              🌱 Ücretsiz Kaydol <ArrowRight size={16} />
+            </Link>
+            <Link to="/flights"
+              style={{ display:'inline-flex', alignItems:'center', gap:'8px', padding:'15px 36px', borderRadius:'12px', border:'1px solid rgba(34,197,94,0.3)', color:'#22c55e', fontWeight:700, fontSize:'0.95rem', textDecoration:'none', background:'rgba(34,197,94,0.05)', transition:'all 0.2s ease' }}
+              onMouseEnter={e=>{e.currentTarget.style.background='rgba(34,197,94,0.12)';e.currentTarget.style.borderColor='rgba(34,197,94,0.5)';}}
+              onMouseLeave={e=>{e.currentTarget.style.background='rgba(34,197,94,0.05)';e.currentTarget.style.borderColor='rgba(34,197,94,0.3)';}}>
+              Uçuşları Keşfet <ArrowRight size={16} />
+            </Link>
+          </div>
         </div>
       </section>
     </div>
