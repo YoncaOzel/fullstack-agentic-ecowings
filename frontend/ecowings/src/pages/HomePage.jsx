@@ -79,6 +79,201 @@ function AirlineMonogram({ name }) {
   );
 }
 
+/* ─────────────────────────────────────────────────────
+   Popular Destinations – static showcase section
+───────────────────────────────────────────────────── */
+const DESTINATIONS = [
+  {
+    id: 1,
+    from: 'Istanbul',
+    to: 'Dubai',
+    date: '12 Mar, 2026',
+    image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=900&q=80',
+    label: 'Trending',
+  },
+  {
+    id: 2,
+    from: 'Ankara',
+    to: 'London',
+    date: '18 Mar, 2026',
+    image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=900&q=80',
+    label: 'Popular',
+  },
+  {
+    id: 3,
+    from: 'Istanbul',
+    to: 'Tokyo',
+    date: '22 Mar, 2026',
+    image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=900&q=80',
+    label: null,
+  },
+  {
+    id: 4,
+    from: 'Izmir',
+    to: 'Paris',
+    date: '29 Mar, 2026',
+    image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=900&q=80',
+    label: null,
+  },
+  {
+    id: 5,
+    from: 'Istanbul',
+    to: 'Singapore',
+    date: '04 Apr, 2026',
+    image: 'https://images.unsplash.com/photo-1565967511849-76a60a516170?auto=format&fit=crop&w=900&q=80',
+    label: null,
+  },
+  {
+    id: 6,
+    from: 'Ankara',
+    to: 'New York',
+    date: '10 Apr, 2026',
+    image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=900&q=80',
+    label: null,
+  },
+];
+
+function DestinationCard({ dest }) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <div style={{
+        position: 'relative',
+        borderRadius: '20px',
+        overflow: 'hidden',
+        aspectRatio: '16 / 10',
+        boxShadow: hovered
+          ? '0 20px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(34,197,94,0.35)'
+          : '0 6px 24px rgba(0,0,0,0.45)',
+        transform: hovered ? 'translateY(-6px) scale(1.01)' : 'translateY(0) scale(1)',
+        transition: 'transform 0.35s ease, box-shadow 0.35s ease',
+      }}>
+        {/* Photo */}
+        <img
+          src={dest.image}
+          alt={`${dest.from} to ${dest.to}`}
+          loading="lazy"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block',
+            transform: hovered ? 'scale(1.06)' : 'scale(1)',
+            transition: 'transform 0.45s ease',
+          }}
+        />
+
+        {/* Gradient overlay */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.75) 100%)',
+          pointerEvents: 'none',
+        }} />
+
+        {/* Top-left label badge */}
+        {dest.label && (
+          <div style={{
+            position: 'absolute',
+            top: '14px',
+            left: '14px',
+            background: 'linear-gradient(90deg, #22c55e, #16a34a)',
+            color: '#030c03',
+            fontSize: '0.65rem',
+            fontWeight: 800,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            padding: '4px 12px',
+            borderRadius: '20px',
+          }}>
+            {dest.label}
+          </div>
+        )}
+
+        {/* Bottom content */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          padding: '18px 20px',
+          display: 'flex',
+          alignItems: 'flex-end',
+          justifyContent: 'space-between',
+          gap: '8px',
+        }}>
+          {/* Destination */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '0.95rem',
+            fontWeight: 700,
+            color: '#ffffff',
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            textShadow: '0 1px 6px rgba(0,0,0,0.6)',
+            lineHeight: 1.2,
+          }}>
+            <MapPin size={13} style={{ color: '#4ade80', flexShrink: 0 }} />
+            {dest.to}
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PopularDestinations() {
+  return (
+    <section className="fade-up" style={{ padding: '80px 0', background: 'var(--bg-base)', position: 'relative', overflow: 'hidden' }}>
+      {/* Ambient glow */}
+      <div style={{ position: 'absolute', top: '-100px', left: '50%', transform: 'translateX(-50%)', width: '800px', height: '420px', background: 'radial-gradient(ellipse, rgba(34,197,94,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
+
+      <div className="container" style={{ position: 'relative' }}>
+        {/* Section header */}
+        <div style={{ marginBottom: '44px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '14px' }}>
+            ✦ Keşfet
+          </div>
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+            <div>
+              <h2 style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.15, margin: 0, background: 'linear-gradient(135deg, #f0fdf4 30%, #4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                Popular Destinations
+              </h2>
+              <p style={{ color: '#6b7280', fontSize: '0.95rem', marginTop: '8px' }}>
+                Dünyanın en gözde destinasyonlarına kanat açın
+              </p>
+            </div>
+            <Link
+              to="/flights"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 22px', borderRadius: '10px', border: '1px solid rgba(34,197,94,0.3)', color: '#22c55e', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none', background: 'rgba(34,197,94,0.05)', transition: 'all 0.2s ease', whiteSpace: 'nowrap' }}
+            >
+              Tüm Destinasyonlar <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div style={{ marginTop: '20px', height: '1px', background: 'linear-gradient(90deg, rgba(34,197,94,0.4) 0%, rgba(34,197,94,0.1) 60%, transparent 100%)' }} />
+        </div>
+
+        {/* Card grid — responsive: 3 cols on desktop, 2 on tablet, 1 on mobile */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: '20px',
+        }}>
+          {DESTINATIONS.map(dest => (
+            <DestinationCard key={dest.id} dest={dest} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function HomePage() {
   const [flights, setFlights] = useState([]);
   const [allFlights, setAllFlights] = useState([]);
@@ -458,48 +653,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Öne Çıkan Uçuşlar ── */}
-      <section className="fade-up" style={{ padding: '72px 0', background: 'var(--bg-base)', position: 'relative', overflow: 'hidden' }}>
-        {/* Decorative radial glow */}
-        <div style={{ position: 'absolute', top: '-120px', left: '50%', transform: 'translateX(-50%)', width: '700px', height: '400px', background: 'radial-gradient(ellipse, rgba(34,197,94,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
-        <div className="container" style={{ position: 'relative' }}>
-          {/* Header */}
-          <div style={{ marginBottom: '40px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: '14px' }}>
-              ✦ Seçili Rotalar
-            </div>
-            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-              <div>
-                <h2 style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.15, margin: 0, background: 'linear-gradient(135deg, #f0fdf4 30%, #4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                  Öne Çıkan Uçuşlar
-                </h2>
-                <p style={{ color: '#6b7280', fontSize: '0.95rem', marginTop: '8px' }}>En popüler rotalardan editörce seçilmiş uçuşlar</p>
-              </div>
-              <Link to="/flights" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 22px', borderRadius: '10px', border: '1px solid rgba(34,197,94,0.3)', color: '#22c55e', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none', background: 'rgba(34,197,94,0.05)', transition: 'all 0.2s ease', whiteSpace: 'nowrap' }}>
-                Tüm Uçuşlar <ArrowRight size={14} />
-              </Link>
-            </div>
-            <div style={{ marginTop: '20px', height: '1px', background: 'linear-gradient(90deg, rgba(34,197,94,0.4) 0%, rgba(34,197,94,0.1) 60%, transparent 100%)' }} />
-          </div>
-
-          {loadingFlights ? <LoadingSpinner /> : errorFlights ? <ErrorMessage message={errorFlights} /> : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {flights.map((f, idx) => (
-                <div key={f.id} style={{ position: 'relative' }}>
-                  {idx < 2 && (
-                    <div style={{ position: 'absolute', top: '-1px', left: '20px', zIndex: 2, background: 'linear-gradient(90deg, #22c55e, #16a34a)', borderRadius: '0 0 8px 8px', padding: '3px 12px', fontSize: '0.65rem', fontWeight: 800, color: '#080e08', letterSpacing: '0.07em', textTransform: 'uppercase' }}>
-                      Popüler
-                    </div>
-                  )}
-                  <div style={idx < 2 ? { boxShadow: '0 0 0 1px rgba(34,197,94,0.35)', borderRadius: '14px' } : {}}>
-                    <FlightCard flight={f} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+      {/* ── Popular Destinations ── */}
+      <PopularDestinations />
 
       {/* ── Havayolu Ortaklarımız ── */}
       <section className="fade-up" style={{ padding: '72px 0', background: 'var(--bg-surface, #0e1a0e)' }}>
