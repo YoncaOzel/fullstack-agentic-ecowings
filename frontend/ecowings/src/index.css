@@ -662,3 +662,44 @@ select option {
   background: var(--bg-elevated) !important;
   color: var(--text-primary) !important;
 }
+
+/* ── Drawer / Navbar animations ──────────────────────────── */
+@keyframes drawerSlideIn {
+  from { transform: translateX(100%); opacity: 0.6; }
+  to   { transform: translateX(0);    opacity: 1;   }
+}
+
+@keyframes navItemSlideIn {
+  from { transform: translateX(28px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes hamburgerTopOpen {
+  0%   { transform: translateY(0) rotate(0); }
+  50%  { transform: translateY(7px) rotate(0); }
+  100% { transform: translateY(7px) rotate(45deg); }
+}
+@keyframes hamburgerTopClose {
+  0%   { transform: translateY(7px) rotate(45deg); }
+  50%  { transform: translateY(7px) rotate(0); }
+  100% { transform: translateY(0) rotate(0); }
+}
+@keyframes hamburgerBotOpen {
+  0%   { transform: translateY(0) rotate(0); }
+  50%  { transform: translateY(-7px) rotate(0); }
+  100% { transform: translateY(-7px) rotate(-45deg); }
+}
+@keyframes hamburgerBotClose {
+  0%   { transform: translateY(-7px) rotate(-45deg); }
+  50%  { transform: translateY(-7px) rotate(0); }
+  100% { transform: translateY(0) rotate(0); }
+}
+
+/* ── Navbar center active-link underline ─────────────────── */
+/* Suppress global a::after underline on centre nav links    */
+.nav-center-link::after { display: none !important; }
