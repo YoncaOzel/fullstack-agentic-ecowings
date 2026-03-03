@@ -1,4 +1,5 @@
-﻿import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+﻿import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import Navbar from './shared/components/Navbar';
 import Footer from './shared/components/Footer';
 import ProtectedRoute from './shared/components/ProtectedRoute';
@@ -15,9 +16,18 @@ import CommentsPage from './domains/reviews/pages/CommentsPage';
 import ProfileSettingsPage from './domains/user/pages/ProfileSettingsPage';
 import GiftTicketPage from './domains/tickets/pages/GiftTicketPage';
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [pathname]);
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <div style={{ minHeight: '100vh', background: 'var(--bg-main)', display: 'flex', flexDirection: 'column' }}>
         <Navbar />
         <main style={{ flex: 1 }}>

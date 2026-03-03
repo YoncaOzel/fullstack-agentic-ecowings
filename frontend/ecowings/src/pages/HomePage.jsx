@@ -409,7 +409,52 @@ export default function HomePage() {
 
         <div className="container" style={{ textAlign:'center', position:'relative', zIndex:2 }}>
           {/* Floating plane */}
-          <div style={{ fontSize:'4.5rem', lineHeight:1, marginBottom:'28px', display:'inline-block', animation:'heroFloat 5s ease-in-out infinite', filter:'drop-shadow(0 0 28px rgba(34,197,94,0.45))' }}>✈️</div>
+          <div style={{ marginBottom: '28px', display: 'inline-block', animation: 'heroFloat 5s ease-in-out infinite' }}>
+            <div style={{ position: 'relative', width: '96px', height: '96px', margin: '0 auto' }}>
+              {/* Outer glow ring */}
+              <div style={{ position: 'absolute', inset: '-12px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(34,197,94,0.22) 0%, transparent 70%)', pointerEvents: 'none' }} />
+              {/* Circle backdrop */}
+              <div style={{
+                width: '96px', height: '96px', borderRadius: '50%',
+                background: 'linear-gradient(145deg, #1a3a1a 0%, #0e2010 100%)',
+                border: '1.5px solid rgba(34,197,94,0.35)',
+                boxShadow: '0 8px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(34,197,94,0.12), inset 0 1px 0 rgba(34,197,94,0.15)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <svg width="54" height="54" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(0 2px 8px rgba(34,197,94,0.5))' }}>
+                  <defs>
+                    <linearGradient id="planeBody" x1="4" y1="14" x2="50" y2="40" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stopColor="#86efac" />
+                      <stop offset="100%" stopColor="#16a34a" />
+                    </linearGradient>
+                    <linearGradient id="planeWing" x1="0" y1="28" x2="36" y2="44" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stopColor="#4ade80" />
+                      <stop offset="100%" stopColor="#15803d" />
+                    </linearGradient>
+                    <linearGradient id="planeTail" x1="4" y1="36" x2="18" y2="50" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stopColor="#4ade80" />
+                      <stop offset="100%" stopColor="#166534" />
+                    </linearGradient>
+                    <linearGradient id="planeWindow" x1="30" y1="16" x2="38" y2="22" gradientUnits="userSpaceOnUse">
+                      <stop offset="0%" stopColor="#bfdbfe" />
+                      <stop offset="100%" stopColor="#60a5fa" />
+                    </linearGradient>
+                  </defs>
+                  {/* Fuselage */}
+                  <path d="M8 27 C8 22 12 17 18 16 L44 14 C47 14 50 16 50 19 C50 22 47 24 44 24 L26 25 L26 29 L44 30 C47 30 50 32 50 35 C50 38 47 40 44 40 L18 38 C12 37 8 32 8 27Z" fill="url(#planeBody)" />
+                  {/* Main wing */}
+                  <path d="M22 25 L4 38 L10 39 L28 29Z" fill="url(#planeWing)" opacity="0.95"/>
+                  {/* Tail wing */}
+                  <path d="M10 37 L4 46 L8 46 L14 39Z" fill="url(#planeTail)" opacity="0.9"/>
+                  {/* Window row */}
+                  <ellipse cx="34" cy="19" rx="3.5" ry="2.5" fill="url(#planeWindow)" opacity="0.9"/>
+                  <ellipse cx="40" cy="18.5" rx="2.5" ry="2" fill="url(#planeWindow)" opacity="0.7"/>
+                  {/* Highlight stripe */}
+                  <path d="M18 17 C22 16.5 32 15.5 42 15 C44.5 14.8 46.5 15.5 46.5 16.8" stroke="rgba(255,255,255,0.25)" strokeWidth="1" strokeLinecap="round" fill="none"/>
+                </svg>
+              </div>
+            </div>
+          </div>
           {/* Badge */}
           <div style={{ display:'inline-flex', alignItems:'center', gap:'6px', background:'rgba(34,197,94,0.1)', border:'1px solid rgba(34,197,94,0.25)', borderRadius:'100px', padding:'5px 16px', fontSize:'0.72rem', fontWeight:700, color:'#22c55e', letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'20px', animation:'fadeIn 0.8s ease both' }}>🌿 Sürdürülebilir Seyahat</div>
           <h1 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'clamp(2.4rem,5vw,4rem)', fontWeight:800, letterSpacing:'-0.04em', lineHeight:1.1, margin:'0 auto 20px', background:'linear-gradient(135deg,#f0fdf4 0%,#86efac 50%,#22c55e 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', animation:'fadeUp 0.7s 0.1s cubic-bezier(0.4,0,0.2,1) both' }}>
