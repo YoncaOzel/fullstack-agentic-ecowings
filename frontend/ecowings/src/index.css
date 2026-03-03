@@ -703,3 +703,14 @@ select option {
 /* ── Navbar center active-link underline ─────────────────── */
 /* Suppress global a::after underline on centre nav links    */
 .nav-center-link::after { display: none !important; }
+
+/* ── Spin keyframe (used by loading spinners) ────────────── */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Auth split-screen layout ────────────────────────────── */
+.auth-mobile-header { display: block; }
+.auth-desktop-header { display: block; }
+@media (min-width: 768px) {
+  .auth-left-panel  { display: flex !important; }
+  .auth-mobile-header { display: none; }
+}
