@@ -147,12 +147,15 @@ export default function AirportSelect({ label, icon = 'takeoff', airports = [], 
 
       {/* Dropdown */}
       {open && (
-        <div style={{
+        <div className="airport-dropdown" style={{
           position: 'absolute',
           top: 'calc(100% + 6px)',
           left: 0,
           right: 0,
-          zIndex: 100,
+          zIndex: 9999,
+          minWidth: '100%',
+          width: 'max-content',
+          maxWidth: '360px',
           background: 'rgba(5,18,8,0.98)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',

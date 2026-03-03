@@ -212,6 +212,8 @@ export default function HomePage() {
             margin: '0 auto',
             border: '1px solid rgba(34,197,94,0.18)',
             boxShadow: '0 24px 64px rgba(0,0,0,0.45), inset 0 1px 0 rgba(34,197,94,0.08)',
+            position: 'relative',
+            zIndex: 10,
           }}>
             {/* Row 1: airport selects */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>

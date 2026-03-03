@@ -382,9 +382,9 @@ textarea:focus {
 
 /* ── Search / form card (glassmorphic container) ─────────── */
 /* Targets the hero search card and similar form containers */
-form,
-[style*="backdropFilter"],
-[style*="backdrop-filter"] {
+form:not(.airport-dropdown-exclude),
+[style*="backdropFilter"]:not(.airport-dropdown),
+[style*="backdrop-filter"]:not(.airport-dropdown) {
   background: rgba(14, 26, 14, 0.8) !important;
   border: 1px solid var(--border) !important;
   backdrop-filter: blur(16px) !important;
@@ -396,7 +396,7 @@ form,
 section:first-of-type {
   background: linear-gradient(135deg, #080e08 0%, #0d1f0d 40%, #0a1a12 100%) !important;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 section:first-of-type::before {
