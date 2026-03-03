@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plane, Star, MapPin, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Plane, Star, MapPin, ArrowRight, CheckCircle2, Calendar, Search, ChevronDown } from 'lucide-react';
 import apiClient from '../shared/services/apiClient';
 import flightService from '../domains/flights/services/flightService';
 import FlightCard from '../domains/flights/components/FlightCard';
@@ -203,15 +203,18 @@ export default function HomePage() {
 
           {/* Search Form */}
           <form onSubmit={handleSearch} style={{
-            background: 'rgba(255,255,255,0.15)',
-            backdropFilter: 'blur(12px)',
-            borderRadius: '16px',
-            padding: '24px',
-            maxWidth: '800px',
+            background: 'rgba(5,18,10,0.78)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)',
+            borderRadius: '20px',
+            padding: '28px 28px 24px',
+            maxWidth: '860px',
             margin: '0 auto',
-            border: '1px solid rgba(255,255,255,0.25)',
+            border: '1px solid rgba(34,197,94,0.18)',
+            boxShadow: '0 24px 64px rgba(0,0,0,0.45), inset 0 1px 0 rgba(34,197,94,0.08)',
           }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '16px' }}>
+            {/* Row 1: airport selects */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
               <AirportSelect
                 label="Nereden?"
                 icon="takeoff"
@@ -228,22 +231,108 @@ export default function HomePage() {
                 onChange={(code) => setSearchForm((p) => ({ ...p, to: code }))}
                 placeholder="Varış havalimanı"
               />
-              <input type="date" className="form-input" value={searchForm.departure}
-                onChange={(e) => setSearchForm((p) => ({ ...p, departure: e.target.value }))}
-                style={{ background: 'rgba(255,255,255,0.9)' }} />
-              <select className="form-input" value={searchForm.travelClass}
-                onChange={(e) => setSearchForm((p) => ({ ...p, travelClass: e.target.value }))}
-                style={{ background: 'rgba(255,255,255,0.9)' }}>
-                <option value="Economy">Ekonomi</option>
-                <option value="Business">Business</option>
-                <option value="FirstClass">First Class</option>
-              </select>
             </div>
-            {searchError && <p style={{ color: '#ffcdd2', fontSize: '0.875rem', marginBottom: '8px' }}>{searchError}</p>}
-            <button type="submit" className="btn" disabled={searching}
-              style={{ background: '#fff', color: 'var(--primary)', padding: '12px 36px', fontWeight: 700 }}>
-              {searching ? 'Aranıyor...' : '🔍 Uçuş Ara'}
-            </button>
+
+            {/* Row 2: date + cabin + button */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '12px', alignItems: 'end' }}>
+              {/* Date field */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(34,197,94,0.7)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Tarih</span>
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                  <Calendar size={15} style={{ position: 'absolute', left: '14px', color: 'rgba(34,197,94,0.6)', pointerEvents: 'none', flexShrink: 0 }} />
+                  <input
+                    type="date"
+                    value={searchForm.departure}
+                    onChange={(e) => setSearchForm((p) => ({ ...p, departure: e.target.value }))}
+                    style={{
+                      width: '100%',
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(34,197,94,0.2)',
+                      borderRadius: '10px',
+                      padding: '12px 14px 12px 40px',
+                      color: searchForm.departure ? '#f0fdf4' : 'rgba(156,163,175,0.7)',
+                      fontSize: '14px',
+                      fontFamily: 'Inter, sans-serif',
+                      outline: 'none',
+                      colorScheme: 'dark',
+                      cursor: 'pointer',
+                      transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                      boxSizing: 'border-box',
+                    }}
+                    onFocus={e => { e.target.style.borderColor = '#22c55e'; e.target.style.boxShadow = '0 0 0 3px rgba(34,197,94,0.12)'; }}
+                    onBlur={e  => { e.target.style.borderColor = 'rgba(34,197,94,0.2)'; e.target.style.boxShadow = 'none'; }}
+                  />
+                </div>
+              </div>
+
+              {/* Cabin class field */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(34,197,94,0.7)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Kabin Sınıfı</span>
+                <div style={{ position: 'relative' }}>
+                  <select
+                    value={searchForm.travelClass}
+                    onChange={(e) => setSearchForm((p) => ({ ...p, travelClass: e.target.value }))}
+                    style={{
+                      width: '100%',
+                      appearance: 'none',
+                      WebkitAppearance: 'none',
+                      background: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(34,197,94,0.2)',
+                      borderRadius: '10px',
+                      padding: '12px 40px 12px 14px',
+                      color: '#f0fdf4',
+                      fontSize: '14px',
+                      fontFamily: 'Inter, sans-serif',
+                      outline: 'none',
+                      cursor: 'pointer',
+                      transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+                    }}
+                    onFocus={e => { e.target.style.borderColor = '#22c55e'; e.target.style.boxShadow = '0 0 0 3px rgba(34,197,94,0.12)'; }}
+                    onBlur={e  => { e.target.style.borderColor = 'rgba(34,197,94,0.2)'; e.target.style.boxShadow = 'none'; }}
+                  >
+                    <option value="Economy" style={{ background: '#0a1a0a' }}>Ekonomi</option>
+                    <option value="Business" style={{ background: '#0a1a0a' }}>Business</option>
+                    <option value="FirstClass" style={{ background: '#0a1a0a' }}>First Class</option>
+                  </select>
+                  <ChevronDown size={14} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(34,197,94,0.6)', pointerEvents: 'none' }} />
+                </div>
+              </div>
+
+              {/* Search button */}
+              <button
+                type="submit"
+                disabled={searching}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  padding: '13px 28px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: searching ? 'rgba(34,197,94,0.4)' : 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                  color: '#051005',
+                  fontWeight: 700,
+                  fontSize: '14px',
+                  letterSpacing: '0.4px',
+                  cursor: searching ? 'not-allowed' : 'pointer',
+                  whiteSpace: 'nowrap',
+                  boxShadow: searching ? 'none' : '0 4px 20px rgba(34,197,94,0.3)',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={e => { if (!searching) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(34,197,94,0.4)'; e.currentTarget.style.filter = 'brightness(1.08)'; } }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = searching ? 'none' : '0 4px 20px rgba(34,197,94,0.3)'; e.currentTarget.style.filter = 'brightness(1)'; }}
+              >
+                <Search size={15} />
+                {searching ? 'Aranıyor...' : 'Uçuş Ara'}
+              </button>
+            </div>
+
+            {searchError && (
+              <p style={{ marginTop: '12px', marginBottom: 0, color: '#fca5a5', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '13px' }}>⚠</span> {searchError}
+              </p>
+            )}
           </form>
         </div>
       </section>
