@@ -361,6 +361,7 @@ textarea {
   padding: 10px 14px;
   outline: none;
   width: 100%;
+  color-scheme: dark;
   transition: border-color var(--transition), box-shadow var(--transition) !important;
 }
 
@@ -378,6 +379,30 @@ textarea:focus {
   outline: none !important;
   border-color: var(--green-primary) !important;
   box-shadow: 0 0 0 3px var(--green-glow) !important;
+}
+
+/* ── Browser autofill override (prevents white bg) ────────── */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  /* Inset shadow fakes the background color — the only reliable trick */
+  -webkit-box-shadow: 0 0 0px 9999px #0e1a0e inset !important;
+  box-shadow:         0 0 0px 9999px #0e1a0e inset !important;
+  /* Ensure text stays readable */
+  -webkit-text-fill-color: #f0fdf4 !important;
+  color: #f0fdf4 !important;
+  caret-color: #4ade80 !important;
+  /* Tell Chrome to use the dark color scheme for autofill UI */
+  color-scheme: dark !important;
+  /* Freeze any background-color transition Chrome applies */
+  transition: background-color 9999999s ease !important;
 }
 
 /* ── Search / form card (glassmorphic container) ─────────── */

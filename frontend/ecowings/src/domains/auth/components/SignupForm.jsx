@@ -33,7 +33,7 @@ function InputField({ label, icon, type, placeholder, value, onChange, autoCompl
       }}>{label}</label>
       <div style={{
         display: 'flex', alignItems: 'center',
-        background: focused ? 'rgba(34,197,94,0.04)' : 'var(--bg-elevated)',
+        background: focused ? 'var(--bg-base)' : 'var(--bg-elevated)',
         border: `1px solid ${focused ? 'rgba(34,197,94,0.5)' : filled ? 'rgba(34,197,94,0.25)' : 'var(--border)'}`,
         borderRadius: '12px',
         transition: 'border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease',
@@ -51,9 +51,10 @@ function InputField({ label, icon, type, placeholder, value, onChange, autoCompl
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           style={{
-            flex: 1, background: 'transparent', border: 'none', outline: 'none',
+            flex: 1, background: 'var(--bg-base)', border: 'none', outline: 'none',
             padding: '13px 0', fontSize: '0.88rem', color: 'var(--text-primary)',
             fontFamily: "'Inter', sans-serif",
+            colorScheme: 'dark',
           }}
         />
         {rightSlot && (
