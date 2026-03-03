@@ -5,13 +5,13 @@ import { Plane, Tag, MapPin, Star, Zap, Gift, X, LogOut, User, HelpCircle } from
 
 /* ── Drawer link definitions ─────────────────────────────── */
 const drawerLinks = [
-  {
+  /*{
     to: '/flights',
     label: 'Uçuşlar',
     desc: 'Uçuş ara, karşılaştır ve rezervasyon yap',
     icon: <Plane size={17} />,
     authRequired: false,
-  },
+  }, */
   {
     to: '/campaigns',
     label: 'Kampanyalar',
@@ -24,6 +24,13 @@ const drawerLinks = [
     label: 'Uçuş Takip',
     desc: 'Gerçek zamanlı uçuş durumu',
     icon: <MapPin size={17} />,
+    authRequired: false,
+  },
+   {
+    to: '/faq',
+    label: 'Sıkça Sorulan Sorular',
+    desc: 'Yapay zeka destekli yardım merkezi',
+    icon: <HelpCircle size={17} />,
     authRequired: false,
   },
   {
@@ -39,7 +46,8 @@ const drawerLinks = [
     desc: 'Rastgele bir destinasyon keşfet',
     icon: <Zap size={17} />,
     authRequired: false,
-  },
+  }
+/*
   {
     to: '/gift-ticket',
     label: 'Biletlerime Hediye Et',
@@ -47,13 +55,8 @@ const drawerLinks = [
     icon: <Gift size={17} />,
     authRequired: true,
   },
-  {
-    to: '/faq',
-    label: 'Sıkça Sorulan Sorular',
-    desc: 'Yapay zeka destekli yardım merkezi',
-    icon: <HelpCircle size={17} />,
-    authRequired: false,
-  },
+  */
+ 
 ];
 
 /* ── DrawerItem subcomponent ─────────────────────────────── */
@@ -138,6 +141,14 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  const closeDrawer = () => {
+    setDrawerClosing(true);
+    setTimeout(() => {
+      setDrawerOpen(false);
+      setDrawerClosing(false);
+    }, 280);
+  };
+
   /* ESC key + body scroll lock */
   useEffect(() => {
     const onKey = (e) => { if (e.key === 'Escape') closeDrawer(); };
@@ -150,14 +161,6 @@ export default function Navbar() {
       document.body.style.overflow = '';
     };
   }, [drawerOpen]);
-
-  const closeDrawer = () => {
-    setDrawerClosing(true);
-    setTimeout(() => {
-      setDrawerOpen(false);
-      setDrawerClosing(false);
-    }, 280);
-  };
 
   const openDrawer = () => {
     setDrawerOpen(true);
