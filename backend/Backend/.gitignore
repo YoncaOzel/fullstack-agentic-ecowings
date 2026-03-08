@@ -1,2 +1,7 @@
 # .gitignore'a ekle
 **/.vs/
+
+# Sensitive configuration files — never commit real secrets
+**/appsettings.json
+**/appsettings.Development.json
+**/appsettings.Production.json
