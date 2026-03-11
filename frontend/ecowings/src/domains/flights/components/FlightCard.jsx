@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
-import ticketService from '../../tickets/services/ticketService';
 import { useState } from 'react';
 import { Plane, Clock, ShoppingCart } from 'lucide-react';
 
@@ -27,9 +26,6 @@ function fmtDate(dateStr) {
 export default function FlightCard({ flight }) {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [buying, setBuying]   = useState(false);
-  const [bought, setBought]   = useState(false);
-  const [buyError, setBuyError] = useState('');
 
   // Backend Flight entity field names: departure / destination / price / estimatedArrivalTime
   const dep      = flight.departure  || {};
@@ -41,19 +37,9 @@ export default function FlightCard({ flight }) {
   const price    = flight.price ?? flight.economyPrice;
   const airline  = flight.airline?.name || flight.carrier || null;
 
-  const handleBuy = async () => {
+  const handleBuy = () => {
     if (!isAuthenticated) { navigate('/login'); return; }
-    setBuying(true);
-    setBuyError('');
-    try {
-      const res = await ticketService.buyTicket({ flightId: flight.id, travelClass: 'Economy' });
-      if (res.data?.succeeded) setBought(true);
-      else setBuyError(res.data?.message || 'Satın alma işlemi başarısız.');
-    } catch (err) {
-      setBuyError(err.response?.data?.message || 'Bir hata oluştu.');
-    } finally {
-      setBuying(false);
-    }
+    navigate('/checkout', { state: { flight, type: 'db' } });
   };
 
   return (
@@ -185,39 +171,26 @@ export default function FlightCard({ flight }) {
               : '—'}
           </div>
         </div>
-        {bought ? (
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: '6px',
-            padding: '9px 18px', borderRadius: '9px',
-            background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)',
-            color: '#4ade80', fontWeight: 700, fontSize: '0.8rem',
-          }}>
-            <span>✓</span> Satın Alındı
-          </div>
-        ) : (
-          <button
+        <button
             onClick={handleBuy}
-            disabled={buying}
             style={{
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px',
               padding: '11px 22px', borderRadius: '9px', border: 'none',
-              cursor: buying ? 'wait' : 'pointer',
-              background: buying ? 'rgba(34,197,94,0.25)' : 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-              color: buying ? '#6b7280' : '#051005',
+              cursor: 'pointer',
+              background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+              color: '#051005',
               fontWeight: 700, fontSize: '0.82rem',
               fontFamily: "'Plus Jakarta Sans', sans-serif",
               letterSpacing: '0.06em', whiteSpace: 'nowrap',
               transition: 'all 0.2s ease',
-              boxShadow: buying ? 'none' : '0 4px 16px rgba(34,197,94,0.3)',
+              boxShadow: '0 4px 16px rgba(34,197,94,0.3)',
             }}
-            onMouseEnter={e => { if (!buying) e.currentTarget.style.filter = 'brightness(1.1)'; }}
+            onMouseEnter={e => { e.currentTarget.style.filter = 'brightness(1.1)'; }}
             onMouseLeave={e => { e.currentTarget.style.filter = 'brightness(1)'; }}
           >
             <ShoppingCart size={13} />
-            {buying ? 'İşleniyor...' : 'SATIN AL'}
+            SATIN AL
           </button>
-        )}
-        {buyError && <p style={{ color: '#f87171', fontSize: '0.72rem', margin: 0, textAlign: 'center' }}>{buyError}</p>}
       </div>
     </div>
   );

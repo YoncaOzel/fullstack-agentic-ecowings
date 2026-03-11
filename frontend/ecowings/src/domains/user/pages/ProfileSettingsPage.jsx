@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { User, Mail, Settings, Key, Tag, Shield } from 'lucide-react';
+import { User, Mail, Settings, Key, Tag, Shield, Ticket } from 'lucide-react';
 import userService from '../services/userService';
 import ProfileForm from '../components/ProfileForm';
 import ChangePasswordForm from '../components/ChangePasswordForm';
 import CouponCard from '../../coupons/components/CouponCard';
+import MyTicketsTab from '../../tickets/components/MyTicketsTab';
 import LoadingSpinner from '../../../shared/components/LoadingSpinner';
 import ErrorMessage from '../../../shared/components/ErrorMessage';
 
@@ -11,6 +12,7 @@ const TABS = [
   { label: 'Profil Bilgileri', icon: User },
   { label: 'Şifre Değiştir', icon: Key },
   { label: 'Kuponlarım', icon: Tag },
+  { label: 'Biletlerim', icon: Ticket },
 ];
 
 export default function ProfileSettingsPage() {
@@ -149,6 +151,8 @@ export default function ProfileSettingsPage() {
             )}
 
             {activeTab === 1 && <ChangePasswordForm />}
+
+            {activeTab === 3 && <MyTicketsTab />}
 
             {activeTab === 2 && (
               loadingCoupons ? <LoadingSpinner /> : couponError ? <ErrorMessage message={couponError} /> : (

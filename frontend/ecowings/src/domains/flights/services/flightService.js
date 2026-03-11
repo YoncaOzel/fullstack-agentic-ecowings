@@ -35,6 +35,14 @@ const flightService = {
    */
   getLuckyFlight: (origin, userId = 0) =>
     apiClient.get("/api/LuckyFlight/search", { params: { origin, userId } }),
+
+  /**
+   * Books an Amadeus flight for a user — saves flight to DB and creates an unpaid Ticket.
+   * POST /api/Flights/book
+   * @param {{ flightNumber, departureAirportId, destinationAirportId, departureTime, estimatedArrivalTime, price, airlineId, userId }} data
+   * @returns {{ ticketId: number }}
+   */
+  bookAmadeusFlight: (data) => apiClient.post("/api/Flights/book", data),
 };
 
 export default flightService;

@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, forwardRef } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { Link } from 'react-router-dom';
 import { Plane, Star, MapPin, ArrowRight, CheckCircle2, Calendar, Search, ChevronDown } from 'lucide-react';
 import apiClient from '../shared/services/apiClient';
@@ -8,6 +10,33 @@ import AmadeusFlightCard from '../domains/flights/components/AmadeusFlightCard';
 import AirportSelect from '../domains/flights/components/AirportSelect';
 import LoadingSpinner from '../shared/components/LoadingSpinner';
 import ErrorMessage from '../shared/components/ErrorMessage';
+
+/* ── Custom input for the homepage date picker ── */
+const DatePickerInput = forwardRef(({ value, onClick }, ref) => (
+  <input
+    ref={ref}
+    value={value}
+    onClick={onClick}
+    placeholder="Tarih seçin"
+    readOnly
+    style={{
+      width: '100%',
+      background: 'rgba(255,255,255,0.04)',
+      border: '1px solid rgba(34,197,94,0.2)',
+      borderRadius: '10px',
+      padding: '12px 14px 12px 40px',
+      color: value ? '#f0fdf4' : 'rgba(156,163,175,0.7)',
+      fontSize: '14px',
+      fontFamily: 'Inter, sans-serif',
+      outline: 'none',
+      cursor: 'pointer',
+      transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+      boxSizing: 'border-box',
+    }}
+    onFocus={e => { e.target.style.borderColor = '#22c55e'; e.target.style.boxShadow = '0 0 0 3px rgba(34,197,94,0.12)'; }}
+    onBlur={e  => { e.target.style.borderColor = 'rgba(34,197,94,0.2)'; e.target.style.boxShadow = 'none'; }}
+  />
+));
 
 /* ── Shimmer skeleton shown while search is running ── */
 function SearchSkeletonCard() {
@@ -290,7 +319,7 @@ export default function HomePage() {
   const [airports, setAirports] = useState([]);
 
   // Search form state
-  const [searchForm, setSearchForm] = useState({ from: '', to: '', departure: '', travelClass: 'Economy' });
+  const [searchForm, setSearchForm] = useState({ from: '', to: '', departure: null, travelClass: 'Economy' });
   const [searchResults, setSearchResults] = useState(null);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
@@ -364,7 +393,7 @@ export default function HomePage() {
       const res = await flightService.searchFlightsApi(
         origin,
         destination,
-        searchForm.departure,
+        searchForm.departure.toISOString().split('T')[0],
         1,
         toApiTravelClass(searchForm.travelClass)
       );
@@ -505,27 +534,15 @@ export default function HomePage() {
                 <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(34,197,94,0.7)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Tarih</span>
                 <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
                   <Calendar size={15} style={{ position: 'absolute', left: '14px', color: 'rgba(34,197,94,0.6)', pointerEvents: 'none', flexShrink: 0 }} />
-                  <input
-                    type="date"
-                    value={searchForm.departure}
-                    onChange={(e) => setSearchForm((p) => ({ ...p, departure: e.target.value }))}
-                    style={{
-                      width: '100%',
-                      background: 'rgba(255,255,255,0.04)',
-                      border: '1px solid rgba(34,197,94,0.2)',
-                      borderRadius: '10px',
-                      padding: '12px 14px 12px 40px',
-                      color: searchForm.departure ? '#f0fdf4' : 'rgba(156,163,175,0.7)',
-                      fontSize: '14px',
-                      fontFamily: 'Inter, sans-serif',
-                      outline: 'none',
-                      colorScheme: 'dark',
-                      cursor: 'pointer',
-                      transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
-                      boxSizing: 'border-box',
-                    }}
-                    onFocus={e => { e.target.style.borderColor = '#22c55e'; e.target.style.boxShadow = '0 0 0 3px rgba(34,197,94,0.12)'; }}
-                    onBlur={e  => { e.target.style.borderColor = 'rgba(34,197,94,0.2)'; e.target.style.boxShadow = 'none'; }}
+                  <DatePicker
+                    selected={searchForm.departure}
+                    onChange={(date) => setSearchForm((p) => ({ ...p, departure: date }))}
+                    minDate={new Date()}
+                    dateFormat="dd/MM/yyyy"
+                    placeholderText="Tarih seçin"
+                    customInput={<DatePickerInput />}
+                    popperPlacement="bottom-start"
+                    portalId="datepicker-root"
                   />
                 </div>
               </div>

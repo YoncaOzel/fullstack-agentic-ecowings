@@ -16,6 +16,9 @@ import CommentsPage from './domains/reviews/pages/CommentsPage';
 import ProfileSettingsPage from './domains/user/pages/ProfileSettingsPage';
 import GiftTicketPage from './domains/tickets/pages/GiftTicketPage';
 import FAQPage from './pages/FAQPage';
+import CheckoutPage from './domains/flights/pages/CheckoutPage';
+import PaymentSuccessPage from './domains/payments/pages/PaymentSuccessPage';
+import PaymentFailPage from './domains/payments/pages/PaymentFailPage';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -49,9 +52,16 @@ export default function App() {
             <Route path="/profile" element={
               <ProtectedRoute><ProfileSettingsPage /></ProtectedRoute>
             } />
+            <Route path="/checkout" element={
+              <ProtectedRoute><CheckoutPage /></ProtectedRoute>
+            } />
             <Route path="/gift-ticket" element={
               <ProtectedRoute><GiftTicketPage /></ProtectedRoute>
             } />
+
+            {/* Payment result pages — public so Stripe redirect always works */}
+            <Route path="/payment-success" element={<PaymentSuccessPage />} />
+            <Route path="/payment-fail" element={<PaymentFailPage />} />
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" replace />} />
