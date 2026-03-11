@@ -25,7 +25,7 @@ function calcDuration(dep, arr) {
 }
 
 const emissionColor = (cls) =>
-  cls === 'Low' ? '#4ade80' : cls === 'Medium' ? '#facc15' : '#f87171';
+  cls === 'Low' ? '#16a34a' : cls === 'Medium' ? '#d97706' : '#dc2626';
 
 /* ─── component ──────────────────────────────────── */
 export default function CheckoutPage() {
@@ -193,16 +193,16 @@ export default function CheckoutPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 340px', gap: '28px', alignItems: 'start' }}>
 
               {/* ── Left: Flight details ── */}
-              <div style={{ background: 'linear-gradient(160deg,#111c11 0%,#0e1a0e 100%)', border: '1px solid rgba(34,197,94,0.12)', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.35)' }}>
+              <div style={{ background: '#ffffff', border: '1px solid rgba(77,124,95,0.16)', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 2px 16px rgba(77,124,95,0.08)' }}>
 
                 {/* Card header */}
-                <div style={{ padding: '20px 28px', borderBottom: '1px solid rgba(34,197,94,0.1)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <div style={{ width: '34px', height: '34px', borderRadius: '9px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Plane size={15} style={{ color: '#22c55e' }} />
+                <div style={{ padding: '20px 28px', borderBottom: '1px solid rgba(77,124,95,0.12)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ width: '34px', height: '34px', borderRadius: '9px', background: 'rgba(77,124,95,0.08)', border: '1px solid rgba(77,124,95,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Plane size={15} style={{ color: '#4d7c5f' }} />
                   </div>
                   <div>
-                    <div style={{ fontWeight: 800, fontSize: '0.95rem', color: '#f0fdf4', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Uçuş Bilgileri</div>
-                    <div style={{ fontSize: '0.74rem', color: '#6b7280' }}>Aldığınız biletin detayları</div>
+                    <div style={{ fontWeight: 800, fontSize: '0.95rem', color: '#1c2b22', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Uçuş Bilgileri</div>
+                    <div style={{ fontSize: '0.74rem', color: '#6c8274' }}>Aldığınız biletin detayları</div>
                   </div>
                 </div>
 
@@ -212,40 +212,40 @@ export default function CheckoutPage() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '28px' }}>
                     {/* Departure */}
                     <div style={{ textAlign: 'center', flex: 1 }}>
-                      <div style={{ fontSize: '2.4rem', fontWeight: 900, color: '#22c55e', fontFamily: "'DM Mono',monospace", letterSpacing: '0.04em', lineHeight: 1 }}>
+                      <div style={{ fontSize: '2.4rem', fontWeight: 900, color: '#4d7c5f', fontFamily: "'DM Mono',monospace", letterSpacing: '0.04em', lineHeight: 1 }}>
                         {depCode || '—'}
                       </div>
-                      {depCity && <div style={{ fontSize: '0.78rem', color: '#9ca3af', marginTop: '4px', fontWeight: 500 }}>{depCity}</div>}
-                      <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f0fdf4', marginTop: '6px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>{depTime}</div>
-                      {depDateStr && <div style={{ fontSize: '0.73rem', color: '#6b7280', marginTop: '3px' }}>{depDateStr}</div>}
+                      {depCity && <div style={{ fontSize: '0.78rem', color: '#6c8274', marginTop: '4px', fontWeight: 500 }}>{depCity}</div>}
+                      <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#1c2b22', marginTop: '6px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>{depTime}</div>
+                      {depDateStr && <div style={{ fontSize: '0.73rem', color: '#6c8274', marginTop: '3px' }}>{depDateStr}</div>}
                     </div>
 
                     {/* Line */}
                     <div style={{ flex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
                       {duration && (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: '#6b7280' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', color: '#6c8274' }}>
                           <Clock size={11} />{duration}
                         </div>
                       )}
                       <div style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
-                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', border: '2px solid #22c55e', background: 'rgba(34,197,94,0.15)', flexShrink: 0, boxShadow: '0 0 8px rgba(34,197,94,0.4)' }} />
-                        <div style={{ flex: 1, height: '1.5px', background: 'linear-gradient(90deg,rgba(34,197,94,0.3),rgba(34,197,94,0.7),rgba(34,197,94,0.3))' }} />
-                        <Plane size={16} style={{ color: '#22c55e', margin: '0 6px', flexShrink: 0 }} />
-                        <div style={{ flex: 1, height: '1.5px', background: 'linear-gradient(90deg,rgba(34,197,94,0.3),rgba(34,197,94,0.7),rgba(34,197,94,0.3))' }} />
-                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', border: '2px solid #22c55e', background: 'rgba(34,197,94,0.15)', flexShrink: 0, boxShadow: '0 0 8px rgba(34,197,94,0.4)' }} />
+                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', border: '2px solid #4d7c5f', background: 'rgba(77,124,95,0.12)', flexShrink: 0, boxShadow: '0 0 6px rgba(77,124,95,0.3)' }} />
+                        <div style={{ flex: 1, height: '1.5px', background: 'linear-gradient(90deg,rgba(77,124,95,0.3),rgba(77,124,95,0.6),rgba(77,124,95,0.3))' }} />
+                        <Plane size={16} style={{ color: '#4d7c5f', margin: '0 6px', flexShrink: 0 }} />
+                        <div style={{ flex: 1, height: '1.5px', background: 'linear-gradient(90deg,rgba(77,124,95,0.3),rgba(77,124,95,0.6),rgba(77,124,95,0.3))' }} />
+                        <div style={{ width: '10px', height: '10px', borderRadius: '50%', border: '2px solid #4d7c5f', background: 'rgba(77,124,95,0.12)', flexShrink: 0, boxShadow: '0 0 6px rgba(77,124,95,0.3)' }} />
                       </div>
-                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: stopCount === 0 ? 'rgba(34,197,94,0.08)' : 'rgba(250,204,21,0.08)', color: stopCount === 0 ? '#4ade80' : '#facc15', border: `1px solid ${stopCount === 0 ? 'rgba(74,222,128,0.2)' : 'rgba(250,204,21,0.2)'}`, borderRadius: '20px', padding: '3px 10px', fontSize: '0.67rem', fontWeight: 700 }}>
+                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: stopCount === 0 ? 'rgba(77,124,95,0.08)' : 'rgba(245,158,11,0.08)', color: stopCount === 0 ? '#2f5e42' : '#d97706', border: `1px solid ${stopCount === 0 ? 'rgba(77,124,95,0.22)' : 'rgba(245,158,11,0.25)'}`, borderRadius: '20px', padding: '3px 10px', fontSize: '0.67rem', fontWeight: 700 }}>
                         <Plane size={9} />{stopLabel}
                       </div>
                     </div>
 
                     {/* Arrival */}
                     <div style={{ textAlign: 'center', flex: 1 }}>
-                      <div style={{ fontSize: '2.4rem', fontWeight: 900, color: '#22c55e', fontFamily: "'DM Mono',monospace", letterSpacing: '0.04em', lineHeight: 1 }}>
+                      <div style={{ fontSize: '2.4rem', fontWeight: 900, color: '#4d7c5f', fontFamily: "'DM Mono',monospace", letterSpacing: '0.04em', lineHeight: 1 }}>
                         {arrCode || '—'}
                       </div>
-                      {arrCity && <div style={{ fontSize: '0.78rem', color: '#9ca3af', marginTop: '4px', fontWeight: 500 }}>{arrCity}</div>}
-                      <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f0fdf4', marginTop: '6px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>{arrTime}</div>
+                      {arrCity && <div style={{ fontSize: '0.78rem', color: '#6c8274', marginTop: '4px', fontWeight: 500 }}>{arrCity}</div>}
+                      <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#1c2b22', marginTop: '6px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>{arrTime}</div>
                     </div>
                   </div>
 
@@ -256,20 +256,20 @@ export default function CheckoutPage() {
                       { label: 'Uçuş No', value: flightNumber, mono: true },
                       ...(isAmadeus && flight.emissionClass ? [{ label: 'Karbon Emisyonu', value: `${flight.emissionClass} · ${flight.carbonEmission?.toFixed(1)} kg CO₂`, color: emissionColor(flight.emissionClass) }] : []),
                     ].map(({ label, value, mono, color }) => (
-                      <div key={label} style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(34,197,94,0.08)', borderRadius: '10px', padding: '12px 14px' }}>
-                        <div style={{ fontSize: '0.67rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '5px' }}>{label}</div>
-                        <div style={{ fontSize: '0.88rem', fontWeight: 700, color: color || '#f0fdf4', fontFamily: mono ? "'DM Mono',monospace" : 'inherit' }}>{value || '—'}</div>
+                      <div key={label} style={{ background: '#f5f7f5', border: '1px solid rgba(77,124,95,0.14)', borderRadius: '10px', padding: '12px 14px' }}>
+                        <div style={{ fontSize: '0.67rem', color: '#6c8274', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600, marginBottom: '5px' }}>{label}</div>
+                        <div style={{ fontSize: '0.88rem', fontWeight: 700, color: color || '#1c2b22', fontFamily: mono ? "'DM Mono',monospace" : 'inherit' }}>{value || '—'}</div>
                       </div>
                     ))}
                   </div>
 
                   {/* Segments */}
                   {stopCount > 0 && flight.segments && (
-                    <div style={{ marginTop: '16px', background: 'rgba(250,204,21,0.04)', border: '1px solid rgba(250,204,21,0.12)', borderRadius: '10px', padding: '14px' }}>
-                      <div style={{ fontSize: '0.67rem', color: '#facc15', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700, marginBottom: '10px' }}>Aktarma Detayları</div>
+                    <div style={{ marginTop: '16px', background: '#fffbeb', border: '1px solid rgba(245,158,11,0.22)', borderRadius: '10px', padding: '14px' }}>
+                      <div style={{ fontSize: '0.67rem', color: '#b45309', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700, marginBottom: '10px' }}>Aktarma Detayları</div>
                       {flight.segments.map((seg, i) => (
-                        <div key={i} style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '0.78rem', color: '#9ca3af', marginBottom: i < flight.segments.length - 1 ? '6px' : 0 }}>
-                          <span style={{ fontFamily: "'DM Mono',monospace", fontWeight: 700, color: '#fde68a' }}>{seg.departure} → {seg.arrival}</span>
+                        <div key={i} style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '0.78rem', color: '#6c8274', marginBottom: i < flight.segments.length - 1 ? '6px' : 0 }}>
+                          <span style={{ fontFamily: "'DM Mono',monospace", fontWeight: 700, color: '#92400e' }}>{seg.departure} → {seg.arrival}</span>
                           <span style={{ color: '#374151' }}>·</span>
                           <span>{seg.carrier} {seg.flightNumber}</span>
                           <span style={{ color: '#374151' }}>·</span>
@@ -283,25 +283,25 @@ export default function CheckoutPage() {
 
               {/* ── Right: Price summary ── */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ background: 'linear-gradient(160deg,#111c11 0%,#0e1a0e 100%)', border: '1px solid rgba(34,197,94,0.12)', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.35)' }}>
+                <div style={{ background: '#ffffff', border: '1px solid rgba(77,124,95,0.16)', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 2px 16px rgba(77,124,95,0.08)' }}>
 
                   {/* Card header */}
-                  <div style={{ padding: '18px 24px', borderBottom: '1px solid rgba(34,197,94,0.1)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <CreditCard size={14} style={{ color: '#22c55e' }} />
+                  <div style={{ padding: '18px 24px', borderBottom: '1px solid rgba(77,124,95,0.12)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ width: '32px', height: '32px', borderRadius: '9px', background: 'rgba(77,124,95,0.08)', border: '1px solid rgba(77,124,95,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <CreditCard size={14} style={{ color: '#4d7c5f' }} />
                     </div>
-                    <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#f0fdf4', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Fiyat Özeti</div>
+                    <div style={{ fontWeight: 800, fontSize: '0.9rem', color: '#1c2b22', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Fiyat Özeti</div>
                   </div>
 
                   <div style={{ padding: '20px 24px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                      <span style={{ fontSize: '0.85rem', color: '#9ca3af' }}>Bilet fiyatı</span>
-                      <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f0fdf4' }}>{priceDisplay}</span>
+                      <span style={{ fontSize: '0.85rem', color: '#6c8274' }}>Bilet fiyatı</span>
+                      <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1c2b22' }}>{priceDisplay}</span>
                     </div>
-                    <div style={{ height: '1px', background: 'rgba(34,197,94,0.1)', margin: '14px 0' }} />
+                    <div style={{ height: '1px', background: 'rgba(77,124,95,0.12)', margin: '14px 0' }} />
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#f0fdf4' }}>Toplam</span>
-                      <span style={{ fontSize: '1.3rem', fontWeight: 900, color: '#22c55e', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>{priceDisplay}</span>
+                      <span style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1c2b22' }}>Toplam</span>
+                      <span style={{ fontSize: '1.3rem', fontWeight: 900, color: '#4d7c5f', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>{priceDisplay}</span>
                     </div>
                   </div>
                 </div>
