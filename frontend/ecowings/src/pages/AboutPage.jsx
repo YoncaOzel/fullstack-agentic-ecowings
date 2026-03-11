@@ -82,7 +82,7 @@ export default function AboutPage() {
             lineHeight: 1.75, maxWidth: '560px', margin: '0 auto 32px',
           }}>
             EcoWings, uçuş deneyimini daha bilinçli, daha sürdürülebilir ve daha
-            bağlantılı kılmak için kuruldu. Her bilet, bir ağaç.
+            bağlantılı kılmak için kuruldu.
           </p>
           <Link to="/flights" style={{
             display: 'inline-flex', alignItems: 'center', gap: '8px',

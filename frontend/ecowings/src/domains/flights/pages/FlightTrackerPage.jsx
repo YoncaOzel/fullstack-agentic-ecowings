@@ -58,7 +58,7 @@ export default function FlightTrackerPage() {
             <Radio size={11} /> Anlık Takip
           </div>
 
-          <h1 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", lineHeight: 1.15, margin: '0 0 16px', background: 'linear-gradient(135deg,#f0fdf4 30%,#4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          <h1 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", lineHeight: 1.15, margin: '0 0 16px', color: '#1a4d33' }}>
             Uçuş Takip
           </h1>
           <p style={{ color: 'rgba(187,247,208,0.75)', fontSize: '1.05rem', marginBottom: '0', maxWidth: '480px' }}>
@@ -74,13 +74,13 @@ export default function FlightTrackerPage() {
 
             {/* Search card */}
             <div style={{
-              background: 'linear-gradient(160deg,rgba(11,21,11,0.92) 0%,rgba(8,14,8,0.95) 100%)',
+              background: 'var(--bg-card)',
               border: '1px solid rgba(34,197,94,0.2)',
               borderRadius: '20px',
               padding: '32px 32px 28px',
               marginBottom: '28px',
-              boxShadow: '0 20px 56px rgba(0,0,0,0.5),inset 0 1px 0 rgba(34,197,94,0.08)',
-              backdropFilter: 'blur(24px)',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
+              backdropFilter: 'none',
             }}>
               {/* Header */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
@@ -88,7 +88,7 @@ export default function FlightTrackerPage() {
                   <Radar size={20} style={{ color: '#22c55e' }} />
                 </div>
                 <div>
-                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#f0fdf4', margin: 0, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Uçuş Numarası ile Sorgula</h3>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#1a4d33', margin: 0, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Uçuş Numarası ile Sorgula</h3>
                   <p style={{ fontSize: '0.8rem', color: '#6b7280', margin: 0, marginTop: '2px' }}>Örn: TK123, PC456, TF789</p>
                 </div>
               </div>
@@ -103,8 +103,8 @@ export default function FlightTrackerPage() {
                     onFocus={() => setInputFocus(true)}
                     onBlur={() => setInputFocus(false)}
                     style={{
-                      width: '100%', background: 'rgba(255,255,255,0.04)', border: `1px solid ${inputFocus ? '#22c55e' : 'rgba(34,197,94,0.2)'}`,
-                      borderRadius: '10px', padding: '13px 14px 13px 42px', color: '#f0fdf4', fontSize: '14px',
+                      width: '100%', background: 'rgba(0,0,0,0.03)', border: `1px solid ${inputFocus ? '#22c55e' : 'rgba(34,197,94,0.2)'}`,
+                      borderRadius: '10px', padding: '13px 14px 13px 42px', color: 'var(--text-primary)', fontSize: '14px',
                       fontFamily: "'DM Mono',monospace", letterSpacing: '0.08em', outline: 'none',
                       transition: 'border-color 0.2s,box-shadow 0.2s',
                       boxShadow: inputFocus ? '0 0 0 3px rgba(34,197,94,0.12)' : 'none',
@@ -154,17 +154,17 @@ export default function FlightTrackerPage() {
             {/* Not found */}
             {!loading && notFound && (
               <div style={{
-                background: 'linear-gradient(160deg,#111c11 0%,#0e1a0e 100%)',
+                background: 'var(--bg-card)',
                 border: '1px solid rgba(34,197,94,0.1)',
                 borderRadius: '20px',
                 padding: '48px 32px',
                 textAlign: 'center',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.06)',
               }}>
                 <div style={{ fontSize: '3.5rem', marginBottom: '16px' }}>🔍</div>
-                <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#f0fdf4', marginBottom: '8px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Uçuş Bulunamadı</h3>
+                <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#1a4d33', marginBottom: '8px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Uçuş Bulunamadı</h3>
                 <p style={{ color: '#6b7280', fontSize: '0.9rem', lineHeight: 1.6 }}>
-                  <span style={{ color: '#bbf7d0', fontFamily: "'DM Mono',monospace", fontWeight: 600 }}>"{flightNumber}"</span> numaralı uçuş sistemde kayıtlı değil.
+                  <span style={{ color: 'var(--green-primary)', fontFamily: "'DM Mono',monospace", fontWeight: 600 }}>"{flightNumber}"</span> numaralı uçuş sistemde kayıtlı değil.
                 </p>
                 <p style={{ color: '#6b7280', fontSize: '0.82rem', marginTop: '8px' }}>Uçuş numaranızı kontrol edip tekrar deneyin.</p>
               </div>
@@ -190,12 +190,12 @@ export default function FlightTrackerPage() {
             {/* Idle state hint */}
             {!hasSearched && !loading && (
               <div style={{
-                background: 'linear-gradient(160deg,#111c11 0%,#0e1a0e 100%)',
+                background: 'var(--bg-card)',
                 border: '1px solid rgba(34,197,94,0.08)',
                 borderRadius: '20px', padding: '40px 32px', textAlign: 'center',
               }}>
                 <div style={{ fontSize: '3rem', marginBottom: '16px' }}>📡</div>
-                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#f0fdf4', marginBottom: '8px' }}>Uçuşunuzu Takip Edin</h3>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#1a4d33', marginBottom: '8px' }}>Uçuşunuzu Takip Edin</h3>
                 <p style={{ color: '#6b7280', fontSize: '0.85rem', lineHeight: 1.6 }}>
                   Uçuş numaranızı girerek kalkış, varış ve durum bilgisine anında ulaşın.
                 </p>

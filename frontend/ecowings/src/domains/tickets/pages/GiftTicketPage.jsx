@@ -62,7 +62,7 @@ export default function GiftTicketPage() {
             <Gift size={11} /> Hediye GÃ¶nder
           </div>
 
-          <h1 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", lineHeight: 1.15, margin: '0 0 16px', background: 'linear-gradient(135deg,#f0fdf4 30%,#4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          <h1 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", lineHeight: 1.15, margin: '0 0 16px', color: '#1a4d33' }}>
             Biletlerime Hediye Et
           </h1>
           <p style={{ color: 'rgba(187,247,208,0.75)', fontSize: '1.05rem', maxWidth: '480px' }}>
@@ -84,10 +84,10 @@ export default function GiftTicketPage() {
             /* â”€â”€ Not admin â”€â”€ */
             <div style={{ maxWidth: '520px', margin: '0 auto' }}>
               <div style={{
-                background: 'linear-gradient(160deg,#111c11 0%,#0e1a0e 100%)',
+                background: 'var(--bg-card)',
                 border: '1px solid rgba(34,197,94,0.13)',
                 borderRadius: '22px', overflow: 'hidden',
-                boxShadow: '0 12px 40px rgba(0,0,0,0.4)',
+                boxShadow: '0 12px 40px rgba(0,0,0,0.08)',
               }}>
                 {/* Top strip */}
                 <div style={{ height: '4px', background: 'linear-gradient(90deg,rgba(239,68,68,0.6) 0%,rgba(239,68,68,0.2) 100%)' }} />
@@ -96,7 +96,7 @@ export default function GiftTicketPage() {
                   <div style={{ width: '72px', height: '72px', borderRadius: '20px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
                     <Lock size={30} style={{ color: '#f87171' }} />
                   </div>
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#f0fdf4', marginBottom: '10px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Yetkisiz EriÅŸim</h3>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1a4d33', marginBottom: '10px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Yetkisiz Erişim</h3>
                   <p style={{ color: '#6b7280', fontSize: '0.9rem', lineHeight: 1.6, maxWidth: '340px', margin: '0 auto 24px' }}>
                     Bu sayfa yalnÄ±zca admin kullanÄ±cÄ±lar iÃ§indir. Bilet hediye etme Ã¶zelliÄŸi geliÅŸtirme aÅŸamasÄ±ndadÄ±r.
                   </p>
@@ -122,7 +122,7 @@ export default function GiftTicketPage() {
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: '14px' }}>
                   âœ¦ Admin Paneli
                 </div>
-                <h2 style={{ fontSize: '1.8rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", margin: 0, background: 'linear-gradient(135deg,#f0fdf4 30%,#4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                <h2 style={{ fontSize: '1.8rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", margin: 0, color: '#1a4d33' }}>
                   Kupon Hediye Et
                 </h2>
                 <div style={{ marginTop: '16px', height: '1px', background: 'linear-gradient(90deg,rgba(34,197,94,0.4) 0%,rgba(34,197,94,0.1) 60%,transparent 100%)' }} />

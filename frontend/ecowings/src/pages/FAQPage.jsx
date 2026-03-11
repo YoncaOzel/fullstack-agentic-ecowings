@@ -279,10 +279,7 @@ export default function FAQPage() {
             fontFamily: "'Plus Jakarta Sans', sans-serif",
             lineHeight: 1.15,
             letterSpacing: '-0.03em',
-            background: 'linear-gradient(135deg, #f0fdf4 0%, #86efac 50%, #22c55e 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
+            color: '#1a4d33',
             margin: '0 0 14px',
           }}>
             Nasıl Yardımcı Olabiliriz?

@@ -49,7 +49,7 @@ export default function CampaignsPage() {
             <Tag size={11} /> Özel Fırsatlar
           </div>
 
-          <h1 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", lineHeight: 1.15, margin: '0 0 16px', background: 'linear-gradient(135deg,#f0fdf4 30%,#4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          <h1 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", lineHeight: 1.15, margin: '0 0 16px', color: '#1a4d33' }}>
             Kampanyalar & Kuponlar
           </h1>
           <p style={{ color: 'rgba(187,247,208,0.75)', fontSize: '1.05rem', maxWidth: '500px' }}>
@@ -70,7 +70,7 @@ export default function CampaignsPage() {
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: '14px' }}>
                   🏷️ Üyelere Özel
                 </div>
-                <h2 style={{ fontSize: '2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", margin: '0 0 10px', background: 'linear-gradient(135deg,#f0fdf4 30%,#4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                <h2 style={{ fontSize: '2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", margin: '0 0 10px', color: '#1a4d33' }}>
                   Özel Kampanyalar Sizi Bekliyor
                 </h2>
                 <p style={{ color: '#6b7280', fontSize: '0.95rem', maxWidth: '480px', margin: '0 auto 12px', lineHeight: 1.6 }}>
@@ -85,17 +85,17 @@ export default function CampaignsPage() {
                   <div
                     key={p.title}
                     style={{
-                      background: 'linear-gradient(160deg,#111c11 0%,#0e1a0e 100%)',
+                      background: 'var(--bg-card)',
                       border: '1px solid rgba(34,197,94,0.13)',
                       borderRadius: '18px',
                       padding: '28px 22px 24px',
                       position: 'relative', overflow: 'hidden',
                       transition: 'transform 0.2s,box-shadow 0.2s,border-color 0.2s',
-                      boxShadow: '0 4px 20px rgba(0,0,0,0.35)',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
                       animationDelay: `${i * 80}ms`,
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 16px 44px rgba(34,197,94,0.12),0 4px 12px rgba(0,0,0,0.4)'; e.currentTarget.style.borderColor = 'rgba(34,197,94,0.3)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.35)'; e.currentTarget.style.borderColor = 'rgba(34,197,94,0.13)'; }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 16px 44px rgba(34,197,94,0.12),0 4px 12px rgba(0,0,0,0.08)'; e.currentTarget.style.borderColor = 'rgba(34,197,94,0.3)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.06)'; e.currentTarget.style.borderColor = 'rgba(34,197,94,0.13)'; }}
                   >
                     {/* Glow blob */}
                     <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '120px', height: '120px', background: 'radial-gradient(ellipse,rgba(34,197,94,0.08) 0%,transparent 70%)', pointerEvents: 'none' }} />
@@ -106,7 +106,7 @@ export default function CampaignsPage() {
                     </div>
 
                     <div style={{ fontSize: '2.4rem', marginBottom: '14px' }}>{p.icon}</div>
-                    <h3 style={{ fontSize: '0.98rem', fontWeight: 700, color: '#f0fdf4', marginBottom: '8px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>{p.title}</h3>
+                    <h3 style={{ fontSize: '0.98rem', fontWeight: 700, color: '#1a4d33', marginBottom: '8px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>{p.title}</h3>
                     <p style={{ fontSize: '0.83rem', color: '#6b7280', lineHeight: 1.6, margin: 0 }}>{p.desc}</p>
 
                     {/* Bottom tag */}
@@ -125,7 +125,7 @@ export default function CampaignsPage() {
                 boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
               }}>
                 <div style={{ fontSize: '2.8rem', marginBottom: '12px' }}>🎫</div>
-                <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#f0fdf4', marginBottom: '10px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+                <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1a4d33', marginBottom: '10px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
                   Kişisel Kuponlarınıza Erişin
                 </h3>
                 <p style={{ color: '#6b7280', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: '28px', maxWidth: '420px', margin: '0 auto 28px' }}>
@@ -151,7 +151,7 @@ export default function CampaignsPage() {
                   {coupons.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '80px 20px', background: 'rgba(34,197,94,0.03)', border: '1px solid rgba(34,197,94,0.1)', borderRadius: '20px' }}>
                       <div style={{ fontSize: '3.5rem', marginBottom: '16px' }}>🎫</div>
-                      <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#f0fdf4', marginBottom: '8px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Kuponunuz Bulunmuyor</h3>
+                      <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1a4d33', marginBottom: '8px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Kuponunuz Bulunmuyor</h3>
                       <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Şu an aktif kuponunuz yok. Uçuşlarınız için kampanyaları takip edin.</p>
                     </div>
                   ) : (
@@ -161,7 +161,7 @@ export default function CampaignsPage() {
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: '14px' }}>
                           ✦ Mevcut Kuponlar
                         </div>
-                        <h2 style={{ fontSize: '1.8rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", margin: 0, background: 'linear-gradient(135deg,#f0fdf4 30%,#4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                        <h2 style={{ fontSize: '1.8rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", margin: 0, color: '#1a4d33' }}>
                           {coupons.length} Kupon Mevcut
                         </h2>
                         <div style={{ marginTop: '16px', height: '1px', background: 'linear-gradient(90deg,rgba(34,197,94,0.4) 0%,rgba(34,197,94,0.1) 60%,transparent 100%)' }} />

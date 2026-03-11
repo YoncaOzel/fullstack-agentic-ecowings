@@ -82,7 +82,7 @@ export default function ProfileSettingsPage() {
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.7rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '10px' }}>
                 <Settings size={10} /> Profil Ayarları
               </div>
-              <h1 style={{ fontSize: 'clamp(1.5rem,4vw,2.2rem)', fontWeight: 900, fontFamily: "'Plus Jakarta Sans',sans-serif", margin: '0 0 8px', lineHeight: 1.15, background: 'linear-gradient(135deg,#f0fdf4 30%,#4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <h1 style={{ fontSize: 'clamp(1.5rem,4vw,2.2rem)', fontWeight: 900, fontFamily: "'Plus Jakarta Sans',sans-serif", margin: '0 0 8px', lineHeight: 1.15, color: '#1a4d33' }}>
                 {profile ? `${profile.firstName} ${profile.lastName}` : 'Profilim'}
               </h1>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
@@ -155,7 +155,7 @@ export default function ProfileSettingsPage() {
                 coupons.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '60px 20px' }}>
                     <div style={{ fontSize: '3.5rem', marginBottom: '14px' }}>🎫</div>
-                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#f0fdf4', marginBottom: '8px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Kuponunuz Bulunmuyor</h3>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1a4d33', marginBottom: '8px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Kuponunuz Bulunmuyor</h3>
                     <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Şu an aktif kuponunuz yok. Kampanyaları takip edin.</p>
                   </div>
                 ) : (
@@ -165,7 +165,7 @@ export default function ProfileSettingsPage() {
                         <Tag size={15} style={{ color: '#22c55e' }} />
                       </div>
                       <div>
-                        <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#f0fdf4', margin: 0, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Kuponlarım</h2>
+                        <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#1a4d33', margin: 0, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Kuponlarım</h2>
                         <p style={{ fontSize: '0.78rem', color: '#6b7280', margin: 0, marginTop: '2px' }}>{coupons.length} kupon mevcut</p>
                       </div>
                     </div>

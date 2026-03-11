@@ -242,7 +242,7 @@ function PopularDestinations() {
           </div>
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
             <div>
-              <h2 style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.15, margin: 0, background: 'linear-gradient(135deg, #f0fdf4 30%, #4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              <h2 style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.15, margin: 0, color: '#1a4d33' }}>
                 Popular Destinations
               </h2>
               <p style={{ color: '#6b7280', fontSize: '0.95rem', marginTop: '8px' }}>
@@ -457,7 +457,7 @@ export default function HomePage() {
           </div>
           {/* Badge */}
           <div style={{ display:'inline-flex', alignItems:'center', gap:'6px', background:'rgba(34,197,94,0.1)', border:'1px solid rgba(34,197,94,0.25)', borderRadius:'100px', padding:'5px 16px', fontSize:'0.72rem', fontWeight:700, color:'#22c55e', letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'20px', animation:'fadeIn 0.8s ease both' }}>🌿 Sürdürülebilir Seyahat</div>
-          <h1 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'clamp(2.4rem,5vw,4rem)', fontWeight:800, letterSpacing:'-0.04em', lineHeight:1.1, margin:'0 auto 20px', background:'linear-gradient(135deg,#f0fdf4 0%,#86efac 50%,#22c55e 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', animation:'fadeUp 0.7s 0.1s cubic-bezier(0.4,0,0.2,1) both' }}>
+          <h1 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'clamp(2.4rem,5vw,4rem)', fontWeight:800, letterSpacing:'-0.04em', lineHeight:1.1, margin:'0 auto 20px', color:'#1a4d33', animation:'fadeUp 0.7s 0.1s cubic-bezier(0.4,0,0.2,1) both' }}>
             Yeşil Bir Yolculuk<br />Başlıyor
           </h1>
           <p style={{ color:'rgba(187,247,208,0.75)', fontSize:'clamp(1rem,2vw,1.15rem)', maxWidth:'560px', margin:'0 auto 44px', lineHeight:1.7, fontFamily:"'Inter',sans-serif", animation:'fadeUp 0.7s 0.22s cubic-bezier(0.4,0,0.2,1) both' }}>
@@ -675,7 +675,7 @@ export default function HomePage() {
         <div className="container" style={{ position:'relative' }}>
           <div className="fade-up" style={{ textAlign:'center', marginBottom:'56px' }}>
             <div style={{ display:'inline-flex', alignItems:'center', gap:'6px', background:'rgba(34,197,94,0.08)', border:'1px solid rgba(34,197,94,0.18)', borderRadius:'20px', padding:'4px 14px', fontSize:'0.72rem', fontWeight:700, color:'#22c55e', letterSpacing:'0.07em', textTransform:'uppercase', marginBottom:'14px' }}>✦ Nasıl Çalışır?</div>
-            <h2 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'2.2rem', fontWeight:800, letterSpacing:'-0.04em', lineHeight:1.15, margin:'0 auto', background:'linear-gradient(135deg,#f0fdf4 30%,#4ade80 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>3 Adımda Yeşil Seyahat</h2>
+            <h2 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'2.2rem', fontWeight:800, letterSpacing:'-0.04em', lineHeight:1.15, margin:'0 auto', color:'#1a4d33' }}>3 Adımda Yeşil Seyahat</h2>
             <p style={{ color:'#6b7280', fontSize:'0.95rem', marginTop:'10px' }}>Sürdürülebilir bir yolculuk planlamak bu kadar kolay</p>
           </div>
           <div className="fade-up" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:'28px' }}>
@@ -684,9 +684,9 @@ export default function HomePage() {
               {step:'02',emoji:'📊',title:'Uçuşları Karşılaştır',desc:'Fiyat, süre ve karbon etkisine göre en iyi uçuşu seç. Tam şeffaflık.'},
               {step:'03',emoji:'🌱',title:'Ekolojiyle Uç',desc:'Rezervasyonunu tamamla, karbon dengeleme programlarına katıl ve gezini kaydet.'},
             ].map((item, i) => (
-              <div key={item.step} style={{ background:'linear-gradient(160deg,#111c11 0%,#0e1a0e 100%)', border:'1px solid rgba(34,197,94,0.13)', borderRadius:'20px', padding:'36px 28px', position:'relative', boxShadow:'0 4px 24px rgba(0,0,0,0.3)', transition:'transform 0.3s ease,box-shadow 0.3s ease,border-color 0.3s ease' }}
-                onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-6px)';e.currentTarget.style.boxShadow='0 20px 48px rgba(34,197,94,0.12),0 8px 16px rgba(0,0,0,0.4)';e.currentTarget.style.borderColor='rgba(34,197,94,0.35)';}}
-                onMouseLeave={e=>{e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='0 4px 24px rgba(0,0,0,0.3)';e.currentTarget.style.borderColor='rgba(34,197,94,0.13)';}}>
+              <div key={item.step} style={{ background:'var(--bg-card)', border:'1px solid rgba(34,197,94,0.13)', borderRadius:'20px', padding:'36px 28px', position:'relative', boxShadow:'0 4px 24px rgba(0,0,0,0.06)', transition:'transform 0.3s ease,box-shadow 0.3s ease,border-color 0.3s ease' }}
+                onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-6px)';e.currentTarget.style.boxShadow='0 20px 48px rgba(34,197,94,0.12),0 8px 16px rgba(0,0,0,0.08)';e.currentTarget.style.borderColor='rgba(34,197,94,0.35)';}}
+                onMouseLeave={e=>{e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='0 4px 24px rgba(0,0,0,0.06)';e.currentTarget.style.borderColor='rgba(34,197,94,0.13)';}}>
                 <div style={{ position:'absolute', top:0, left:'28px', right:'28px', height:'2px', background:'linear-gradient(90deg,rgba(34,197,94,0.6),transparent)', borderRadius:'0 0 2px 2px' }} />
                 <div style={{ fontFamily:"'DM Mono',monospace", fontSize:'0.72rem', fontWeight:700, color:'rgba(34,197,94,0.4)', letterSpacing:'0.1em', marginBottom:'16px' }}>ADIM {item.step}</div>
                 <div style={{ fontSize:'2.4rem', marginBottom:'16px', lineHeight:1 }}>{item.emoji}</div>
@@ -702,14 +702,14 @@ export default function HomePage() {
       <PopularDestinations />
 
       {/* ── Havayolu Ortaklarımız ── */}
-      <section className="fade-up" style={{ padding: '72px 0', background: 'var(--bg-surface, #0e1a0e)' }}>
+      <section className="fade-up" style={{ padding: '72px 0', background: 'var(--bg-surface)' }}>
         <div className="container">
           {/* Header */}
           <div style={{ marginBottom: '40px' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: '14px' }}>
               ✈ Güvenilir Ortaklar
             </div>
-            <h2 style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.15, margin: 0, background: 'linear-gradient(135deg, #f0fdf4 30%, #4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <h2 style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.15, margin: 0, color: '#1a4d33' }}>
               Havayolu Ortaklarımız
             </h2>
             <p style={{ color: '#6b7280', fontSize: '0.95rem', marginTop: '8px' }}>Seçkin havayolu şirketleriyle güvenli ve konforlu seyahat edin</p>
@@ -720,24 +720,24 @@ export default function HomePage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
               {airlines.slice(0, 8).map((a) => (
                 <div key={a.id} style={{
-                  background: 'linear-gradient(160deg, #111c11 0%, #0e1a0e 100%)',
+                  background: 'var(--bg-card)',
                   border: '1px solid rgba(34,197,94,0.13)',
                   borderRadius: '16px',
                   padding: '28px 20px 22px',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px',
                   transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
-                  boxShadow: '0 2px 16px rgba(0,0,0,0.35)',
+                  boxShadow: '0 2px 16px rgba(0,0,0,0.06)',
                   cursor: 'default',
                   position: 'relative',
                 }}
                   onMouseEnter={e => {
                     e.currentTarget.style.transform = 'translateY(-4px)';
-                    e.currentTarget.style.boxShadow = '0 12px 36px rgba(34,197,94,0.12), 0 4px 12px rgba(0,0,0,0.4)';
+                    e.currentTarget.style.boxShadow = '0 12px 36px rgba(34,197,94,0.12), 0 4px 12px rgba(0,0,0,0.08)';
                     e.currentTarget.style.borderColor = 'rgba(34,197,94,0.32)';
                   }}
                   onMouseLeave={e => {
                     e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 16px rgba(0,0,0,0.35)';
+                    e.currentTarget.style.boxShadow = '0 2px 16px rgba(0,0,0,0.06)';
                     e.currentTarget.style.borderColor = 'rgba(34,197,94,0.13)';
                   }}
                 >
@@ -756,7 +756,7 @@ export default function HomePage() {
                   )}
 
                   <div style={{ textAlign: 'center' }}>
-                    <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#f0fdf4', marginBottom: '4px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1a4d33', marginBottom: '4px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                       {a.name}
                     </h3>
                     {a.country && (
@@ -790,7 +790,7 @@ export default function HomePage() {
             </div>
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
               <div>
-                <h2 style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.15, margin: 0, background: 'linear-gradient(135deg, #f0fdf4 30%, #4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                <h2 style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.15, margin: 0, color: '#1a4d33' }}>
                   Son Yorumlar
                 </h2>
                 <p style={{ color: '#6b7280', fontSize: '0.95rem', marginTop: '8px' }}>Gerçek yolculardan gerçek deneyimler</p>
@@ -810,23 +810,23 @@ export default function HomePage() {
                 const filled = Math.max(0, Math.min(5, Math.round(r.rating)));
                 return (
                   <div key={r.id} style={{
-                    background: 'linear-gradient(160deg, #111c11 0%, #0e1a0e 100%)',
+                    background: 'var(--bg-card)',
                     border: '1px solid rgba(34,197,94,0.12)',
                     borderLeft: '4px solid rgba(34,197,94,0.5)',
                     borderRadius: '16px',
                     padding: '28px 24px 22px',
                     display: 'flex', flexDirection: 'column', gap: '16px',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.35)',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
                     transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                     position: 'relative', overflow: 'hidden',
                   }}
                     onMouseEnter={e => {
                       e.currentTarget.style.transform = 'translateY(-3px)';
-                      e.currentTarget.style.boxShadow = '0 12px 36px rgba(34,197,94,0.1), 0 4px 12px rgba(0,0,0,0.4)';
+                      e.currentTarget.style.boxShadow = '0 12px 36px rgba(34,197,94,0.1), 0 4px 12px rgba(0,0,0,0.08)';
                     }}
                     onMouseLeave={e => {
                       e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.35)';
+                      e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.06)';
                     }}
                   >
                     {/* Decorative giant quote */}
@@ -843,7 +843,7 @@ export default function HomePage() {
                     </div>
 
                     {/* Comment */}
-                    <p style={{ color: '#bbf7d0', fontSize: '0.93rem', lineHeight: 1.7, fontStyle: 'italic', margin: 0, position: 'relative', zIndex: 1 }}>
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.93rem', lineHeight: 1.7, fontStyle: 'italic', margin: 0, position: 'relative', zIndex: 1 }}>
                       &ldquo;{r.comment}&rdquo;
                     </p>
 
@@ -862,7 +862,7 @@ export default function HomePage() {
                         flexShrink: 0,
                       }}>{initials}</div>
                       <div>
-                        <div style={{ fontWeight: 700, fontSize: '0.875rem', color: '#f0fdf4' }}>{r.userName}</div>
+                        <div style={{ fontWeight: 700, fontSize: '0.875rem', color: '#1a4d33' }}>{r.userName}</div>
                         {r.createdDate && (
                           <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: '1px' }}>
                             {new Date(r.createdDate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
@@ -879,12 +879,12 @@ export default function HomePage() {
       </section>
 
       {/* ── Bottom CTA ───────────────────────────────────────── */}
-      <section className="fade-up" style={{ padding:'96px 0', background:'linear-gradient(160deg,#0a1a0a 0%,#060e06 100%)', borderTop:'1px solid rgba(34,197,94,0.1)', position:'relative', overflow:'hidden' }}>
+      <section className="fade-up" style={{ padding:'96px 0', background:'var(--bg-surface)', borderTop:'1px solid rgba(34,197,94,0.1)', position:'relative', overflow:'hidden' }}>
         <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:'700px', height:'500px', background:'radial-gradient(ellipse,rgba(34,197,94,0.1) 0%,transparent 65%)', pointerEvents:'none' }} />
         <div className="container" style={{ textAlign:'center', position:'relative' }}>
           <div style={{ display:'inline-flex', alignItems:'center', gap:'6px', background:'rgba(34,197,94,0.1)', border:'1px solid rgba(34,197,94,0.25)', borderRadius:'100px', padding:'5px 16px', fontSize:'0.72rem', fontWeight:700, color:'#22c55e', letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'24px' }}>🌿 Bugün Başla</div>
-          <h2 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'clamp(2rem,4vw,3.2rem)', fontWeight:800, letterSpacing:'-0.04em', lineHeight:1.1, margin:'0 auto 20px', background:'linear-gradient(135deg,#f0fdf4 0%,#86efac 50%,#22c55e 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', maxWidth:'640px' }}>Sürdürülebilir Seyahate Hazır Mısın?</h2>
-          <p style={{ color:'rgba(187,247,208,0.65)', fontSize:'1.05rem', maxWidth:'480px', margin:'0 auto 40px', lineHeight:1.7, fontFamily:"'Inter',sans-serif" }}>Ücretsiz hesap oluştur, karbon ayak izini takip et ve daha yeşil bir dünya için uç.</p>
+          <h2 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'clamp(2rem,4vw,3.2rem)', fontWeight:800, letterSpacing:'-0.04em', lineHeight:1.1, margin:'0 auto 20px', color:'#1a4d33', maxWidth:'640px' }}>Sürdürülebilir Seyahate Hazır Mısın?</h2>
+          <p style={{ color:'var(--text-muted)', fontSize:'1.05rem', maxWidth:'480px', margin:'0 auto 40px', lineHeight:1.7, fontFamily:"'Inter',sans-serif" }}>Ücretsiz hesap oluştur, karbon ayak izini takip et ve daha yeşil bir dünya için uç.</p>
           <div style={{ display:'flex', gap:'16px', justifyContent:'center', flexWrap:'wrap' }}>
             <Link to="/signup"
               style={{ display:'inline-flex', alignItems:'center', gap:'8px', padding:'15px 36px', borderRadius:'12px', background:'linear-gradient(135deg,#22c55e,#16a34a)', color:'#051005', fontWeight:700, fontSize:'0.95rem', textDecoration:'none', boxShadow:'0 4px 20px rgba(34,197,94,0.35)', transition:'all 0.2s ease' }}

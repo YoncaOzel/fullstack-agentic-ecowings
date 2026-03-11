@@ -117,7 +117,7 @@ export default function FlightsPage() {
             <Plane size={11} /> Tüm Rotalar
           </div>
 
-          <h1 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", lineHeight: 1.15, margin: '0 0 16px', background: 'linear-gradient(135deg,#f0fdf4 30%,#4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          <h1 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", lineHeight: 1.15, margin: '0 0 16px', color: '#1a4d33' }}>
             Tüm Uçuşlar
           </h1>
           <p style={{ color: 'rgba(187,247,208,0.75)', fontSize: '1.05rem', marginBottom: '40px', maxWidth: '500px' }}>
@@ -209,7 +209,7 @@ export default function FlightsPage() {
           ) : filtered.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '80px 20px', background: 'rgba(34,197,94,0.03)', border: '1px solid rgba(34,197,94,0.1)', borderRadius: '20px' }}>
               <div style={{ fontSize: '3.5rem', marginBottom: '16px' }}>✈️</div>
-              <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#f0fdf4', marginBottom: '8px' }}>Sonuç Bulunamadı</h3>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1a4d33', marginBottom: '8px' }}>Sonuç Bulunamadı</h3>
               <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Farklı bir arama terimi veya sıralama deneyin.</p>
             </div>
           ) : (
@@ -219,7 +219,7 @@ export default function FlightsPage() {
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: '14px' }}>
                   ✦ Müsait Rotalar
                 </div>
-                <h2 style={{ fontSize: '1.8rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", margin: 0, background: 'linear-gradient(135deg,#f0fdf4 30%,#4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                <h2 style={{ fontSize: '1.8rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", margin: 0, color: '#1a4d33' }}>
                   {search ? `"${search}" için ${filtered.length} Uçuş` : 'Tüm Uçuşlar'}
                 </h2>
                 <div style={{ marginTop: '16px', height: '1px', background: 'linear-gradient(90deg,rgba(34,197,94,0.4) 0%,rgba(34,197,94,0.1) 60%,transparent 100%)' }} />

@@ -58,7 +58,7 @@ export default function LuckyFlightPage() {
             <Shuffle size={11} /> Şanslı Uçuş
           </div>
 
-          <h1 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 900, fontFamily: "'Plus Jakarta Sans',sans-serif", margin: '0 0 14px', lineHeight: 1.15, background: 'linear-gradient(135deg,#f0fdf4 30%,#4ade80 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          <h1 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 900, fontFamily: "'Plus Jakarta Sans',sans-serif", margin: '0 0 14px', lineHeight: 1.15, color: '#1a4d33' }}>
             Şansını Dene, Kanatlan!
           </h1>
           <p style={{ fontSize: '1rem', color: '#6b7280', maxWidth: '480px', margin: '0 auto', lineHeight: 1.7 }}>
@@ -70,14 +70,14 @@ export default function LuckyFlightPage() {
       {/* ══ Search Panel ══ */}
       <section style={{ padding: '48px 0', position: 'relative' }}>
         <div className="container" style={{ maxWidth: '520px' }}>
-          <div style={{ background: 'rgba(11,21,11,0.92)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '36px 32px', boxShadow: '0 24px 60px rgba(0,0,0,0.5)' }}>
+          <div style={{ background: 'var(--bg-card)', backdropFilter: 'none', WebkitBackdropFilter: 'none', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '36px 32px', boxShadow: '0 8px 32px rgba(0,0,0,0.08)' }}>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.22)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <MapPin size={17} style={{ color: '#22c55e' }} />
               </div>
               <div>
-                <h2 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#f0fdf4', margin: 0, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Kalkış Noktanı Gir</h2>
+                <h2 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1a4d33', margin: 0, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Kalkış Noktanı Gir</h2>
                 <p style={{ fontSize: '0.78rem', color: '#6b7280', margin: 0, marginTop: '2px' }}>3 harfli IATA havalimanı kodu</p>
               </div>
             </div>
@@ -92,8 +92,8 @@ export default function LuckyFlightPage() {
                   onKeyDown={handleKeyDown}
                   maxLength={3}
                   style={{
-                    width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(34,197,94,0.2)',
-                    borderRadius: '12px', padding: '14px 16px', color: '#f0fdf4',
+                    width: '100%', background: 'rgba(0,0,0,0.03)', border: '1px solid rgba(34,197,94,0.2)',
+                    borderRadius: '12px', padding: '14px 16px', color: 'var(--text-primary)',
                     fontSize: '1.15rem', fontFamily: "'DM Mono',monospace", letterSpacing: '4px',
                     outline: 'none', textTransform: 'uppercase', textAlign: 'center',
                     transition: 'border-color 0.2s,box-shadow 0.2s',
@@ -209,7 +209,7 @@ export default function LuckyFlightPage() {
             ) : !error ? (
               <div style={{ textAlign: 'center', padding: '60px 20px', background: 'rgba(34,197,94,0.03)', border: '1px solid rgba(34,197,94,0.1)', borderRadius: '20px' }}>
                 <div style={{ fontSize: '3.5rem', marginBottom: '16px' }}>🔍</div>
-                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#f0fdf4', marginBottom: '8px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Uçuş Bulunamadı</h3>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1a4d33', marginBottom: '8px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Uçuş Bulunamadı</h3>
                 <p style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: '24px' }}>{origin.toUpperCase()} noktasından uygun uçuş bulunamadı. Başka bir kalkış kodu deneyin.</p>
                 <button onClick={() => { setSearched(false); setOrigin(''); }} style={{ padding: '10px 24px', borderRadius: '10px', border: 'none', background: 'linear-gradient(135deg,#22c55e,#16a34a)', color: '#080e08', fontWeight: 700, cursor: 'pointer' }}>
                   Tekrar Ara

@@ -70,7 +70,7 @@ export default function ChangePasswordForm() {
           <Key size={16} style={{ color: '#22c55e' }} />
         </div>
         <div>
-          <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#f0fdf4', margin: 0, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Şifre Değiştir</h3>
+          <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#1a4d33', margin: 0, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Şifre Değiştir</h3>
           <p style={{ fontSize: '0.78rem', color: '#6b7280', margin: 0, marginTop: '2px' }}>Hesabınızın güvenliği için güçlü bir şifre seçin</p>
         </div>
       </div>
