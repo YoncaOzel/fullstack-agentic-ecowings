@@ -317,8 +317,8 @@ export default function FAQPage() {
         <div
           className="faq-fade-up fade-up"
           style={{
-            background: 'linear-gradient(180deg, #0d1f0d 0%, #0a1a0e 100%)',
-            border: '1px solid rgba(34,197,94,0.15)',
+            background: 'var(--bg-card)',
+            border: '1px solid var(--border)',
             borderRadius: '18px',
             overflow: 'hidden',
             display: 'flex',
@@ -326,7 +326,7 @@ export default function FAQPage() {
             minHeight: '440px',
             maxHeight: '520px',
             marginBottom: '0',
-            boxShadow: '0 4px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(34,197,94,0.05)',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
           }}
         >
           {/* Chat header bar */}
@@ -444,14 +444,13 @@ export default function FAQPage() {
             display: 'flex',
             gap: '10px',
             alignItems: 'flex-end',
-            background: 'rgba(14,26,14,0.85)',
-            backdropFilter: 'blur(16px)',
+            background: 'var(--bg-card)',
             border: `1px solid ${inputFocused ? 'rgba(34,197,94,0.45)' : 'rgba(34,197,94,0.18)'}`,
             borderRadius: '14px',
             padding: '12px 12px 12px 16px',
             boxShadow: inputFocused
-              ? '0 0 0 3px rgba(34,197,94,0.08), 0 4px 24px rgba(0,0,0,0.3)'
-              : '0 4px 24px rgba(0,0,0,0.25)',
+              ? '0 0 0 3px rgba(34,197,94,0.08), 0 4px 12px rgba(0,0,0,0.06)'
+              : '0 4px 12px rgba(0,0,0,0.06)',
             transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
           }}>
             <textarea
