@@ -31,12 +31,12 @@ function GlowBlobs() {
       <div style={{
         position: 'absolute', bottom: '-120px', right: '-80px',
         width: '400px', height: '400px', pointerEvents: 'none',
-        background: 'radial-gradient(circle, rgba(34,197,94,0.1) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(77,124,95,0.18) 0%, transparent 70%)',
       }} />
       <div style={{
         position: 'absolute', top: '-60px', left: '-60px',
         width: '280px', height: '280px', pointerEvents: 'none',
-        background: 'radial-gradient(circle, rgba(34,197,94,0.06) 0%, transparent 70%)',
+        background: 'radial-gradient(circle, rgba(77,124,95,0.12) 0%, transparent 70%)',
       }} />
     </>
   );
@@ -291,7 +291,7 @@ export default function AuthPage() {
         width: `${BRAND_W}%`,
         left: brandLeft,
         transition: panelTransition,
-        background: 'linear-gradient(160deg, #0a180a 0%, #080e08 100%)',
+        background: 'linear-gradient(160deg, var(--bg-elevated) 0%, var(--bg-surface) 100%)',
         borderRight: isLogin ? '1px solid var(--border)' : 'none',
         borderLeft: isLogin ? 'none' : '1px solid var(--border)',
         padding: '56px 48px',
@@ -307,8 +307,8 @@ export default function AuthPage() {
         width: formWidth,
         left: formLeft,
         transition: panelTransition,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        padding: '32px 24px',
+        display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
+        padding: '56px 24px 48px',
         overflowY: 'auto',
         zIndex: 1,
       }}>
@@ -332,7 +332,7 @@ export default function AuthPage() {
           <div style={{
             background: 'var(--bg-card)', border: '1px solid var(--border)',
             borderRadius: '20px', padding: '36px 32px',
-            boxShadow: '0 8px 48px rgba(0,0,0,0.4)',
+            boxShadow: '0 4px 24px rgba(77,124,95,0.10)',
           }}>
             {isLogin ? (
               <>

@@ -36,7 +36,7 @@ function InputField({ label, icon, type, placeholder, value, onChange, autoCompl
             flex: 1, background: 'var(--bg-base)', border: 'none', outline: 'none',
             padding: '14px 0', fontSize: '0.9rem', color: 'var(--text-primary)',
             fontFamily: "'Inter', sans-serif",
-            colorScheme: 'dark',
+
           }}
         />
         {rightSlot && <span style={{ padding: '0 14px', display: 'flex', alignItems: 'center', flexShrink: 0 }}>{rightSlot}</span>}

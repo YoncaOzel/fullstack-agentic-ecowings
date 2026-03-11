@@ -30,12 +30,12 @@ export default function LoginPage() {
   };
 
   return (
-    <main style={{ minHeight: 'calc(100vh - 64px)', display: 'flex', background: 'var(--bg-base)' }}>
+    <main style={{ minHeight: 'calc(100vh - 64px)', display: 'flex', background: 'var(--bg-base)', overflowY: 'auto' }}>
 
       {/* ── Left decorative panel ─────────────────────────── */}
       <div style={{
         flex: '0 0 42%', display: 'none',
-        background: 'linear-gradient(160deg, #0a180a 0%, #080e08 100%)',
+        background: 'linear-gradient(160deg, var(--bg-elevated) 0%, var(--bg-surface) 100%)',
         borderRight: '1px solid var(--border)',
         padding: '60px 52px',
         flexDirection: 'column', justifyContent: 'space-between',
@@ -44,13 +44,13 @@ export default function LoginPage() {
         <div style={{
           position: 'absolute', bottom: '-120px', right: '-80px',
           width: '400px', height: '400px',
-          background: 'radial-gradient(circle, rgba(34,197,94,0.1) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(77,124,95,0.18) 0%, transparent 70%)',
           pointerEvents: 'none',
         }} />
         <div style={{
           position: 'absolute', top: '-60px', left: '-60px',
           width: '280px', height: '280px',
-          background: 'radial-gradient(circle, rgba(34,197,94,0.06) 0%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(77,124,95,0.12) 0%, transparent 70%)',
           pointerEvents: 'none',
         }} />
 
@@ -137,7 +137,7 @@ export default function LoginPage() {
             border: '1px solid var(--border)',
             borderRadius: '20px',
             padding: '36px 32px',
-            boxShadow: '0 8px 48px rgba(0,0,0,0.4)',
+            boxShadow: '0 4px 24px rgba(77,124,95,0.10)',
           }}>
             <div style={{ marginBottom: '28px' }} className="auth-desktop-header">
               <h1 style={{

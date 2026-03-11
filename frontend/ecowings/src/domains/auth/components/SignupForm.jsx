@@ -54,7 +54,6 @@ function InputField({ label, icon, type, placeholder, value, onChange, autoCompl
             flex: 1, background: 'var(--bg-base)', border: 'none', outline: 'none',
             padding: '13px 0', fontSize: '0.88rem', color: 'var(--text-primary)',
             fontFamily: "'Inter', sans-serif",
-            colorScheme: 'dark',
           }}
         />
         {rightSlot && (
