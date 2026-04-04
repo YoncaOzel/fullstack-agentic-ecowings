@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, forwardRef } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Link } from 'react-router-dom';
-import { Plane, Star, MapPin, ArrowRight, CheckCircle2, Calendar, Search, ChevronDown } from 'lucide-react';
+import { Plane, Star, MapPin, ArrowRight, CheckCircle2, Calendar, Search, ChevronDown, MapPinned, BarChart2, Leaf } from 'lucide-react';
 import apiClient from '../shared/services/apiClient';
 import flightService from '../domains/flights/services/flightService';
 import FlightCard from '../domains/flights/components/FlightCard';
@@ -89,21 +89,27 @@ function SearchSkeletonCard() {
 }
 
 /* ── Airline initial badge when logoUrl is missing ── */
-function AirlineMonogram({ name }) {
+function AirlineMonogram({ name, size = 52 }) {
   const letters = (name || '??').slice(0, 2).toUpperCase();
-  const hue = (name || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
+  const PALETTES = [
+    ['#e0f2fe','#0369a1'], ['#fce7f3','#9d174d'], ['#f0fdf4','#15803d'],
+    ['#fef9c3','#a16207'], ['#ede9fe','#6d28d9'], ['#fee2e2','#b91c1c'],
+    ['#ecfdf5','#047857'], ['#fff7ed','#c2410c'],
+  ];
+  const idx = (name || '').split('').reduce((a, c) => a + c.charCodeAt(0), 0) % PALETTES.length;
+  const [bg, fg] = PALETTES[idx];
   return (
     <div style={{
-      width: '72px', height: '72px',
-      borderRadius: '16px',
-      background: `linear-gradient(135deg, hsla(${hue},55%,22%,1) 0%, hsla(${hue},45%,15%,1) 100%)`,
-      border: `1px solid hsla(${hue},55%,35%,0.4)`,
+      width: size, height: size,
+      borderRadius: size * 0.28,
+      background: bg,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: '1.1rem', fontWeight: 800,
-      color: `hsl(${hue},70%,70%)`,
-      letterSpacing: '0.05em',
+      fontSize: size * 0.32, fontWeight: 800,
+      color: fg,
+      letterSpacing: '0.06em',
       fontFamily: "'DM Mono', monospace",
       flexShrink: 0,
+      userSelect: 'none',
     }}>{letters}</div>
   );
 }
@@ -578,18 +584,18 @@ export default function HomePage() {
 
       {/* ── Search Results / Skeleton ── */}
       {(searching || searchResults !== null) && (
-        <section ref={resultsRef} style={{ background: 'var(--bg-section-alt)', padding: '52px 0' }}>
+        <section ref={resultsRef} style={{ background: '#f4f9f5', padding: '52px 0', borderTop: '1px solid rgba(34,197,94,0.12)', borderBottom: '1px solid rgba(34,197,94,0.12)' }}>
           <div className="container">
             {/* Section heading */}
             <div style={{ marginBottom: '32px' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.75rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '12px' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.75rem', fontWeight: 700, color: '#166534', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '12px' }}>
                 <Plane size={11} /> Arama Sonuçları
               </div>
               {searching ? (
                 <p style={{ color: '#6b7280', fontSize: '0.9rem', marginTop: '4px' }}>Uçuşlar aranıyor…</p>
               ) : (
                 <>
-                  <h2 style={{ fontSize: '1.9rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", margin: 0, lineHeight: 1.2 }}>
+                  <h2 style={{ fontSize: '1.9rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", margin: 0, lineHeight: 1.2, color: '#1c2b22' }}>
                     {searchResults.length} Uçuş Bulundu
                   </h2>
                   <p style={{ color: '#6b7280', fontSize: '0.9rem', marginTop: '6px' }}>Arama kriterlerinize uyan sonuçlar</p>
@@ -604,9 +610,9 @@ export default function HomePage() {
                 <SearchSkeletonCard />
               </div>
             ) : searchResults.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '60px 20px', background: 'rgba(34,197,94,0.03)', border: '1px solid rgba(34,197,94,0.08)', borderRadius: '16px' }}>
-                <div style={{ fontSize: '3rem', marginBottom: '12px' }}>✈️</div>
-                <p style={{ fontWeight: 700, fontSize: '1.1rem', color: '#f0fdf4', marginBottom: '6px' }}>Sonuç bulunamadı</p>
+              <div style={{ textAlign: 'center', padding: '60px 20px', background: '#ffffff', border: '1px solid rgba(34,197,94,0.14)', borderRadius: '16px', boxShadow: '0 2px 12px rgba(77,124,95,0.06)' }}>
+                <Plane size={36} style={{ color: '#d1e7d9', marginBottom: '14px' }} />
+                <p style={{ fontWeight: 700, fontSize: '1.1rem', color: '#1c2b22', marginBottom: '6px' }}>Sonuç bulunamadı</p>
                 <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Farklı tarih veya havalimanı deneyin.</p>
               </div>
             ) : (
@@ -621,16 +627,46 @@ export default function HomePage() {
       )}
 
       {/* ── Stats strip ──────────────────────────────────────── */}
-      <section style={{ padding:'52px 0', background:'var(--bg-surface,#0e1a0e)', borderTop:'1px solid rgba(34,197,94,0.08)', borderBottom:'1px solid rgba(34,197,94,0.08)' }}>
+      <section style={{ padding:'60px 0', background:'#f4f9f5', borderTop:'1px solid rgba(34,197,94,0.1)', borderBottom:'1px solid rgba(34,197,94,0.1)' }}>
         <div className="container">
-          <div className="fade-up" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:'20px' }}>
-            {[{value:'2M+',label:'Mutlu Yolcu',emoji:'👥'},{value:'300+',label:'Havalimanı',emoji:'🏢'},{value:'50+',label:'Havayolu Ortağı',emoji:'✈️'},{value:'120K t',label:'CO₂ Tasarrufu',emoji:'🌿'}].map((s) => (
-              <div key={s.label} style={{ textAlign:'center', padding:'28px 16px', background:'rgba(34,197,94,0.04)', border:'1px solid rgba(34,197,94,0.1)', borderRadius:'16px', transition:'background 0.2s,border-color 0.2s,transform 0.2s', cursor:'default' }}
-                onMouseEnter={e=>{e.currentTarget.style.background='rgba(34,197,94,0.09)';e.currentTarget.style.borderColor='rgba(34,197,94,0.28)';e.currentTarget.style.transform='translateY(-3px)';}}
-                onMouseLeave={e=>{e.currentTarget.style.background='rgba(34,197,94,0.04)';e.currentTarget.style.borderColor='rgba(34,197,94,0.1)';e.currentTarget.style.transform='translateY(0)';}}>
-                <div style={{fontSize:'2rem',marginBottom:'8px'}}>{s.emoji}</div>
-                <div style={{fontFamily:"'Plus Jakarta Sans',sans-serif",fontSize:'clamp(1.9rem,3vw,2.8rem)',fontWeight:800,color:'var(--green-primary)',letterSpacing:'-0.04em',lineHeight:1}}>{s.value}</div>
-                <div style={{fontSize:'0.8rem',color:'var(--text-muted)',marginTop:'8px',fontFamily:"'Inter',sans-serif"}}>{s.label}</div>
+          <div className="fade-up" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:'0' }}>
+            {[
+              {value:'2M+', label:'Mutlu Yolcu', sub:'Dünya genelinde', Icon: () => (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              )},
+              {value:'300+', label:'Havalimanı', sub:'6 kıtada', Icon: () => (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              )},
+              {value:'50+', label:'Havayolu Ortağı', sub:'Seçkin taşıyıcılar', Icon: () => (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              )},
+              {value:'120K t', label:'CO₂ Tasarrufu', sub:'2023 yılında', Icon: () => (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+              )},
+            ].map((s, idx, arr) => (
+              <div key={s.label} style={{
+                padding: '32px 28px',
+                borderRight: idx < arr.length - 1 ? '1px solid rgba(34,197,94,0.12)' : 'none',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+                position: 'relative',
+                cursor: 'default',
+              }}>
+                <div style={{
+                  width: '44px', height: '44px', borderRadius: '12px',
+                  background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  marginBottom: '4px',
+                }}>
+                  <s.Icon />
+                </div>
+                <div>
+                  <div style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'clamp(2rem,3vw,2.6rem)', fontWeight:800, color:'#1a4d33', letterSpacing:'-0.04em', lineHeight:1 }}>{s.value}</div>
+                  <div style={{ fontSize:'0.92rem', fontWeight:700, color:'#1c2b22', marginTop:'6px', fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{s.label}</div>
+                  <div style={{ fontSize:'0.75rem', color:'#6b7280', marginTop:'2px', fontFamily:"'Inter',sans-serif" }}>{s.sub}</div>
+                </div>
+                <div style={{ position:'absolute', bottom:0, left:'28px', right:'28px', height:'2px', background:'linear-gradient(90deg,rgba(34,197,94,0.5) 0%,transparent 100%)', borderRadius:'2px' }} />
               </div>
             ))}
           </div>
@@ -648,16 +684,18 @@ export default function HomePage() {
           </div>
           <div className="fade-up" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:'28px' }}>
             {[
-              {step:'01',emoji:'🔍',title:'Rota Seç',desc:'Kalkış ve varış havalimanını belirle, tarih seç. 300+ havalimanına anında erişim.'},
-              {step:'02',emoji:'📊',title:'Uçuşları Karşılaştır',desc:'Fiyat, süre ve karbon etkisine göre en iyi uçuşu seç. Tam şeffaflık.'},
-              {step:'03',emoji:'🌱',title:'Ekolojiyle Uç',desc:'Rezervasyonunu tamamla, karbon dengeleme programlarına katıl ve gezini kaydet.'},
-            ].map((item, i) => (
+              {step:'01', Icon: MapPinned, title:'Rota Seç', desc:'Kalkış ve varış havalimanını belirle, tarih seç. 300+ havalimanına anında erişim.'},
+              {step:'02', Icon: BarChart2, title:'Uçuşları Karşılaştır', desc:'Fiyat, süre ve karbon etkisine göre en iyi uçuşu seç. Tam şeffaflık.'},
+              {step:'03', Icon: Leaf, title:'Ekolojiyle Uç', desc:'Rezervasyonunu tamamla, karbon dengeleme programlarına katıl ve gezini kaydet.'},
+            ].map((item) => (
               <div key={item.step} style={{ background:'var(--bg-card)', border:'1px solid rgba(34,197,94,0.13)', borderRadius:'20px', padding:'36px 28px', position:'relative', boxShadow:'0 4px 24px rgba(0,0,0,0.06)', transition:'transform 0.3s ease,box-shadow 0.3s ease,border-color 0.3s ease' }}
                 onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-6px)';e.currentTarget.style.boxShadow='0 20px 48px rgba(34,197,94,0.12),0 8px 16px rgba(0,0,0,0.08)';e.currentTarget.style.borderColor='rgba(34,197,94,0.35)';}}
                 onMouseLeave={e=>{e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='0 4px 24px rgba(0,0,0,0.06)';e.currentTarget.style.borderColor='rgba(34,197,94,0.13)';}}>
                 <div style={{ position:'absolute', top:0, left:'28px', right:'28px', height:'2px', background:'linear-gradient(90deg,rgba(34,197,94,0.6),transparent)', borderRadius:'0 0 2px 2px' }} />
                 <div style={{ fontFamily:"'DM Mono',monospace", fontSize:'0.72rem', fontWeight:700, color:'rgba(34,197,94,0.4)', letterSpacing:'0.1em', marginBottom:'16px' }}>ADIM {item.step}</div>
-                <div style={{ fontSize:'2.4rem', marginBottom:'16px', lineHeight:1 }}>{item.emoji}</div>
+                <div style={{ width:'48px', height:'48px', borderRadius:'14px', background:'rgba(34,197,94,0.09)', border:'1px solid rgba(34,197,94,0.2)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:'18px' }}>
+                  <item.Icon size={22} style={{ color:'#16a34a', strokeWidth:1.75 }} />
+                </div>
                 <h3 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'1.1rem', fontWeight:800, letterSpacing:'-0.02em', color:'var(--text-primary)', marginBottom:'10px' }}>{item.title}</h3>
                 <p style={{ fontSize:'0.875rem', color:'var(--text-muted)', lineHeight:1.7, fontFamily:"'Inter',sans-serif", margin:0 }}>{item.desc}</p>
               </div>
@@ -670,81 +708,113 @@ export default function HomePage() {
       <PopularDestinations />
 
       {/* ── Havayolu Ortaklarımız ── */}
-      <section className="fade-up" style={{ padding: '72px 0', background: 'var(--bg-surface)' }}>
+      <section className="fade-up" style={{ padding: '72px 0', background: '#f8faf9', overflow: 'hidden' }}>
         <div className="container">
           {/* Header */}
-          <div style={{ marginBottom: '40px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: '14px' }}>
-              ✈ Güvenilir Ortaklar
+          <div style={{ marginBottom: '44px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#16a34a', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: '14px' }}>
+              <CheckCircle2 size={10} /> Güvenilir Ortaklar
             </div>
-            <h2 style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.15, margin: 0, color: '#1a4d33' }}>
-              Havayolu Ortaklarımız
-            </h2>
-            <p style={{ color: '#6b7280', fontSize: '0.95rem', marginTop: '8px' }}>Seçkin havayolu şirketleriyle güvenli ve konforlu seyahat edin</p>
-            <div style={{ marginTop: '20px', height: '1px', background: 'linear-gradient(90deg, rgba(34,197,94,0.4) 0%, rgba(34,197,94,0.1) 60%, transparent 100%)' }} />
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+              <div>
+                <h2 style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.15, margin: 0, color: '#1a4d33' }}>
+                  Havayolu Ortaklarımız
+                </h2>
+                <p style={{ color: '#6b7280', fontSize: '0.95rem', marginTop: '8px', margin: '8px 0 0' }}>Seçkin havayolu şirketleriyle güvenli ve konforlu seyahat edin</p>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: '#6b7280' }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e', animation: 'pulse-dot 2s ease-in-out infinite' }} />
+                Canlı ortak ağı
+              </div>
+            </div>
+            <div style={{ marginTop: '24px', height: '1px', background: 'linear-gradient(90deg, rgba(34,197,94,0.4) 0%, rgba(34,197,94,0.08) 70%, transparent 100%)' }} />
           </div>
-
-          {loadingAirlines ? <LoadingSpinner /> : errorAirlines ? <ErrorMessage message={errorAirlines} /> : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
-              {airlines.slice(0, 8).map((a) => (
-                <div key={a.id} style={{
-                  background: 'var(--bg-card)',
-                  border: '1px solid rgba(34,197,94,0.13)',
-                  borderRadius: '16px',
-                  padding: '28px 20px 22px',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px',
-                  transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
-                  boxShadow: '0 2px 16px rgba(0,0,0,0.06)',
-                  cursor: 'default',
-                  position: 'relative',
-                }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.transform = 'translateY(-4px)';
-                    e.currentTarget.style.boxShadow = '0 12px 36px rgba(34,197,94,0.12), 0 4px 12px rgba(0,0,0,0.08)';
-                    e.currentTarget.style.borderColor = 'rgba(34,197,94,0.32)';
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 2px 16px rgba(0,0,0,0.06)';
-                    e.currentTarget.style.borderColor = 'rgba(34,197,94,0.13)';
-                  }}
-                >
-                  {/* Partner badge */}
-                  <div style={{ position: 'absolute', top: '12px', right: '12px', display: 'flex', alignItems: 'center', gap: '3px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.15)', borderRadius: '20px', padding: '2px 8px', fontSize: '0.6rem', fontWeight: 700, color: '#4ade80', letterSpacing: '0.05em' }}>
-                    <CheckCircle2 size={9} /> Sertifikalı
-                  </div>
-
-                  {/* Logo or monogram */}
-                  {a.logoUrl ? (
-                    <div style={{ width: '72px', height: '72px', borderRadius: '16px', background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                      <img src={a.logoUrl} alt={a.name} style={{ width: '56px', height: '56px', objectFit: 'contain' }} />
-                    </div>
-                  ) : (
-                    <AirlineMonogram name={a.name} />
-                  )}
-
-                  <div style={{ textAlign: 'center' }}>
-                    <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1a4d33', marginBottom: '4px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                      {a.name}
-                    </h3>
-                    {a.country && (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', fontSize: '0.75rem', color: '#6b7280' }}>
-                        <MapPin size={10} />{a.country}
-                      </div>
-                    )}
-                  </div>
-
-                  {a.averageRating && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.15)', borderRadius: '20px', padding: '4px 12px' }}>
-                      <Star size={11} style={{ color: '#22c55e', fill: '#22c55e' }} />
-                      <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#22c55e' }}>{a.averageRating.toFixed(1)}</span>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
         </div>
+
+        {/* Full-width marquee track */}
+        {loadingAirlines ? <div className="container"><LoadingSpinner /></div> : errorAirlines ? <div className="container"><ErrorMessage message={errorAirlines} /></div> : (
+          <div style={{ position: 'relative' }}>
+            {/* Left fade */}
+            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '80px', background: 'linear-gradient(90deg, #f8faf9 0%, transparent 100%)', zIndex: 2, pointerEvents: 'none' }} />
+            {/* Right fade */}
+            <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '80px', background: 'linear-gradient(270deg, #f8faf9 0%, transparent 100%)', zIndex: 2, pointerEvents: 'none' }} />
+
+            <div style={{ overflow: 'hidden', padding: '8px 0 12px', paddingLeft: 'max(20px, calc((100vw - 1200px) / 2))' }}>
+              <div style={{
+                display: 'flex',
+                gap: '16px',
+                width: 'max-content',
+                animation: 'marquee-ltr 400s linear infinite',
+              }}>
+                {[...airlines, ...airlines].map((a, idx) => (
+                  <div key={`${a.id}-${idx}`} style={{
+                    flexShrink: 0,
+                    width: '260px',
+                    background: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '14px',
+                    padding: '18px 20px',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: '14px',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}>
+                    {/* Subtle left accent bar */}
+                    <div style={{ position: 'absolute', left: 0, top: '16px', bottom: '16px', width: '3px', background: 'linear-gradient(180deg, #22c55e 0%, #86efac 100%)', borderRadius: '0 3px 3px 0' }} />
+
+                    {/* Logo / Monogram */}
+                    {a.logoUrl ? (
+                      <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#f9fafb', border: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+                        <img src={a.logoUrl} alt={a.name} style={{ width: '38px', height: '38px', objectFit: 'contain' }} />
+                      </div>
+                    ) : (
+                      <AirlineMonogram name={a.name} size={48} />
+                    )}
+
+                    {/* Info */}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.3 }}>
+                        {a.name}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '5px', flexWrap: 'wrap' }}>
+                        {a.country && (
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.69rem', color: '#6b7280', fontFamily: 'Inter, sans-serif' }}>
+                            <MapPin size={9} style={{ flexShrink: 0 }} />{a.country}
+                          </span>
+                        )}
+                        {a.country && (
+                          <span style={{ width: '3px', height: '3px', borderRadius: '50%', background: '#d1d5db', flexShrink: 0 }} />
+                        )}
+                        {a.averageRating ? (
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.69rem', fontWeight: 700, color: '#16a34a' }}>
+                            <Star size={9} style={{ fill: '#16a34a', color: '#16a34a' }} />{a.averageRating.toFixed(1)}
+                          </span>
+                        ) : (
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.69rem', fontWeight: 600, color: '#16a34a' }}>
+                            <CheckCircle2 size={9} />Onaylı
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+        <style>{`
+          @keyframes marquee-ltr {
+            0%   { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+          @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50%       { opacity: 0.5; transform: scale(0.7); }
+          }
+        `}</style>
       </section>
 
       {/* ── Son Yorumlar ── */}

@@ -1,4 +1,4 @@
-﻿import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import Navbar from './shared/components/Navbar';
 import Footer from './shared/components/Footer';
@@ -16,6 +16,7 @@ import CommentsPage from './domains/reviews/pages/CommentsPage';
 import ProfileSettingsPage from './domains/user/pages/ProfileSettingsPage';
 import GiftTicketPage from './domains/tickets/pages/GiftTicketPage';
 import FAQPage from './pages/FAQPage';
+import TravelPlannerPage from './pages/TravelPlannerPage';
 import CheckoutPage from './domains/flights/pages/CheckoutPage';
 import PaymentSuccessPage from './domains/payments/pages/PaymentSuccessPage';
 import PaymentFailPage from './domains/payments/pages/PaymentFailPage';
@@ -47,6 +48,7 @@ export default function App() {
             <Route path="/campaigns" element={<CampaignsPage />} />
             <Route path="/comments" element={<CommentsPage />} />
             <Route path="/faq" element={<FAQPage />} />
+            <Route path="/travel-planner" element={<TravelPlannerPage />} />
 
             {/* Protected */}
             <Route path="/profile" element={

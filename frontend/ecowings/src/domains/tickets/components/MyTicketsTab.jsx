@@ -41,7 +41,7 @@ export default function MyTicketsTab() {
   if (tickets.length === 0) return (
     <div style={{ textAlign: 'center', padding: '64px 20px' }}>
       <div style={{ fontSize: '3.5rem', marginBottom: '16px' }}>✈️</div>
-      <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1a4d33', marginBottom: '8px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+      <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#166534', marginBottom: '8px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
         Henüz Biletiniz Yok
       </h3>
       <p style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: '24px' }}>
@@ -66,7 +66,7 @@ export default function MyTicketsTab() {
           <Plane size={15} style={{ color: '#22c55e' }} />
         </div>
         <div>
-          <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#1a4d33', margin: 0, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Biletlerim</h2>
+          <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#166534', margin: 0, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Biletlerim</h2>
           <p style={{ fontSize: '0.78rem', color: '#6b7280', margin: 0, marginTop: '2px' }}>{tickets.length} bilet</p>
         </div>
       </div>
@@ -86,27 +86,28 @@ function TicketCard({ ticket }) {
 
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.02)',
-      border: `1px solid ${isPaid ? 'rgba(34,197,94,0.18)' : 'rgba(250,204,21,0.15)'}`,
+      background: '#ffffff',
+      border: `1px solid ${isPaid ? 'rgba(34,197,94,0.22)' : 'rgba(245,158,11,0.22)'}`,
       borderRadius: '14px',
       overflow: 'hidden',
       transition: 'border-color 0.2s, box-shadow 0.2s',
+      boxShadow: '0 2px 10px rgba(77,124,95,0.06)',
     }}
-      onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 4px 20px ${isPaid ? 'rgba(34,197,94,0.08)' : 'rgba(250,204,21,0.06)'}` ; }}
-      onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; }}
+      onMouseEnter={e => { e.currentTarget.style.boxShadow = `0 6px 24px ${isPaid ? 'rgba(34,197,94,0.1)' : 'rgba(245,158,11,0.1)'}` ; }}
+      onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 2px 10px rgba(77,124,95,0.06)'; }}
     >
       {/* Top stripe */}
-      <div style={{ height: '3px', background: isPaid ? 'linear-gradient(90deg,#22c55e,#16a34a)' : 'linear-gradient(90deg,#facc15,#d97706)' }} />
+      <div style={{ height: '3px', background: isPaid ? 'linear-gradient(90deg,#22c55e,#16a34a)' : 'linear-gradient(90deg,#f59e0b,#d97706)' }} />
 
       <div style={{ padding: '18px 20px' }}>
         {/* Row 1: flight number + status badge */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontFamily: "'DM Mono',monospace", fontWeight: 700, fontSize: '0.9rem', color: '#bbf7d0', letterSpacing: '0.06em' }}>
+            <span style={{ fontFamily: "'DM Mono',monospace", fontWeight: 700, fontSize: '0.9rem', color: '#166534', letterSpacing: '0.06em' }}>
               {ticket.flightNumber || '—'}
             </span>
           </div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', borderRadius: '20px', padding: '4px 12px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.06em', background: isPaid ? 'rgba(34,197,94,0.1)' : 'rgba(250,204,21,0.08)', color: isPaid ? '#4ade80' : '#fde68a', border: `1px solid ${isPaid ? 'rgba(74,222,128,0.25)' : 'rgba(250,204,21,0.2)'}` }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', borderRadius: '20px', padding: '4px 12px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.06em', background: isPaid ? 'rgba(34,197,94,0.1)' : 'rgba(245,158,11,0.08)', color: isPaid ? '#166534' : '#92400e', border: `1px solid ${isPaid ? 'rgba(34,197,94,0.28)' : 'rgba(245,158,11,0.28)'}` }}>
             {isPaid ? <CheckCircle size={11} /> : <Clock size={11} />}
             {isPaid ? 'Ödendi' : 'Ödeme Bekleniyor'}
           </div>
@@ -115,11 +116,11 @@ function TicketCard({ ticket }) {
         {/* Row 2: Route */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
           <div style={{ textAlign: 'left' }}>
-            <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#22c55e', fontFamily: "'DM Mono',monospace", lineHeight: 1 }}>
+            <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#166534', fontFamily: "'DM Mono',monospace", lineHeight: 1 }}>
               {ticket.from || '—'}
             </div>
             {ticket.departureTime && (
-              <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginTop: '3px' }}>
+              <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: '3px' }}>
                 {fmtTime(ticket.departureTime)}
               </div>
             )}
@@ -127,25 +128,25 @@ function TicketCard({ ticket }) {
 
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' }}>
             <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <div style={{ flex: 1, height: '1px', background: 'rgba(34,197,94,0.25)' }} />
+              <div style={{ flex: 1, height: '1px', background: 'rgba(34,197,94,0.3)' }} />
               <Plane size={13} style={{ color: '#22c55e' }} />
-              <div style={{ flex: 1, height: '1px', background: 'rgba(34,197,94,0.25)' }} />
+              <div style={{ flex: 1, height: '1px', background: 'rgba(34,197,94,0.3)' }} />
             </div>
           </div>
 
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#22c55e', fontFamily: "'DM Mono',monospace", lineHeight: 1 }}>
+            <div style={{ fontSize: '1.4rem', fontWeight: 900, color: '#166534', fontFamily: "'DM Mono',monospace", lineHeight: 1 }}>
               {ticket.to || '—'}
             </div>
             {ticket.estimatedArrivalTime && (
-              <div style={{ fontSize: '0.72rem', color: '#9ca3af', marginTop: '3px' }}>
+              <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: '3px' }}>
                 {fmtTime(ticket.estimatedArrivalTime)}
               </div>
             )}
           </div>
         </div>
 
-        {/* Row 3: Date + Price + PNR */}
+        {/* Row 3: Date + Price */}
         <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
           {ticket.departureTime && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.78rem', color: '#6b7280' }}>
@@ -153,9 +154,9 @@ function TicketCard({ ticket }) {
             </div>
           )}
           {ticket.price != null && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', color: '#9ca3af', marginLeft: 'auto' }}>
-              <Tag size={10} />
-              <span style={{ fontWeight: 700, color: '#22c55e' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', marginLeft: 'auto' }}>
+              <Tag size={10} style={{ color: '#6b7280' }} />
+              <span style={{ fontWeight: 700, color: '#16a34a' }}>
                 {Number(ticket.price).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
               </span>
             </div>
@@ -164,9 +165,9 @@ function TicketCard({ ticket }) {
 
         {/* PNR code — only when paid */}
         {isPaid && ticket.pnrCode && (
-          <div style={{ marginTop: '12px', borderTop: '1px solid rgba(34,197,94,0.1)', paddingTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ marginTop: '12px', borderTop: '1px solid #e8f5ee', paddingTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: '0.7rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 600 }}>PNR</span>
-            <span style={{ fontFamily: "'DM Mono',monospace", fontWeight: 800, fontSize: '1rem', color: '#f0fdf4', letterSpacing: '0.12em', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '8px', padding: '4px 12px' }}>
+            <span style={{ fontFamily: "'DM Mono',monospace", fontWeight: 800, fontSize: '1rem', color: '#166534', letterSpacing: '0.12em', background: '#f0faf3', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '4px 12px' }}>
               {ticket.pnrCode}
             </span>
           </div>

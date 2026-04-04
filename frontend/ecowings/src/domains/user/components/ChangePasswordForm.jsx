@@ -42,12 +42,12 @@ export default function ChangePasswordForm() {
   };
 
   const inputStyle = (key) => ({
-    width: '100%', background: 'rgba(255,255,255,0.04)',
-    border: `1px solid ${focused === key ? '#22c55e' : 'rgba(34,197,94,0.15)'}`,
-    borderRadius: '10px', padding: '12px 40px 12px 14px', color: '#f0fdf4',
+    width: '100%', background: focused === key ? '#f0f7f2' : '#f8faf9',
+    border: `1px solid ${focused === key ? '#22c55e' : '#d1e7d9'}`,
+    borderRadius: '10px', padding: '12px 40px 12px 14px', color: '#1c2b22',
     fontSize: '14px', fontFamily: 'Inter,sans-serif', outline: 'none',
     boxShadow: focused === key ? '0 0 0 3px rgba(34,197,94,0.1)' : 'none',
-    transition: 'border-color 0.2s,box-shadow 0.2s',
+    transition: 'border-color 0.2s,box-shadow 0.2s,background 0.2s',
   });
 
   const fields = [
@@ -70,7 +70,7 @@ export default function ChangePasswordForm() {
           <Key size={16} style={{ color: '#22c55e' }} />
         </div>
         <div>
-          <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#1a4d33', margin: 0, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Şifre Değiştir</h3>
+          <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#166534', margin: 0, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Şifre Değiştir</h3>
           <p style={{ fontSize: '0.78rem', color: '#6b7280', margin: 0, marginTop: '2px' }}>Hesabınızın güvenliği için güçlü bir şifre seçin</p>
         </div>
       </div>
@@ -127,9 +127,9 @@ export default function ChangePasswordForm() {
         ))}
 
         {/* Security note */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', background: 'rgba(34,197,94,0.04)', border: '1px solid rgba(34,197,94,0.1)', borderRadius: '10px', padding: '12px 14px' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', background: '#f0f7f2', border: '1px solid #d1e7d9', borderRadius: '10px', padding: '12px 14px' }}>
           <Shield size={13} style={{ color: 'rgba(34,197,94,0.5)', marginTop: '1px', flexShrink: 0 }} />
-          <p style={{ fontSize: '0.78rem', color: '#4b5563', margin: 0, lineHeight: 1.5 }}>
+          <p style={{ fontSize: '0.78rem', color: '#374151', margin: 0, lineHeight: 1.5 }}>
             Güvenliğiniz için şifrenizi kimseyle paylaşmayın. Güçlü bir şifre büyük harf, rakam ve özel karakter içermelidir.
           </p>
         </div>

@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Plane, Clock, Leaf, CreditCard, AlertCircle, ArrowLeft, Shield } from 'lucide-react';
 import { useAuth } from '../../../shared/context/AuthContext';
 import flightService from '../services/flightService';
-import paymentService from '../../../shared/services/paymentService';
 import airportService from '../../../shared/services/airportService';
 
 /* ─── helpers ─────────────────────────────────────── */
@@ -39,9 +38,9 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Airport resolution for Amadeus flights
+  // Airport name resolution for display only (non-blocking)
   const [airports, setAirports] = useState([]);
-  const [airportsLoading, setAirportsLoading] = useState(type === 'amadeus');
+  const [airportsLoading, setAirportsLoading] = useState(false);
 
   useEffect(() => {
     if (type !== 'amadeus') return;
@@ -49,8 +48,7 @@ export default function CheckoutPage() {
       .then(res => {
         if (Array.isArray(res.data)) setAirports(res.data);
       })
-      .catch(() => {/* non-fatal */})
-      .finally(() => setAirportsLoading(false));
+      .catch(() => {/* non-fatal */});
   }, [type]);
 
   // Redirect if arrived without state
@@ -94,47 +92,44 @@ export default function CheckoutPage() {
     setError('');
     setLoading(true);
     try {
-      let ticketId;
+      let paymentUrl;
 
       if (isAmadeus) {
-        // Resolve airport IDs from our DB
-        const depAirport = airports.find(a => a.code === flight.departure);
-        const arrAirport = airports.find(a => a.code === flight.arrival);
+        // book-and-pay: tek istekte uçuş + bilet oluşturur, ödeme linki döner
+        const res = await flightService.bookAndPay({
+          flightNumber: flight.flightNumber,
+          departureAirportCode: flight.departure,
+          destinationAirportCode: flight.arrival,
+          departureTime: flight.departureTime,
+          estimatedArrivalTime: flight.arrivalTime,
+          price: rawPrice,
+          airlineCode: flight.carrier || '',
+          userEmail: user?.email || '',
+        });
 
-        if (!depAirport || !arrAirport) {
-          setError('Havalimanı bilgileri çözümlenemedi. Lütfen daha sonra tekrar deneyin.');
+        paymentUrl = res.data?.paymentUrl;
+        const ticketId = res.data?.ticketId;
+        if (ticketId) localStorage.setItem('pendingTicketId', String(ticketId));
+      } else {
+        // DB uçuşu — bilet oluştur, sonra ödeme başlat
+        const ticketRes = await import('../../tickets/services/ticketService').then(m =>
+          m.default.buyTicket({ flightId: flight.id, travelClass: 'Economy' })
+        );
+        const ticketId = ticketRes.data?.id;
+
+        if (!ticketId) {
+          setError('Bilet oluşturulamadı. Lütfen tekrar deneyin.');
           setLoading(false);
           return;
         }
 
-        const bookRes = await flightService.bookAmadeusFlight({
-          flightNumber: flight.flightNumber,
-          departureAirportId: depAirport.id,
-          destinationAirportId: arrAirport.id,
-          departureTime: flight.departureTime,
-          estimatedArrivalTime: flight.arrivalTime,
-          price: rawPrice,
-          airlineId: 0, // Known gap: Airline entity has no IATA code field
-          userId: user?.id || 0,
-        });
+        localStorage.setItem('pendingTicketId', String(ticketId));
 
-        ticketId = bookRes.data?.ticketId;
-      } else {
-        // DB flight — create ticket
-        const ticketRes = await import('../../tickets/services/ticketService').then(m =>
-          m.default.buyTicket({ flightId: flight.id, travelClass: 'Economy' })
+        const payRes = await import('../../../shared/services/paymentService').then(m =>
+          m.default.initiatePayment(ticketId, rawPrice)
         );
-        ticketId = ticketRes.data?.id;
+        paymentUrl = payRes.data?.paymentUrl;
       }
-
-      if (!ticketId) {
-        setError('Bilet oluşturulamadı. Lütfen tekrar deneyin.');
-        setLoading(false);
-        return;
-      }
-
-      const payRes = await paymentService.initiatePayment(ticketId, rawPrice);
-      const paymentUrl = payRes.data?.paymentUrl;
 
       if (!paymentUrl) {
         setError('Ödeme sayfası açılamadı. Lütfen tekrar deneyin.');

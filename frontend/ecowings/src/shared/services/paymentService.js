@@ -10,6 +10,14 @@ const paymentService = {
     apiClient.post("/api/Payment/pay", null, {
       params: { ticketId, amount },
     }),
+
+  /**
+   * Checks the payment status of a ticket.
+   * GET /api/Payment/check-ticket/{ticketId}
+   * @returns {{ ticketId, isPaid, pnrCode, price, bookingDate, passengerId, flightNumber }}
+   */
+  checkTicket: (ticketId) =>
+    apiClient.get(`/api/Payment/check-ticket/${ticketId}`),
 };
 
 export default paymentService;

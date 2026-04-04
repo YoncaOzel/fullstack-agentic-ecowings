@@ -39,26 +39,26 @@ export default function AmadeusFlightCard({ flight }) {
   return (
     <div
       style={{
-        background: 'linear-gradient(135deg, #0d1f0d 0%, #0a1a0e 100%)',
-        border: '1px solid rgba(34,197,94,0.15)',
+        background: '#ffffff',
+        border: '1px solid rgba(34,197,94,0.18)',
         borderRadius: '16px',
         overflow: 'hidden',
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'stretch',
         transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.4)',
+        boxShadow: '0 2px 12px rgba(77,124,95,0.08)',
         width: '100%',
       }}
       onMouseEnter={e => {
         e.currentTarget.style.transform = 'translateY(-2px)';
-        e.currentTarget.style.boxShadow = '0 14px 44px rgba(34,197,94,0.13), 0 4px 16px rgba(0,0,0,0.5)';
+        e.currentTarget.style.boxShadow = '0 12px 36px rgba(34,197,94,0.12), 0 4px 12px rgba(77,124,95,0.08)';
         e.currentTarget.style.borderColor = 'rgba(34,197,94,0.35)';
       }}
       onMouseLeave={e => {
         e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 4px 24px rgba(0,0,0,0.4)';
-        e.currentTarget.style.borderColor = 'rgba(34,197,94,0.15)';
+        e.currentTarget.style.boxShadow = '0 2px 12px rgba(77,124,95,0.08)';
+        e.currentTarget.style.borderColor = 'rgba(34,197,94,0.18)';
       }}
     >
       {/* ── Left accent bar ── */}
@@ -73,14 +73,15 @@ export default function AmadeusFlightCard({ flight }) {
         padding: '20px 18px',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         gap: '6px', minWidth: '88px', maxWidth: '88px', flexShrink: 0,
-        borderRight: '1px solid rgba(34,197,94,0.08)',
+        borderRight: '1px solid rgba(34,197,94,0.1)',
+        background: '#f8faf9',
       }}>
         <div style={{
           width: '42px', height: '42px', borderRadius: '11px',
-          background: 'linear-gradient(135deg, rgba(34,197,94,0.18) 0%, rgba(22,163,74,0.1) 100%)',
-          border: '1px solid rgba(34,197,94,0.25)',
+          background: 'linear-gradient(135deg, rgba(34,197,94,0.12) 0%, rgba(22,163,74,0.07) 100%)',
+          border: '1px solid rgba(34,197,94,0.22)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '0.78rem', fontWeight: 800, color: '#22c55e',
+          fontSize: '0.78rem', fontWeight: 800, color: '#16a34a',
           fontFamily: "'DM Mono', monospace", letterSpacing: '0.05em',
         }}>
           {(flight.carrier || 'XX').slice(0, 2).toUpperCase()}
@@ -89,9 +90,9 @@ export default function AmadeusFlightCard({ flight }) {
           {flight.carrier || '—'}
         </div>
         <div style={{
-          fontSize: '0.67rem', fontWeight: 700, color: '#bbf7d0',
+          fontSize: '0.67rem', fontWeight: 700, color: '#166534',
           fontFamily: "'DM Mono', monospace",
-          background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.12)',
+          background: '#f0faf3', border: '1px solid #bbf7d0',
           borderRadius: '6px', padding: '2px 6px',
         }}>
           {flight.flightNumber || '—'}
@@ -106,10 +107,10 @@ export default function AmadeusFlightCard({ flight }) {
           {depDate && (
             <div style={{ fontSize: '0.69rem', color: '#6b7280', fontWeight: 500, marginBottom: '3px' }}>{depDate}</div>
           )}
-          <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#f0fdf4', lineHeight: 1, fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '-0.02em' }}>
+          <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#1c2b22', lineHeight: 1, fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '-0.02em' }}>
             {depTime}
           </div>
-          <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#22c55e', marginTop: '5px', letterSpacing: '0.08em' }}>
+          <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#16a34a', marginTop: '5px', letterSpacing: '0.08em' }}>
             {flight.departure || '—'}
           </div>
         </div>
@@ -120,17 +121,17 @@ export default function AmadeusFlightCard({ flight }) {
             <Clock size={11} /><span>{flight.duration || '—'}</span>
           </div>
           <div style={{ width: '100%', display: 'flex', alignItems: 'center' }}>
-            <div style={{ width: '9px', height: '9px', borderRadius: '50%', background: 'rgba(34,197,94,0.18)', border: '2px solid #22c55e', flexShrink: 0, boxShadow: '0 0 6px rgba(34,197,94,0.35)' }} />
-            <div style={{ flex: 1, height: '1.5px', background: 'linear-gradient(90deg, rgba(34,197,94,0.3) 0%, rgba(34,197,94,0.75) 50%, rgba(34,197,94,0.3) 100%)' }} />
+            <div style={{ width: '9px', height: '9px', borderRadius: '50%', background: 'rgba(34,197,94,0.15)', border: '2px solid #22c55e', flexShrink: 0 }} />
+            <div style={{ flex: 1, height: '1.5px', background: 'linear-gradient(90deg, rgba(34,197,94,0.25) 0%, rgba(34,197,94,0.6) 50%, rgba(34,197,94,0.25) 100%)' }} />
             <Plane size={15} style={{ color: '#22c55e', flexShrink: 0, margin: '0 5px' }} />
-            <div style={{ flex: 1, height: '1.5px', background: 'linear-gradient(90deg, rgba(34,197,94,0.3) 0%, rgba(34,197,94,0.75) 50%, rgba(34,197,94,0.3) 100%)' }} />
-            <div style={{ width: '9px', height: '9px', borderRadius: '50%', background: 'rgba(34,197,94,0.18)', border: '2px solid #22c55e', flexShrink: 0, boxShadow: '0 0 6px rgba(34,197,94,0.35)' }} />
+            <div style={{ flex: 1, height: '1.5px', background: 'linear-gradient(90deg, rgba(34,197,94,0.25) 0%, rgba(34,197,94,0.6) 50%, rgba(34,197,94,0.25) 100%)' }} />
+            <div style={{ width: '9px', height: '9px', borderRadius: '50%', background: 'rgba(34,197,94,0.15)', border: '2px solid #22c55e', flexShrink: 0 }} />
           </div>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: '4px',
-            background: stopCount === 0 ? 'rgba(34,197,94,0.08)' : 'rgba(250,204,21,0.08)',
-            color: stopCount === 0 ? '#4ade80' : '#facc15',
-            border: `1px solid ${stopCount === 0 ? 'rgba(74,222,128,0.2)' : 'rgba(250,204,21,0.2)'}`,
+            background: stopCount === 0 ? 'rgba(34,197,94,0.1)' : 'rgba(245,158,11,0.08)',
+            color: stopCount === 0 ? '#166534' : '#92400e',
+            border: `1px solid ${stopCount === 0 ? 'rgba(34,197,94,0.28)' : 'rgba(245,158,11,0.28)'}`,
             borderRadius: '20px', padding: '2px 9px', fontSize: '0.66rem', fontWeight: 700,
           }}>
             <Plane size={9} />{stopLabel}
@@ -142,10 +143,10 @@ export default function AmadeusFlightCard({ flight }) {
           {(arrDate || depDate) && (
             <div style={{ fontSize: '0.69rem', color: '#6b7280', fontWeight: 500, marginBottom: '3px' }}>{arrDate || depDate}</div>
           )}
-          <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#f0fdf4', lineHeight: 1, fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '-0.02em' }}>
+          <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#1c2b22', lineHeight: 1, fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '-0.02em' }}>
             {arrTime}
           </div>
-          <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#22c55e', marginTop: '5px', letterSpacing: '0.08em' }}>
+          <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#16a34a', marginTop: '5px', letterSpacing: '0.08em' }}>
             {flight.arrival || '—'}
           </div>
         </div>
@@ -155,19 +156,19 @@ export default function AmadeusFlightCard({ flight }) {
       {stopCount > 0 && flight.segments && (
         <div style={{
           alignSelf: 'center', padding: '10px 14px',
-          background: 'rgba(250,204,21,0.04)', border: '1px solid rgba(250,204,21,0.12)',
+          background: '#fffbeb', border: '1px solid #fde68a',
           borderRadius: '10px', marginRight: '16px',
           display: 'flex', flexDirection: 'column', gap: '5px',
           maxWidth: '200px', flexShrink: 0,
         }}>
           {flight.segments.map((seg, i) => (
             <div key={i} style={{ fontSize: '0.67rem', color: '#6b7280', display: 'flex', gap: '4px', alignItems: 'center', flexWrap: 'wrap' }}>
-              <span style={{ fontFamily: "'DM Mono', monospace", fontWeight: 600, color: '#fde68a' }}>
+              <span style={{ fontFamily: "'DM Mono', monospace", fontWeight: 600, color: '#92400e' }}>
                 {seg.departure} → {seg.arrival}
               </span>
-              <span style={{ color: '#374151' }}>·</span>
+              <span style={{ color: '#d1d5db' }}>·</span>
               <span>{seg.carrier} {seg.flightNumber}</span>
-              <span style={{ color: '#374151' }}>·</span>
+              <span style={{ color: '#d1d5db' }}>·</span>
               <span>{seg.duration}</span>
             </div>
           ))}
@@ -179,8 +180,8 @@ export default function AmadeusFlightCard({ flight }) {
         <div style={{
           alignSelf: 'center', padding: '0 20px', flexShrink: 0,
           display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
-          borderLeft: '1px solid rgba(34,197,94,0.08)',
-          borderRight: '1px solid rgba(34,197,94,0.08)',
+          borderLeft: '1px solid rgba(34,197,94,0.12)',
+          borderRight: '1px solid rgba(34,197,94,0.12)',
         }}>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: '4px',
@@ -202,14 +203,14 @@ export default function AmadeusFlightCard({ flight }) {
         padding: '20px 26px', flexShrink: 0,
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
         gap: '12px', minWidth: '190px',
-        background: 'rgba(0,0,0,0.22)',
-        borderLeft: '1px solid rgba(34,197,94,0.1)',
+        background: '#f4f9f5',
+        borderLeft: '1px solid rgba(34,197,94,0.12)',
       }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#6b7280', fontWeight: 600, marginBottom: '4px' }}>
             Fiyat
           </div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#22c55e', lineHeight: 1, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#16a34a', lineHeight: 1, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             {flight.price
               ? `${parseFloat(flight.price).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ${flight.currency || ''}`
               : '—'}

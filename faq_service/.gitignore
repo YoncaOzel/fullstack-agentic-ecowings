@@ -1,0 +1,19 @@
+# Environment
+.env
+
+# Virtual environment
+venv/
+
+# Vector store (yeniden oluşturulabilir)
+data/vector_store/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# VS Code
+.vscode/
+
+# Travel Planner PDF output
+data/travel_plans/

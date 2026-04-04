@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { User, Mail, Settings, Key, Tag, Shield, Ticket } from 'lucide-react';
 import userService from '../services/userService';
 import ProfileForm from '../components/ProfileForm';
@@ -15,8 +16,12 @@ const TABS = [
   { label: 'Biletlerim', icon: Ticket },
 ];
 
+const TAB_PARAM_MAP = { profile: 0, password: 1, coupons: 2, tickets: 3 };
+
 export default function ProfileSettingsPage() {
-  const [activeTab, setActiveTab] = useState(0);
+  const [searchParams] = useSearchParams();
+  const initialTab = TAB_PARAM_MAP[searchParams.get('tab')] ?? 0;
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [profile, setProfile] = useState(null);
   const [coupons, setCoupons] = useState([]);
   const [loadingProfile, setLoadingProfile] = useState(true);
@@ -109,28 +114,27 @@ export default function ProfileSettingsPage() {
         <div className="container" style={{ maxWidth: '880px' }}>
 
           {/* Tab bar */}
-          <div style={{ display: 'flex', gap: '6px', marginBottom: '36px', background: 'rgba(17,28,17,0.8)', border: '1px solid rgba(34,197,94,0.12)', borderRadius: '14px', padding: '6px' }}>
+          <div style={{ display: 'flex', gap: '6px', marginBottom: '28px', background: '#f0f7f2', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '14px', padding: '6px' }}>
             {TABS.map(({ label, icon: Icon }, i) => (
               <button
                 key={label}
                 onClick={() => setActiveTab(i)}
                 style={{
                   flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px',
-                  padding: '11px 16px', border: 'none', borderRadius: '10px', cursor: 'pointer',
-                  fontWeight: 700, fontSize: '0.875rem',
+                  padding: '11px 16px', borderRadius: '10px', cursor: 'pointer',
+                  fontWeight: 700, fontSize: '0.875rem', fontFamily: "'Plus Jakarta Sans',sans-serif",
                   background: activeTab === i
-                    ? 'linear-gradient(135deg,rgba(34,197,94,0.18) 0%,rgba(22,163,74,0.1) 100%)'
+                    ? '#ffffff'
                     : 'transparent',
-                  color: activeTab === i ? '#4ade80' : '#6b7280',
-                  border: activeTab === i ? '1px solid rgba(34,197,94,0.25)' : '1px solid transparent',
-                  boxShadow: activeTab === i ? '0 2px 10px rgba(34,197,94,0.1)' : 'none',
+                  color: activeTab === i ? '#166534' : '#6b7280',
+                  border: activeTab === i ? '1px solid rgba(34,197,94,0.28)' : '1px solid transparent',
+                  boxShadow: activeTab === i ? '0 2px 8px rgba(34,197,94,0.12)' : 'none',
                   transition: 'all 0.2s',
                 }}
-                onMouseEnter={e => { if (activeTab !== i) { e.currentTarget.style.color = '#f0fdf4'; e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; } }}
+                onMouseEnter={e => { if (activeTab !== i) { e.currentTarget.style.color = '#166534'; e.currentTarget.style.background = 'rgba(255,255,255,0.7)'; } }}
                 onMouseLeave={e => { if (activeTab !== i) { e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.background = 'transparent'; } }}
               >
                 <Icon size={14} />
-                <span style={{ display: 'none', ['@media (min-width: 480px)']: { display: 'inline' } }}>{label}</span>
                 <span>{label}</span>
               </button>
             ))}
@@ -138,11 +142,11 @@ export default function ProfileSettingsPage() {
 
           {/* Tab panels */}
           <div style={{
-            background: 'linear-gradient(160deg,#111c11 0%,#0e1a0e 100%)',
-            border: '1px solid rgba(34,197,94,0.12)',
+            background: '#ffffff',
+            border: '1px solid rgba(34,197,94,0.14)',
             borderRadius: '20px',
             padding: '36px 32px',
-            boxShadow: '0 8px 40px rgba(0,0,0,0.4)',
+            boxShadow: '0 4px 24px rgba(77,124,95,0.07)',
           }}>
             {activeTab === 0 && (
               loadingProfile ? <LoadingSpinner /> : profileError ? <ErrorMessage message={profileError} /> : (
@@ -159,7 +163,7 @@ export default function ProfileSettingsPage() {
                 coupons.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '60px 20px' }}>
                     <div style={{ fontSize: '3.5rem', marginBottom: '14px' }}>🎫</div>
-                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#1a4d33', marginBottom: '8px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Kuponunuz Bulunmuyor</h3>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#166534', marginBottom: '8px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Kuponunuz Bulunmuyor</h3>
                     <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Şu an aktif kuponunuz yok. Kampanyaları takip edin.</p>
                   </div>
                 ) : (
@@ -169,7 +173,7 @@ export default function ProfileSettingsPage() {
                         <Tag size={15} style={{ color: '#22c55e' }} />
                       </div>
                       <div>
-                        <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#1a4d33', margin: 0, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Kuponlarım</h2>
+                        <h2 style={{ fontSize: '1rem', fontWeight: 800, color: '#166534', margin: 0, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Kuponlarım</h2>
                         <p style={{ fontSize: '0.78rem', color: '#6b7280', margin: 0, marginTop: '2px' }}>{coupons.length} kupon mevcut</p>
                       </div>
                     </div>

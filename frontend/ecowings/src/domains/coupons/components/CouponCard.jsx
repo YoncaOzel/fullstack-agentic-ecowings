@@ -27,23 +27,23 @@ export default function CouponCard({ coupon }) {
       onMouseLeave={() => setHovered(false)}
       style={{
         position: 'relative',
-        background: 'linear-gradient(160deg,#111c11 0%,#0e1a0e 100%)',
-        border: `1px solid ${isActive ? 'rgba(34,197,94,0.18)' : 'rgba(239,68,68,0.2)'}`,
+        background: '#ffffff',
+        border: `1px solid ${isActive ? 'rgba(34,197,94,0.22)' : 'rgba(239,68,68,0.2)'}`,
         borderLeft: `4px solid ${isActive ? '#22c55e' : '#ef4444'}`,
         borderRadius: '14px',
         padding: '20px',
         overflow: 'hidden',
         transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
         boxShadow: hovered
-          ? `0 12px 30px ${isActive ? 'rgba(34,197,94,0.14)' : 'rgba(239,68,68,0.1)'}`
-          : '0 2px 8px rgba(0,0,0,0.3)',
+          ? `0 10px 28px ${isActive ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.1)'}`
+          : '0 2px 10px rgba(77,124,95,0.07)',
         transition: 'transform 0.22s,box-shadow 0.22s,border-color 0.22s',
       }}
     >
-      {/* Glow blob */}
+      {/* Subtle top accent */}
       <div style={{
         position: 'absolute', top: '-30px', right: '-30px', width: '100px', height: '100px',
-        background: isActive ? 'radial-gradient(circle,rgba(34,197,94,0.08) 0%,transparent 70%)' : 'radial-gradient(circle,rgba(239,68,68,0.06) 0%,transparent 70%)',
+        background: isActive ? 'radial-gradient(circle,rgba(34,197,94,0.06) 0%,transparent 70%)' : 'radial-gradient(circle,rgba(239,68,68,0.04) 0%,transparent 70%)',
         pointerEvents: 'none',
       }} />
 
@@ -66,13 +66,13 @@ export default function CouponCard({ coupon }) {
       {/* Code row */}
       <div style={{ marginBottom: '16px', marginRight: discountLabel ? '70px' : '0' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '5px' }}>
-          <Tag size={11} style={{ color: 'rgba(34,197,94,0.5)' }} />
-          <span style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(34,197,94,0.6)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Kupon Kodu</span>
+          <Tag size={11} style={{ color: '#22c55e' }} />
+          <span style={{ fontSize: '10px', fontWeight: 700, color: '#16a34a', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Kupon Kodu</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <span style={{
             fontSize: '1.25rem', fontWeight: 800, letterSpacing: '3px',
-            color: isActive ? '#4ade80' : '#9ca3af',
+            color: isActive ? '#166534' : '#9ca3af',
             fontFamily: "'DM Mono',monospace",
           }}>
             {coupon.code}
@@ -83,8 +83,8 @@ export default function CouponCard({ coupon }) {
             style={{
               display: 'inline-flex', alignItems: 'center', gap: '5px',
               padding: '5px 11px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-              background: copied ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.06)',
-              color: copied ? '#4ade80' : 'rgba(240,253,244,0.7)',
+              background: copied ? 'rgba(34,197,94,0.12)' : '#f3f4f6',
+              color: copied ? '#166534' : '#374151',
               fontSize: '11px', fontWeight: 700,
               transition: 'all 0.2s',
             }}
@@ -100,14 +100,14 @@ export default function CouponCard({ coupon }) {
           <Users size={12} style={{ color: 'rgba(34,197,94,0.5)', flexShrink: 0 }} />
           <div>
             <div style={{ fontSize: '9px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Limit</div>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#f0fdf4' }}>{coupon.usageLimit ?? 'Sınırsız'}</div>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: '#1c2b22' }}>{coupon.usageLimit ?? 'Sınırsız'}</div>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
           <Calendar size={12} style={{ color: 'rgba(34,197,94,0.5)', flexShrink: 0 }} />
           <div>
             <div style={{ fontSize: '9px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Son Kullanım</div>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: isExpired ? '#fca5a5' : '#f0fdf4' }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: isExpired ? '#dc2626' : '#1c2b22' }}>
               {coupon.expiryDate ? formatDateShort(coupon.expiryDate) : 'Süresiz'}
             </div>
           </div>
@@ -127,7 +127,7 @@ export default function CouponCard({ coupon }) {
           display: 'inline-block',
           boxShadow: isActive ? '0 0 5px rgba(34,197,94,0.6)' : 'none',
         }} />
-        <span style={{ fontSize: '11px', fontWeight: 700, color: isActive ? '#4ade80' : '#fca5a5' }}>
+        <span style={{ fontSize: '11px', fontWeight: 700, color: isActive ? '#166534' : '#dc2626' }}>
           {isActive ? 'Aktif' : 'Süresi Dolmuş'}
         </span>
       </div>

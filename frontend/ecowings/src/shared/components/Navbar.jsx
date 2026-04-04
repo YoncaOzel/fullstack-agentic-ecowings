@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Plane, Tag, MapPin, Star, Zap, Gift, X, LogOut, User, HelpCircle } from 'lucide-react';
+import { Plane, Tag, MapPin, Star, Zap, Gift, X, LogOut, User, HelpCircle, Globe } from 'lucide-react';
 
 /* ── Drawer link definitions ─────────────────────────────── */
 const drawerLinks = [
@@ -19,6 +19,20 @@ const drawerLinks = [
     icon: <Tag size={17} />,
     authRequired: false,
   },
+    {
+    to: '/faq',
+    label: 'Sıkça Sorulan Sorular',
+    desc: 'Yapay zeka destekli yardım merkezi',
+    icon: <HelpCircle size={17} />,
+    authRequired: false,
+  },
+   {
+    to: '/travel-planner',
+    label: 'Seyahat Planlayıcı',
+    desc: 'AI ile kişisel seyahat planı oluştur',
+    icon: <Globe size={17} />,
+    authRequired: false,
+  },
   {
     to: '/flight-tracker',
     label: 'Uçuş Takip',
@@ -26,20 +40,15 @@ const drawerLinks = [
     icon: <MapPin size={17} />,
     authRequired: false,
   },
-   {
-    to: '/faq',
-    label: 'Sıkça Sorulan Sorular',
-    desc: 'Yapay zeka destekli yardım merkezi',
-    icon: <HelpCircle size={17} />,
-    authRequired: false,
-  },
+  
+
   {
     to: '/comments',
     label: 'Yorumlar',
     desc: 'Havayolu deneyimlerini paylaş',
     icon: <Star size={17} />,
     authRequired: false,
-  },
+  }/*
   {
     to: '/lucky-flight',
     label: 'Şanslı Uçuş',
@@ -47,7 +56,7 @@ const drawerLinks = [
     icon: <Zap size={17} />,
     authRequired: false,
   }
-/*
+
   {
     to: '/gift-ticket',
     label: 'Biletlerime Hediye Et',
@@ -265,6 +274,14 @@ export default function Navbar() {
               style={({ isActive }) => centerLinkStyle(isActive)}
             >
               SSS
+            </NavLink>
+            <NavLink
+              to="/travel-planner"
+              end
+              className="nav-center-link"
+              style={({ isActive }) => centerLinkStyle(isActive)}
+            >
+              Seyahat Planlayıcı
             </NavLink>
           </div>
 
