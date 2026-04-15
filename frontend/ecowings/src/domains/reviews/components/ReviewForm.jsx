@@ -3,7 +3,7 @@ import { PenLine, ChevronDown } from 'lucide-react';
 import reviewService from '../services/reviewService';
 
 export default function ReviewForm({ airlines, onSuccess }) {
-  const [form, setForm] = useState({ airlineId: '', rating: 0, comment: '' });
+  const [form, setForm] = useState({ airlineCode: '', rating: 0, comment: '' });
   const [hoverRating, setHoverRating] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -13,20 +13,20 @@ export default function ReviewForm({ airlines, onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!form.airlineId) { setError('Havayolu seçin.'); return; }
+    if (!form.airlineCode) { setError('Havayolu seçin.'); return; }
     if (!form.rating) { setError('Puan verin.'); return; }
     if (!form.comment.trim()) { setError('Yorum yazın.'); return; }
 
     setSubmitting(true);
     try {
       const res = await reviewService.addReview({
-        airlineId: Number(form.airlineId),
+        airlineCode: form.airlineCode,
         rating: form.rating,
         comment: form.comment,
       });
       if (res.status >= 200 && res.status < 300) {
         onSuccess?.(null);
-        setForm({ airlineId: '', rating: 0, comment: '' });
+        setForm({ airlineCode: '', rating: 0, comment: '' });
       } else {
         setError(res.data?.message || 'Yorum gönderilemedi.');
       }
@@ -64,8 +64,8 @@ export default function ReviewForm({ airlines, onSuccess }) {
           <label style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(34,197,94,0.7)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Havayolu</label>
           <div style={{ position: 'relative' }}>
             <select
-              value={form.airlineId}
-              onChange={(e) => setForm((p) => ({ ...p, airlineId: e.target.value }))}
+              value={form.airlineCode}
+              onChange={(e) => setForm((p) => ({ ...p, airlineCode: e.target.value }))}
               onFocus={() => setAirlineFocus(true)}
               onBlur={() => setAirlineFocus(false)}
               style={{
@@ -78,7 +78,7 @@ export default function ReviewForm({ airlines, onSuccess }) {
               }}
             >
               <option value="" style={{ background: '#0a1a0a' }}>Havayolu seçin</option>
-              {airlines.map((a) => <option key={a.id} value={a.id} style={{ background: '#0a1a0a' }}>{a.name}</option>)}
+              {airlines.map((a) => <option key={a.id} value={a.airlineCode} style={{ background: '#0a1a0a' }}>{a.name}</option>)}
             </select>
             <ChevronDown size={13} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(34,197,94,0.6)', pointerEvents: 'none' }} />
           </div>

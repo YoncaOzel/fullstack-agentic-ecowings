@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Plane, Tag, MapPin, Star, Zap, Gift, X, LogOut, User, HelpCircle, Globe } from 'lucide-react';
+import { Plane, Tag, MapPin, Star, X, LogOut, User, HelpCircle, Globe, ChevronDown, Settings } from 'lucide-react';
 
 /* ── Drawer link definitions ─────────────────────────────── */
 const drawerLinks = [
@@ -14,49 +14,40 @@ const drawerLinks = [
   }, */
   {
     to: '/campaigns',
-    label: 'Kampanyalar',
-    desc: 'Özel indirimler ve fırsatlar',
+    label: 'Campaigns',
+    desc: 'Exclusive discounts and deals',
     icon: <Tag size={17} />,
-    authRequired: false,
-  },
-    {
-    to: '/faq',
-    label: 'Sıkça Sorulan Sorular',
-    desc: 'Yapay zeka destekli yardım merkezi',
-    icon: <HelpCircle size={17} />,
-    authRequired: false,
-  },
-   {
-    to: '/travel-planner',
-    label: 'Seyahat Planlayıcı',
-    desc: 'AI ile kişisel seyahat planı oluştur',
-    icon: <Globe size={17} />,
     authRequired: false,
   },
   {
     to: '/flight-tracker',
-    label: 'Uçuş Takip',
-    desc: 'Gerçek zamanlı uçuş durumu',
+    label: 'Flight Tracker',
+    desc: 'Real-time flight status',
     icon: <MapPin size={17} />,
     authRequired: false,
   },
-  
-
+  {
+    to: '/travel-planner',
+    label: 'Travel Planner',
+    desc: 'Create a personalised travel plan with AI',
+    icon: <Globe size={17} />,
+    authRequired: false,
+  },
+  {
+    to: '/faq',
+    label: 'FAQ',
+    desc: 'AI-powered help centre',
+    icon: <HelpCircle size={17} />,
+    authRequired: false,
+  },
   {
     to: '/comments',
-    label: 'Yorumlar',
-    desc: 'Havayolu deneyimlerini paylaş',
+    label: 'Reviews',
+    desc: 'Share your airline experiences',
     icon: <Star size={17} />,
     authRequired: false,
-  }/*
-  {
-    to: '/lucky-flight',
-    label: 'Şanslı Uçuş',
-    desc: 'Rastgele bir destinasyon keşfet',
-    icon: <Zap size={17} />,
-    authRequired: false,
-  }
-
+  },
+/*
   {
     to: '/gift-ticket',
     label: 'Biletlerime Hediye Et',
@@ -142,6 +133,8 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerClosing, setDrawerClosing] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   /* scroll shadow */
   useEffect(() => {
@@ -176,6 +169,17 @@ export default function Navbar() {
     setDrawerClosing(false);
   };
 
+  /* Click-outside closes dropdown */
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    if (dropdownOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [dropdownOpen]);
+
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -191,73 +195,72 @@ export default function Navbar() {
     : '??';
 
   const centerLinkStyle = (isActive) => ({
-    padding: '6px 14px',
-    paddingBottom: '7px',
-    borderRadius: '8px',
+    padding: '4px 4px 8px',
     fontSize: '0.875rem',
-    fontFamily: "'Plus Jakarta Sans', sans-serif",
-    fontWeight: 600,
-    letterSpacing: '0.01em',
-    color: isActive ? 'var(--green-primary)' : 'var(--text-secondary)',
+    fontFamily: "'Manrope', sans-serif",
+    fontWeight: 500,
+    letterSpacing: '0.04em',
+    color: isActive ? '#003527' : '#404944',
     textDecoration: 'none',
-    transition: 'color 0.18s ease, border-color 0.18s ease',
-    borderBottom: isActive
-      ? '2px solid var(--green-primary)'
-      : '2px solid transparent',
-    position: 'relative',
+    transition: 'color 0.3s ease, transform 0.3s ease',
+    borderBottom: isActive ? '2px solid #003527' : '2px solid transparent',
   });
 
   return (
     <>
       {/* ── Navbar ────────────────────────────────────────── */}
       <nav style={{
-        position: 'sticky',
+        position: 'fixed',
         top: 0,
+        width: '100%',
         zIndex: 1000,
-        transition: 'box-shadow 0.2s ease',
-        boxShadow: scrolled ? '0 2px 24px rgba(0,0,0,0.5)' : 'none',
+        background: 'rgba(247,249,251,0.82)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(191,201,195,0.18)',
+        boxShadow: scrolled ? '0 12px 40px rgba(25,28,30,0.08)' : '0 12px 40px rgba(25,28,30,0.04)',
+        transition: 'box-shadow 0.3s ease',
       }}>
         <div
-          className="container"
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            height: '64px',
+            maxWidth: '1280px',
+            margin: '0 auto',
+            padding: '0 48px',
+            height: '72px',
           }}
         >
           {/* ── Left: Logo ─────────────────────────────── */}
           <Link
             to="/"
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
               textDecoration: 'none',
               flexShrink: 0,
             }}
           >
-            <span style={{ fontSize: '1.5rem', lineHeight: 1 }}>🌿</span>
             <span style={{
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontWeight: 800,
-              fontSize: '1.15rem',
-              color: 'var(--green-primary)',
-              letterSpacing: '-0.02em',
+              fontFamily: "'Manrope', sans-serif",
+              fontWeight: 700,
+              fontSize: '1.2rem',
+              color: '#003527',
+              letterSpacing: '-0.04em',
+              textTransform: 'uppercase',
             }}>
               EcoWings
             </span>
           </Link>
 
-          {/* ── Center: Ana Sayfa + About Us ────────────── */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
+          {/* ── Center: Nav links ────────────── */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
             <NavLink
               to="/"
               end
               className="nav-center-link"
               style={({ isActive }) => centerLinkStyle(isActive)}
             >
-              Ana Sayfa
+              Home
             </NavLink>
             <NavLink
               to="/about"
@@ -281,37 +284,43 @@ export default function Navbar() {
               className="nav-center-link"
               style={({ isActive }) => centerLinkStyle(isActive)}
             >
-              Seyahat Planlayıcı
+              Travel Planner
             </NavLink>
           </div>
 
           {/* ── Right: badge + logout + hamburger ──────── */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
 
-            {/* User badge (authenticated) */}
+            {/* User dropdown (authenticated) */}
             {isAuthenticated && (
-              <NavLink to="/profile" style={{ textDecoration: 'none' }} title="Profil">
-                <div
+              <div ref={dropdownRef} style={{ position: 'relative' }}>
+                {/* Trigger pill */}
+                <button
+                  onClick={() => setDropdownOpen((prev) => !prev)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '7px',
-                    background: 'var(--bg-surface)',
-                    border: '1px solid var(--border)',
+                    gap: '8px',
+                    background: dropdownOpen ? 'rgba(0,53,39,0.1)' : 'rgba(0,53,39,0.06)',
+                    border: `1px solid ${dropdownOpen ? 'rgba(0,53,39,0.32)' : 'rgba(0,53,39,0.15)'}`,
                     borderRadius: '100px',
-                    padding: '4px 12px 4px 4px',
+                    padding: '4px 10px 4px 4px',
                     cursor: 'pointer',
-                    transition: 'border-color 0.18s ease, background 0.18s ease',
+                    transition: 'border-color 0.22s ease, background 0.22s ease',
+                    outline: 'none',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--border-hover)';
-                    e.currentTarget.style.background = 'var(--bg-elevated)';
+                    e.currentTarget.style.borderColor = 'rgba(0,53,39,0.32)';
+                    e.currentTarget.style.background = 'rgba(0,53,39,0.1)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--border)';
-                    e.currentTarget.style.background = 'var(--bg-surface)';
+                    if (!dropdownOpen) {
+                      e.currentTarget.style.borderColor = 'rgba(0,53,39,0.15)';
+                      e.currentTarget.style.background = 'rgba(0,53,39,0.06)';
+                    }
                   }}
                 >
+                  {/* Avatar */}
                   <div style={{
                     width: '28px',
                     height: '28px',
@@ -320,110 +329,233 @@ export default function Navbar() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '0.65rem',
+                    fontSize: '0.63rem',
                     fontWeight: 700,
                     color: '#f0fdf4',
-                    letterSpacing: '0.04em',
+                    letterSpacing: '0.05em',
                     fontFamily: "'DM Mono', monospace",
                     flexShrink: 0,
+                    boxShadow: '0 2px 8px rgba(34,197,94,0.3)',
                   }}>
                     {initials}
                   </div>
+                  {/* Username */}
                   <span style={{
                     fontSize: '0.8rem',
                     fontWeight: 600,
-                    color: 'var(--text-secondary)',
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    color: '#003527',
+                    fontFamily: "'Manrope', sans-serif",
                     letterSpacing: '0.01em',
-                    maxWidth: '96px',
+                    maxWidth: '90px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
                   }}>
-                    {user?.userName || 'Profil'}
+                    {user?.userName || 'Profile'}
                   </span>
-                </div>
-              </NavLink>
-            )}
+                  {/* Chevron */}
+                  <ChevronDown
+                    size={12}
+                    color="#003527"
+                    style={{
+                      transition: 'transform 0.22s ease',
+                      transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                      flexShrink: 0,
+                    }}
+                  />
+                </button>
 
-            {/* Logout button (authenticated) */}
-            {isAuthenticated && (
-              <button
-                onClick={handleLogout}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  background: 'var(--bg-surface)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '8px',
-                  padding: '7px 12px',
-                  fontSize: '0.8rem',
-                  fontWeight: 600,
-                  color: 'var(--text-muted)',
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  cursor: 'pointer',
-                  transition: 'color 0.18s ease, border-color 0.18s ease, background 0.18s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#f87171';
-                  e.currentTarget.style.borderColor = 'rgba(248,113,113,0.35)';
-                  e.currentTarget.style.background = 'rgba(248,113,113,0.07)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = 'var(--text-muted)';
-                  e.currentTarget.style.borderColor = 'var(--border)';
-                  e.currentTarget.style.background = 'var(--bg-surface)';
-                }}
-              >
-                <LogOut size={14} />
-                Çıkış
-              </button>
+                {/* Dropdown panel */}
+                {dropdownOpen && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 10px)',
+                    right: 0,
+                    width: '232px',
+                    background: 'rgba(255,255,255,0.96)',
+                    backdropFilter: 'blur(24px)',
+                    WebkitBackdropFilter: 'blur(24px)',
+                    border: '1px solid rgba(0,53,39,0.1)',
+                    borderRadius: '16px',
+                    boxShadow: '0 12px 40px rgba(0,45,28,0.13), 0 2px 8px rgba(0,0,0,0.06)',
+                    overflow: 'hidden',
+                    zIndex: 1100,
+                    animation: 'dropdownFadeIn 0.18s cubic-bezier(0.16,1,0.3,1) both',
+                  }}>
+                    {/* User info header */}
+                    <div style={{
+                      padding: '16px',
+                      background: 'linear-gradient(135deg, rgba(34,197,94,0.06), rgba(0,53,39,0.04))',
+                      borderBottom: '1px solid rgba(0,53,39,0.07)',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '11px' }}>
+                        <div style={{
+                          width: '40px',
+                          height: '40px',
+                          borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          color: '#f0fdf4',
+                          letterSpacing: '0.05em',
+                          fontFamily: "'DM Mono', monospace",
+                          flexShrink: 0,
+                          boxShadow: '0 4px 12px rgba(34,197,94,0.35)',
+                        }}>
+                          {initials}
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{
+                            fontSize: '0.875rem',
+                            fontWeight: 700,
+                            color: '#002d1c',
+                            fontFamily: "'Manrope', sans-serif",
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}>
+                            {user?.userName || 'User'}
+                          </div>
+                          <div style={{
+                            fontSize: '0.7rem',
+                            color: '#6c8274',
+                            marginTop: '2px',
+                            fontFamily: "'Plus Jakarta Sans', sans-serif",
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}>
+                            {user?.email || 'EcoWings Member'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Menu items */}
+                    <div style={{ padding: '6px' }}>
+                      <NavLink
+                        to="/profile"
+                        onClick={() => setDropdownOpen(false)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '9px 12px',
+                          borderRadius: '10px',
+                          textDecoration: 'none',
+                          color: '#003527',
+                          fontSize: '0.845rem',
+                          fontWeight: 500,
+                          fontFamily: "'Manrope', sans-serif",
+                          transition: 'background 0.15s ease',
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,53,39,0.06)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                      >
+                        <div style={{
+                          width: '30px', height: '30px', borderRadius: '8px',
+                          background: 'rgba(0,53,39,0.07)', display: 'flex',
+                          alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                        }}>
+                          <User size={14} color="#003527" />
+                        </div>
+                        View Profile
+                      </NavLink>
+
+                      {/* Divider */}
+                      <div style={{ height: '1px', background: 'rgba(0,53,39,0.07)', margin: '4px 2px' }} />
+
+                      {/* Sign Out */}
+                      <button
+                        onClick={handleLogout}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          padding: '9px 12px',
+                          borderRadius: '10px',
+                          background: 'transparent',
+                          border: 'none',
+                          color: '#dc2626',
+                          fontSize: '0.845rem',
+                          fontWeight: 500,
+                          fontFamily: "'Manrope', sans-serif",
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'background 0.15s ease',
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(220,38,38,0.06)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+                      >
+                        <div style={{
+                          width: '30px', height: '30px', borderRadius: '8px',
+                          background: 'rgba(220,38,38,0.07)', display: 'flex',
+                          alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                        }}>
+                          <LogOut size={14} color="#dc2626" />
+                        </div>
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
 
             {/* Login / Signup (unauthenticated) */}
             {!isAuthenticated && (
-              <div style={{ display: 'flex', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
                 <Link
                   to="/login"
                   style={{
-                    padding: '7px 14px',
-                    borderRadius: '8px',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                    color: 'var(--text-secondary)',
-                    border: '1px solid var(--border)',
-                    background: 'var(--bg-surface)',
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    color: '#404944',
+                    fontFamily: "'Manrope', sans-serif",
+                    letterSpacing: '0.04em',
                     textDecoration: 'none',
-                    transition: 'border-color 0.18s ease, color 0.18s ease',
+                    transition: 'color 0.3s ease, transform 0.3s ease',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--border-hover)';
-                    e.currentTarget.style.color = 'var(--green-primary)';
+                    e.currentTarget.style.color = '#003527';
+                    e.currentTarget.style.transform = 'scale(1.05)';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--border)';
-                    e.currentTarget.style.color = 'var(--text-secondary)';
+                    e.currentTarget.style.color = '#404944';
+                    e.currentTarget.style.transform = 'scale(1)';
                   }}
                 >
-                  Giriş Yap
+                  Sign In
                 </Link>
                 <Link
                   to="/signup"
                   style={{
-                    padding: '7px 14px',
+                    padding: '10px 24px',
                     borderRadius: '8px',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                    color: '#f0fdf4',
-                    background: 'linear-gradient(135deg, #22c55e, #16a34a)',
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    color: '#ffffff',
+                    background: '#003527',
+                    fontFamily: "'Manrope', sans-serif",
+                    letterSpacing: '0.04em',
                     textDecoration: 'none',
-                    boxShadow: '0 2px 12px rgba(34,197,94,0.3)',
+                    boxShadow: '0 2px 8px rgba(0,53,39,0.2)',
+                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,53,39,0.35)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,53,39,0.2)';
                   }}
                 >
-                  Kayıt Ol
+                  Sign Up
                 </Link>
               </div>
             )}
@@ -431,7 +563,7 @@ export default function Navbar() {
             {/* ── Hamburger ──────────────────────────────── */}
             <button
               onClick={() => (drawerOpen ? closeDrawer() : openDrawer())}
-              aria-label={drawerOpen ? 'Menüyü kapat' : 'Menüyü aç'}
+              aria-label={drawerOpen ? 'Close menu' : 'Open menu'}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -553,7 +685,7 @@ export default function Navbar() {
                 fontSize: '1rem',
                 color: 'var(--green-primary)',
               }}>
-                EcoWings Menü
+                EcoWings Menu
               </span>
             </div>
             <button
@@ -594,7 +726,7 @@ export default function Navbar() {
               letterSpacing: '0.1em',
               padding: '8px 8px 6px',
             }}>
-              Sayfalar
+              Pages
             </div>
             {visibleDrawerLinks.map((link, i) => (
               <DrawerItem key={link.to} link={link} index={i} onClose={closeDrawer} />
@@ -647,14 +779,14 @@ export default function Navbar() {
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
                     }}>
-                      {user?.userName || 'Kullanıcı'}
+                      {user?.userName || 'User'}
                     </div>
                     <div style={{
                       fontSize: '0.72rem',
                       color: 'var(--text-muted)',
                       marginTop: '1px',
                     }}>
-                      {user?.email || 'EcoWings Üyesi'}
+                      {user?.email || 'EcoWings Member'}
                     </div>
                   </div>
                   <NavLink
@@ -697,7 +829,7 @@ export default function Navbar() {
                   }}
                 >
                   <LogOut size={15} />
-                  Çıkış Yap
+                  Sign Out
                 </button>
               </>
             ) : (
@@ -729,7 +861,7 @@ export default function Navbar() {
                     e.currentTarget.style.color = 'var(--text-secondary)';
                   }}
                 >
-                  Giriş Yap
+                  Sign In
                 </Link>
                 <Link
                   to="/signup"
@@ -742,14 +874,14 @@ export default function Navbar() {
                     borderRadius: '10px',
                     fontSize: '0.875rem',
                     fontWeight: 600,
-                    color: '#f0fdf4',
-                    background: 'linear-gradient(135deg, #22c55e, #16a34a)',
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    color: '#ffffff',
+                    background: '#003527',
+                    fontFamily: "'Manrope', sans-serif",
                     textDecoration: 'none',
-                    boxShadow: '0 2px 16px rgba(34,197,94,0.3)',
+                    boxShadow: '0 2px 16px rgba(0,53,39,0.3)',
                   }}
                 >
-                  Kayıt Ol
+                  Sign Up
                 </Link>
               </div>
             )}

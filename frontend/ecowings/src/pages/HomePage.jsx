@@ -2,10 +2,9 @@ import { useState, useEffect, useRef, forwardRef } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Link } from 'react-router-dom';
-import { Plane, Star, MapPin, ArrowRight, CheckCircle2, Calendar, Search, ChevronDown, MapPinned, BarChart2, Leaf } from 'lucide-react';
+import { Plane, ArrowRight } from 'lucide-react';
 import apiClient from '../shared/services/apiClient';
 import flightService from '../domains/flights/services/flightService';
-import FlightCard from '../domains/flights/components/FlightCard';
 import AmadeusFlightCard from '../domains/flights/components/AmadeusFlightCard';
 import AirportSelect from '../domains/flights/components/AirportSelect';
 import LoadingSpinner from '../shared/components/LoadingSpinner';
@@ -17,24 +16,20 @@ const DatePickerInput = forwardRef(({ value, onClick }, ref) => (
     ref={ref}
     value={value}
     onClick={onClick}
-    placeholder="Tarih seçin"
+    placeholder="Select date"
     readOnly
     style={{
       width: '100%',
-      background: 'rgba(255,255,255,0.04)',
-      border: '1px solid rgba(34,197,94,0.2)',
-      borderRadius: '10px',
-      padding: '12px 14px 12px 40px',
-      color: value ? '#f0fdf4' : 'rgba(156,163,175,0.7)',
+      background: 'transparent',
+      border: 'none',
+      padding: '0',
+      color: value ? '#1c2b22' : '#6c8274',
       fontSize: '14px',
-      fontFamily: 'Inter, sans-serif',
+      fontFamily: "'Plus Jakarta Sans', sans-serif",
+      fontWeight: 600,
       outline: 'none',
       cursor: 'pointer',
-      transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
-      boxSizing: 'border-box',
     }}
-    onFocus={e => { e.target.style.borderColor = '#22c55e'; e.target.style.boxShadow = '0 0 0 3px rgba(34,197,94,0.12)'; }}
-    onBlur={e  => { e.target.style.borderColor = 'rgba(34,197,94,0.2)'; e.target.style.boxShadow = 'none'; }}
   />
 ));
 
@@ -42,13 +37,13 @@ const DatePickerInput = forwardRef(({ value, onClick }, ref) => (
 function SearchSkeletonCard() {
   return (
     <div style={{
-      background: 'linear-gradient(160deg, #111c11 0%, #0e1a0e 100%)',
-      border: '1px solid rgba(34,197,94,0.12)',
+      background: '#ffffff',
+      border: '1px solid rgba(77,124,95,0.13)',
       borderRadius: '18px',
       overflow: 'hidden',
-      boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+      boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
     }}>
-      <div style={{ padding: '14px 20px 12px', borderBottom: '1px solid rgba(34,197,94,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ padding: '14px 20px 12px', borderBottom: '1px solid rgba(77,124,95,0.08)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div className="skeleton" style={{ width: '38px', height: '38px', borderRadius: '10px' }} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -74,7 +69,7 @@ function SearchSkeletonCard() {
           <div className="skeleton" style={{ width: '44px', height: '16px', borderRadius: '4px' }} />
         </div>
       </div>
-      <div style={{ padding: '14px 20px 20px', borderTop: '1px solid rgba(34,197,94,0.08)', background: 'rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div style={{ padding: '14px 20px 20px', borderTop: '1px solid rgba(77,124,95,0.08)', background: 'rgba(0,0,0,0.02)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
             <div className="skeleton" style={{ width: '36px', height: '10px', borderRadius: '4px' }} />
@@ -89,225 +84,35 @@ function SearchSkeletonCard() {
 }
 
 /* ── Airline initial badge when logoUrl is missing ── */
-function AirlineMonogram({ name, size = 52 }) {
-  const letters = (name || '??').slice(0, 2).toUpperCase();
-  const PALETTES = [
-    ['#e0f2fe','#0369a1'], ['#fce7f3','#9d174d'], ['#f0fdf4','#15803d'],
-    ['#fef9c3','#a16207'], ['#ede9fe','#6d28d9'], ['#fee2e2','#b91c1c'],
-    ['#ecfdf5','#047857'], ['#fff7ed','#c2410c'],
-  ];
-  const idx = (name || '').split('').reduce((a, c) => a + c.charCodeAt(0), 0) % PALETTES.length;
-  const [bg, fg] = PALETTES[idx];
-  return (
-    <div style={{
-      width: size, height: size,
-      borderRadius: size * 0.28,
-      background: bg,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      fontSize: size * 0.32, fontWeight: 800,
-      color: fg,
-      letterSpacing: '0.06em',
-      fontFamily: "'DM Mono', monospace",
-      flexShrink: 0,
-      userSelect: 'none',
-    }}>{letters}</div>
-  );
-}
+
 
 /* ─────────────────────────────────────────────────────
-   Popular Destinations – static showcase section
+   Bento Grid Destinations – static eco showcase
 ───────────────────────────────────────────────────── */
-const DESTINATIONS = [
+const ECO_DESTINATIONS = [
   {
     id: 1,
-    from: 'Istanbul',
-    to: 'Dubai',
-    date: '12 Mar, 2026',
-    image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=900&q=80',
-    label: 'Trending',
+    name: 'Norwegian Fjords',
+    desc: 'Fully integrated travel experience with electric ships and trains.',
+    badge: '45% Less Carbon',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDzGOyc7LWr18-imrPSEyosXLjze26LZkUHlPeiypA0gR5K7ZZCsu3uTIKT5sj_jcc6cGNMY8MSEKqg6RHCL_20o_ZJai9Mdw7KSdJsareunnOdRgcJ_-Jj9jSqtNGAVGeHuSVMeTA0PB_c4qE_OEZ2xKgMOC1jiMR_y1GF9SHZxHH_zmm11w-1OfHXE9RMA7oS0Pbqv766GMoNVKOBjJ_SCmbPdQGZm3ZiVQIAVy32KHTmrj3lYzaspWzCtfcM2DxZPhas0y1_gtw',
+    large: true,
   },
   {
     id: 2,
-    from: 'Ankara',
-    to: 'London',
-    date: '18 Mar, 2026',
-    image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=900&q=80',
-    label: 'Popular',
+    name: 'Swiss Alps',
+    desc: 'Zero-emission mountain villages.',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBhxXbzqLOYMwC93d3vSCZWEALS2jxsItbGEAuuaajrIQZEJmfnx6IUyVC734M9v3dYYTDBK_P52y1mOvM506qz8yEEwSYDsvtLHmoCjKruweb3r_xLo0bQN_y_f22OjNDV2m52z12yl70cix0bT-GglULB8Guz2CeLY5OzYl-ELI6CZ5MXVncaXk8jNSYoD8rw6YqNyITHsW0-rhEuG-4FEXlUBn675uiA9JZ3036iilYhJnZD8PY2FBC8JvwOOOjdfoRdYeDfON4',
+    large: false,
   },
   {
     id: 3,
-    from: 'Istanbul',
-    to: 'Tokyo',
-    date: '22 Mar, 2026',
-    image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=900&q=80',
-    label: null,
-  },
-  {
-    id: 4,
-    from: 'Izmir',
-    to: 'Paris',
-    date: '29 Mar, 2026',
-    image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=900&q=80',
-    label: null,
-  },
-  {
-    id: 5,
-    from: 'Istanbul',
-    to: 'Singapore',
-    date: '04 Apr, 2026',
-    image: 'https://images.unsplash.com/photo-1565967511849-76a60a516170?auto=format&fit=crop&w=900&q=80',
-    label: null,
-  },
-  {
-    id: 6,
-    from: 'Ankara',
-    to: 'New York',
-    date: '10 Apr, 2026',
-    image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=900&q=80',
-    label: null,
+    name: 'Iceland',
+    desc: 'Cities heated by geothermal energy.',
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBN9j69PohT7HAgM6LUN9-NMNp96CAIRAp6yCc7SwcFAza75UONTeJr1WJPvoBMPmDTwdIUUhcB48gvJrTdRZ9dlbOcO8sZJ37k7vPgUW6pJvY1vqIEOsL_WV_naWyKcPVMSyeSBI6jTEsebz0tBZFpFlEbh8f2t0Nk7GlEiQsu0N5e0SMdg7dlhZsfFJl-NGuBVvmRyqidUfReNp0CFI8NGqUJD2PSGFn76VVmsBVwcUhEXbGQ9By1UDYlWcv-Jwd9aNN5ogZIZuE',
+    large: false,
   },
 ];
-
-function DestinationCard({ dest }) {
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <div style={{
-        position: 'relative',
-        borderRadius: '20px',
-        overflow: 'hidden',
-        aspectRatio: '16 / 10',
-        boxShadow: hovered
-          ? '0 20px 50px rgba(0,0,0,0.6), 0 0 0 1px rgba(34,197,94,0.35)'
-          : '0 6px 24px rgba(0,0,0,0.45)',
-        transform: hovered ? 'translateY(-6px) scale(1.01)' : 'translateY(0) scale(1)',
-        transition: 'transform 0.35s ease, box-shadow 0.35s ease',
-      }}>
-        {/* Photo */}
-        <img
-          src={dest.image}
-          alt={`${dest.from} to ${dest.to}`}
-          loading="lazy"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            display: 'block',
-            transform: hovered ? 'scale(1.06)' : 'scale(1)',
-            transition: 'transform 0.45s ease',
-          }}
-        />
-
-        {/* Gradient overlay */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.75) 100%)',
-          pointerEvents: 'none',
-        }} />
-
-        {/* Top-left label badge */}
-        {dest.label && (
-          <div style={{
-            position: 'absolute',
-            top: '14px',
-            left: '14px',
-            background: 'linear-gradient(90deg, #22c55e, #16a34a)',
-            color: '#030c03',
-            fontSize: '0.65rem',
-            fontWeight: 800,
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            padding: '4px 12px',
-            borderRadius: '20px',
-          }}>
-            {dest.label}
-          </div>
-        )}
-
-        {/* Bottom content */}
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          padding: '18px 20px',
-          display: 'flex',
-          alignItems: 'flex-end',
-          justifyContent: 'space-between',
-          gap: '8px',
-        }}>
-          {/* Destination */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontSize: '0.95rem',
-            fontWeight: 700,
-            color: '#ffffff',
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
-            textShadow: '0 1px 6px rgba(0,0,0,0.6)',
-            lineHeight: 1.2,
-          }}>
-            <MapPin size={13} style={{ color: '#4ade80', flexShrink: 0 }} />
-            {dest.to}
-          </div>
-
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PopularDestinations() {
-  return (
-    <section className="fade-up" style={{ padding: '80px 0', background: 'var(--bg-base)', position: 'relative', overflow: 'hidden' }}>
-      {/* Ambient glow */}
-      <div style={{ position: 'absolute', top: '-100px', left: '50%', transform: 'translateX(-50%)', width: '800px', height: '420px', background: 'radial-gradient(ellipse, rgba(34,197,94,0.06) 0%, transparent 70%)', pointerEvents: 'none' }} />
-
-      <div className="container" style={{ position: 'relative' }}>
-        {/* Section header */}
-        <div style={{ marginBottom: '44px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '14px' }}>
-            ✦ Keşfet
-          </div>
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-            <div>
-              <h2 style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.15, margin: 0, color: '#1a4d33' }}>
-                Popular Destinations
-              </h2>
-              <p style={{ color: '#6b7280', fontSize: '0.95rem', marginTop: '8px' }}>
-                Dünyanın en gözde destinasyonlarına kanat açın
-              </p>
-            </div>
-            <Link
-              to="/flights"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 22px', borderRadius: '10px', border: '1px solid rgba(34,197,94,0.3)', color: '#22c55e', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none', background: 'rgba(34,197,94,0.05)', transition: 'all 0.2s ease', whiteSpace: 'nowrap' }}
-            >
-              Tüm Destinasyonlar <ArrowRight size={14} />
-            </Link>
-          </div>
-          <div style={{ marginTop: '20px', height: '1px', background: 'linear-gradient(90deg, rgba(34,197,94,0.4) 0%, rgba(34,197,94,0.1) 60%, transparent 100%)' }} />
-        </div>
-
-        {/* Card grid — responsive: 3 cols on desktop, 2 on tablet, 1 on mobile */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-          gap: '20px',
-        }}>
-          {DESTINATIONS.map(dest => (
-            <DestinationCard key={dest.id} dest={dest} />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 export default function HomePage() {
   const [flights, setFlights] = useState([]);
@@ -341,15 +146,15 @@ export default function HomePage() {
         setAllFlights(list);
         setFlights(list.slice(0, 6));
       })
-      .catch(() => setErrorFlights('Uçuşlar yüklenemedi.'))
+      .catch(() => setErrorFlights('Could not load flights.'))
       .finally(() => setLoadingFlights(false));
 
     apiClient.get('/api/Airline')
       .then((res) => {
         if (Array.isArray(res.data)) setAirlines(res.data);
-        else setErrorAirlines(res.data?.message || 'Havayolları yüklenemedi.');
+        else setErrorAirlines(res.data?.message || 'Could not load airlines.');
       })
-      .catch(() => setErrorAirlines('Havayolları yüklenemedi.'))
+      .catch(() => setErrorAirlines('Could not load airlines.'))
       .finally(() => setLoadingAirlines(false));
 
     apiClient.get('/api/Airport')
@@ -359,9 +164,9 @@ export default function HomePage() {
     apiClient.get('/api/AirlineReview')
       .then((res) => {
         if (Array.isArray(res.data)) setReviews(res.data.slice(-4));
-        else setErrorReviews(res.data?.message || 'Yorumlar yüklenemedi.');
+        else setErrorReviews(res.data?.message || 'Could not load reviews.');
       })
-      .catch(() => setErrorReviews('Yorumlar yüklenemedi.'))
+      .catch(() => setErrorReviews('Could not load reviews.'))
       .finally(() => setLoadingReviews(false));
   }, []);
 
@@ -387,10 +192,10 @@ export default function HomePage() {
     const origin = searchForm.from.trim();
     const destination = searchForm.to.trim();
     if (!origin || !destination) {
-      setSearchError('Kalkış ve varış şehri / IATA kodunu girin.'); return;
+      setSearchError('Please enter a departure and arrival city / IATA code.'); return;
     }
     if (!searchForm.departure) {
-      setSearchError('Lütfen kalkış tarihini seçin.'); return;
+      setSearchError('Please select a departure date.'); return;
     }
     setSearchError('');
     setSearching(true);
@@ -419,8 +224,8 @@ export default function HomePage() {
       const msg =
         err.response?.data?.message ||
         err.response?.data ||
-        'Uçuş arama sırasında bir hata oluştu.';
-      setSearchError(typeof msg === 'string' ? msg : 'Uçuş arama sırasında bir hata oluştu.');
+        'An error occurred while searching for flights.';
+      setSearchError(typeof msg === 'string' ? msg : 'An error occurred while searching for flights.');
       setSearchResults([]);
     } finally {
       setSearching(false);
@@ -428,177 +233,305 @@ export default function HomePage() {
   };
 
   return (
-    <div>
-      {/* ── Hero ──────────────────────────────────────────────── */}
+    <div className="ecowings-home">
+
+      {/* ── Hero Section ──────────────────────────────────────── */}
       <section style={{
-        position: 'relative', overflow: 'hidden',
-        background: 'linear-gradient(180deg,#060c06 0%,#0a180a 50%,#0d2010 100%)',
-        padding: '100px 0 90px', minHeight: '62vh',
-        display: 'flex', alignItems: 'center',
+        position: 'relative',
+        minHeight: '870px',
+        display: 'flex',
+        alignItems: 'center',
+        overflow: 'visible',
+        background: 'linear-gradient(135deg, #002d1c 0%, #00452e 100%)',
+        paddingTop: '72px',
       }}>
-        {/* Ambient orbs */}
-        <div style={{ position:'absolute', top:'-80px', left:'10%', width:'540px', height:'540px', borderRadius:'50%', background:'radial-gradient(circle,rgba(34,197,94,0.13) 0%,transparent 65%)', animation:'pulseOrb 6s ease-in-out infinite', pointerEvents:'none' }} />
-        <div style={{ position:'absolute', bottom:'-100px', right:'8%', width:'620px', height:'620px', borderRadius:'50%', background:'radial-gradient(circle,rgba(34,197,94,0.08) 0%,transparent 65%)', animation:'pulseOrb 8s ease-in-out infinite 2s', pointerEvents:'none' }} />
-        {/* Grid overlay */}
-        <div style={{ position:'absolute', inset:0, backgroundImage:'linear-gradient(rgba(34,197,94,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,0.03) 1px,transparent 1px)', backgroundSize:'44px 44px', pointerEvents:'none' }} />
+        {/* Background video */}
+        <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+          <video
+            src="/PlaneVideo.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: 0.5 }}
+          />
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(to right, #002d1c 0%, rgba(0,45,28,0.8) 55%, transparent 100%)',
+          }} />
+        </div>
 
-        <div className="container" style={{ textAlign:'center', position:'relative', zIndex:2 }}>
-          <h1 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'clamp(2.4rem,5vw,4rem)', fontWeight:800, letterSpacing:'-0.04em', lineHeight:1.1, margin:'0 auto 20px', color:'#1a4d33', animation:'fadeUp 0.7s 0.1s cubic-bezier(0.4,0,0.2,1) both' }}>
-            Yeşil Bir Yolculuk<br />Başlıyor
-          </h1>
-          <p style={{ color:'#384d3e', fontSize:'clamp(1rem,2vw,1.15rem)', maxWidth:'560px', margin:'0 auto 44px', lineHeight:1.7, fontFamily:"'Inter',sans-serif", animation:'fadeUp 0.7s 0.22s cubic-bezier(0.4,0,0.2,1) both' }}>
-            Sürdürülebilir seyahat için en uygun uçuşları bulun, karbon ayak izinizi azaltın.
-          </p>
+        <div className="container" style={{ position: 'relative', zIndex: 2, padding: '80px 24px' }}>
+          <div style={{ maxWidth: '840px' }}>
+            {/* Eyebrow label */}
+            <span style={{
+              display: 'block',
+              fontFamily: "'Inter', sans-serif",
+              fontSize: '11px',
+              fontWeight: 700,
+              letterSpacing: '0.2rem',
+              textTransform: 'uppercase',
+              color: '#b1f0ce',
+              marginBottom: '24px',
+            }}>
+              Sustainable Aviation
+            </span>
 
-          {/* Search Form */}
-          <form onSubmit={handleSearch} style={{
-            background: 'rgba(5,18,10,0.78)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            borderRadius: '20px',
-            padding: '28px 28px 24px',
-            maxWidth: '860px',
-            margin: '0 auto',
-            border: '1px solid rgba(34,197,94,0.18)',
-            boxShadow: '0 24px 64px rgba(0,0,0,0.45), inset 0 1px 0 rgba(34,197,94,0.08)',
-            position: 'relative',
-            zIndex: 10,
-          }}>
-            {/* Row 1: airport selects */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-              <AirportSelect
-                label="Nereden?"
-                icon="takeoff"
-                airports={airports}
-                value={searchForm.from}
-                onChange={(code) => setSearchForm((p) => ({ ...p, from: code }))}
-                placeholder="Kalkış havalimanı"
-              />
-              <AirportSelect
-                label="Nereye?"
-                icon="landing"
-                airports={airports}
-                value={searchForm.to}
-                onChange={(code) => setSearchForm((p) => ({ ...p, to: code }))}
-                placeholder="Varış havalimanı"
-              />
-            </div>
+            {/* H1 */}
+            <h1 style={{
+              fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif",
+              fontSize: 'clamp(2.5rem, 8vw, 5rem)',
+              fontWeight: 800,
+              lineHeight: 1.1,
+              letterSpacing: '-0.04em',
+              color: '#ffffff',
+              marginBottom: '28px',
+            }}>
+              A Green Journey<br />Begins
+            </h1>
 
-            {/* Row 2: date + cabin + button */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '12px', alignItems: 'end' }}>
-              {/* Date field */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(34,197,94,0.7)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Tarih</span>
-                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-                  <Calendar size={15} style={{ position: 'absolute', left: '14px', color: 'rgba(34,197,94,0.6)', pointerEvents: 'none', flexShrink: 0 }} />
-                  <DatePicker
-                    selected={searchForm.departure}
-                    onChange={(date) => setSearchForm((p) => ({ ...p, departure: date }))}
-                    minDate={new Date()}
-                    dateFormat="dd/MM/yyyy"
-                    placeholderText="Tarih seçin"
-                    customInput={<DatePickerInput />}
-                    popperPlacement="bottom-start"
-                    portalId="datepicker-root"
+            {/* Subtext */}
+            <p style={{
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              fontSize: '1.15rem',
+              color: 'rgba(177,240,206,0.85)',
+              maxWidth: '560px',
+              lineHeight: 1.75,
+              marginBottom: '48px',
+            }}>
+              Fly into the future today. We create environmentally friendly routes with our smart algorithms that optimize your carbon footprint.
+            </p>
+
+            {/* ── Search Widget ── */}
+            <form
+              onSubmit={handleSearch}
+              className="airport-dropdown-exclude hero-search-form"
+              style={{
+                background: '#ffffff',
+                borderRadius: '16px',
+                padding: '6px',
+                maxWidth: '940px',
+                boxShadow: '0 20px 60px rgba(0,45,28,0.25)',
+                position: 'relative',
+                zIndex: 10,
+                overflow: 'visible',
+                boxSizing: 'border-box',
+              }}
+            >
+              {/* Tek satır — flexbox ile tüm alanlar ve buton eşit hizada */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'stretch',
+                width: '100%',
+                boxSizing: 'border-box',
+              }}>
+
+                {/* Nereden */}
+                <div style={{
+                  flex: '1 1 0',
+                  minWidth: 0,
+                  padding: '10px 14px',
+                  borderRight: '1px solid #e5e7eb',
+                  overflow: 'visible',
+                }}>
+                  <AirportSelect
+                    label="From?"
+                    icon="takeoff"
+                    airports={airports}
+                    value={searchForm.from}
+                    onChange={(code) => setSearchForm((p) => ({ ...p, from: code }))}
+                    placeholder="Departure airport"
                   />
                 </div>
-              </div>
 
-              {/* Cabin class field */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(34,197,94,0.7)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Kabin Sınıfı</span>
-                <div style={{ position: 'relative' }}>
-                  <select
-                    value={searchForm.travelClass}
-                    onChange={(e) => setSearchForm((p) => ({ ...p, travelClass: e.target.value }))}
-                    style={{
-                      width: '100%',
-                      appearance: 'none',
-                      WebkitAppearance: 'none',
-                      background: 'rgba(255,255,255,0.04)',
-                      border: '1px solid rgba(34,197,94,0.2)',
-                      borderRadius: '10px',
-                      padding: '12px 40px 12px 14px',
-                      color: '#f0fdf4',
-                      fontSize: '14px',
-                      fontFamily: 'Inter, sans-serif',
-                      outline: 'none',
-                      cursor: 'pointer',
-                      transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
-                    }}
-                    onFocus={e => { e.target.style.borderColor = '#22c55e'; e.target.style.boxShadow = '0 0 0 3px rgba(34,197,94,0.12)'; }}
-                    onBlur={e  => { e.target.style.borderColor = 'rgba(34,197,94,0.2)'; e.target.style.boxShadow = 'none'; }}
-                  >
-                    <option value="Economy" style={{ background: '#0a1a0a' }}>Ekonomi</option>
-                    <option value="Business" style={{ background: '#0a1a0a' }}>Business</option>
-                    <option value="FirstClass" style={{ background: '#0a1a0a' }}>First Class</option>
-                  </select>
-                  <ChevronDown size={14} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(34,197,94,0.6)', pointerEvents: 'none' }} />
+                {/* Nereye */}
+                <div style={{
+                  flex: '1 1 0',
+                  minWidth: 0,
+                  padding: '10px 14px',
+                  borderRight: '1px solid #e5e7eb',
+                  overflow: 'visible',
+                }}>
+                  <AirportSelect
+                    label="To?"
+                    icon="landing"
+                    airports={airports}
+                    value={searchForm.to}
+                    onChange={(code) => setSearchForm((p) => ({ ...p, to: code }))}
+                    placeholder="Arrival airport"
+                  />
                 </div>
+
+                {/* Tarih */}
+                <div style={{
+                  flex: '0 0 155px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  padding: '10px 14px',
+                  borderRight: '1px solid #e5e7eb',
+                  minWidth: 0,
+                }}>
+                  <span style={{
+                    display: 'block',
+                    fontFamily: "'Inter', sans-serif",
+                    fontSize: '10px',
+                    fontWeight: 700,
+                    letterSpacing: '0.12rem',
+                    textTransform: 'uppercase',
+                    color: '#6c8274',
+                    marginBottom: '5px',
+                  }}>
+                    Date
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                    <span
+                      className="material-symbols-outlined"
+                      style={{ fontSize: '16px', color: '#002d1c', flexShrink: 0, lineHeight: 1 }}
+                    >
+                      calendar_today
+                    </span>
+                    <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                      <DatePicker
+                        selected={searchForm.departure}
+                        onChange={(date) => setSearchForm((p) => ({ ...p, departure: date }))}
+                        minDate={new Date()}
+                        dateFormat="dd/MM/yyyy"
+                        placeholderText="Select date"
+                        customInput={<DatePickerInput />}
+                        popperPlacement="bottom-start"
+                        portalId="datepicker-root"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Kabin Sınıfı */}
+                <div style={{
+                  flex: '0 0 145px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  padding: '10px 14px',
+                  borderRight: '1px solid #e5e7eb',
+                  minWidth: 0,
+                }}>
+                  <span style={{
+                    display: 'block',
+                    fontFamily: "'Inter', sans-serif",
+                    fontSize: '10px',
+                    fontWeight: 700,
+                    letterSpacing: '0.12rem',
+                    textTransform: 'uppercase',
+                    color: '#6c8274',
+                    marginBottom: '5px',
+                  }}>
+                    Cabin Class
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
+                    <span
+                      className="material-symbols-outlined"
+                      style={{ fontSize: '16px', color: '#002d1c', flexShrink: 0, lineHeight: 1 }}
+                    >
+                      airline_seat_recline_extra
+                    </span>
+                    <select
+                      value={searchForm.travelClass}
+                      onChange={(e) => setSearchForm((p) => ({ ...p, travelClass: e.target.value }))}
+                      style={{
+                        flex: 1,
+                        minWidth: 0,
+                        appearance: 'none',
+                        WebkitAppearance: 'none',
+                        background: 'transparent',
+                        border: 'none',
+                        padding: 0,
+                        color: '#1c2b22',
+                        fontSize: '13px',
+                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        fontWeight: 600,
+                        outline: 'none',
+                        cursor: 'pointer',
+                        boxShadow: 'none',
+                        width: '100%',
+                      }}
+                    >
+                      <option value="Economy">Economy</option>
+                      <option value="Business">Business</option>
+                      <option value="FirstClass">First Class</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Uçuş Ara butonu — flex item, form içinde kalır */}
+                <div style={{ flex: '0 0 auto', padding: '6px', display: 'flex', alignItems: 'stretch' }}>
+                  <button
+                    type="submit"
+                    disabled={searching}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      padding: '0 20px',
+                      borderRadius: '10px',
+                      border: 'none',
+                      background: searching
+                        ? '#6c8274'
+                        : 'linear-gradient(135deg, #002d1c 0%, #00452e 100%)',
+                      color: '#ffffff',
+                      fontFamily: "'Manrope', sans-serif",
+                      fontWeight: 700,
+                      fontSize: '14px',
+                      cursor: searching ? 'not-allowed' : 'pointer',
+                      whiteSpace: 'nowrap',
+                      boxShadow: searching ? 'none' : '0 4px 16px rgba(0,45,28,0.35)',
+                      transition: 'all 0.2s ease',
+                      minWidth: '120px',
+                      height: '100%',
+                    }}
+                    onMouseEnter={e => { if (!searching) { e.currentTarget.style.filter = 'brightness(1.1)'; e.currentTarget.style.boxShadow = '0 6px 24px rgba(0,45,28,0.45)'; } }}
+                    onMouseLeave={e => { e.currentTarget.style.filter = 'brightness(1)'; e.currentTarget.style.boxShadow = searching ? 'none' : '0 4px 16px rgba(0,45,28,0.35)'; }}
+                  >
+                    {searching ? (
+                      'Searching...'
+                    ) : (
+                      <>
+                        <span>Search Flights</span>
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px', lineHeight: 1 }}>arrow_forward</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
               </div>
 
-              {/* Search button */}
-              <button
-                type="submit"
-                disabled={searching}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  padding: '13px 28px',
-                  borderRadius: '10px',
-                  border: 'none',
-                  background: searching ? 'rgba(34,197,94,0.4)' : 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-                  color: '#051005',
-                  fontWeight: 700,
-                  fontSize: '14px',
-                  letterSpacing: '0.4px',
-                  cursor: searching ? 'not-allowed' : 'pointer',
-                  whiteSpace: 'nowrap',
-                  boxShadow: searching ? 'none' : '0 4px 20px rgba(34,197,94,0.3)',
-                  transition: 'all 0.2s ease',
-                }}
-                onMouseEnter={e => { if (!searching) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(34,197,94,0.4)'; e.currentTarget.style.filter = 'brightness(1.08)'; } }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = searching ? 'none' : '0 4px 20px rgba(34,197,94,0.3)'; e.currentTarget.style.filter = 'brightness(1)'; }}
-              >
-                <Search size={15} />
-                {searching ? 'Aranıyor...' : 'Uçuş Ara'}
-              </button>
-            </div>
-
-            {searchError && (
-              <p style={{ marginTop: '12px', marginBottom: 0, color: '#fca5a5', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '13px' }}>⚠</span> {searchError}
-              </p>
-            )}
-          </form>
-
-          {/* Scroll indicator */}
-          <div style={{ marginTop:'48px', display:'flex', flexDirection:'column', alignItems:'center', gap:'8px', animation:'fadeIn 1s 0.9s both', opacity:0 }}>
-            <span style={{ fontSize:'0.7rem', color:'#4d7c5f', fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase' }}>Keşfet</span>
-            <ChevronDown size={20} style={{ color:'#4d7c5f', animation:'heroFloat 2s ease-in-out infinite' }} />
+              {searchError && (
+                <p style={{ marginTop: '8px', marginBottom: 0, padding: '0 10px 6px', color: '#b91c1c', fontSize: '0.82rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span>⚠</span> {searchError}
+                </p>
+              )}
+            </form>
           </div>
         </div>
       </section>
 
       {/* ── Search Results / Skeleton ── */}
       {(searching || searchResults !== null) && (
-        <section ref={resultsRef} style={{ background: '#f4f9f5', padding: '52px 0', borderTop: '1px solid rgba(34,197,94,0.12)', borderBottom: '1px solid rgba(34,197,94,0.12)' }}>
+        <section ref={resultsRef} style={{ background: '#f3f4f5', padding: '52px 0', borderTop: '1px solid rgba(77,124,95,0.12)', borderBottom: '1px solid rgba(77,124,95,0.12)' }}>
           <div className="container">
-            {/* Section heading */}
             <div style={{ marginBottom: '32px' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.75rem', fontWeight: 700, color: '#166534', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '12px' }}>
-                <Plane size={11} /> Arama Sonuçları
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(0,69,46,0.08)', border: '1px solid rgba(0,69,46,0.2)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.75rem', fontWeight: 700, color: '#00452e', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '12px' }}>
+                <Plane size={11} /> Search Results
               </div>
               {searching ? (
-                <p style={{ color: '#6b7280', fontSize: '0.9rem', marginTop: '4px' }}>Uçuşlar aranıyor…</p>
+                <p style={{ color: '#6c8274', fontSize: '0.9rem', marginTop: '4px' }}>Searching for flights…</p>
               ) : (
                 <>
                   <h2 style={{ fontSize: '1.9rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", margin: 0, lineHeight: 1.2, color: '#1c2b22' }}>
-                    {searchResults.length} Uçuş Bulundu
+                    {searchResults.length} Flights Found
                   </h2>
-                  <p style={{ color: '#6b7280', fontSize: '0.9rem', marginTop: '6px' }}>Arama kriterlerinize uyan sonuçlar</p>
+                  <p style={{ color: '#6c8274', fontSize: '0.9rem', marginTop: '6px' }}>Results matching your search criteria</p>
                 </>
               )}
             </div>
@@ -610,10 +543,10 @@ export default function HomePage() {
                 <SearchSkeletonCard />
               </div>
             ) : searchResults.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '60px 20px', background: '#ffffff', border: '1px solid rgba(34,197,94,0.14)', borderRadius: '16px', boxShadow: '0 2px 12px rgba(77,124,95,0.06)' }}>
-                <Plane size={36} style={{ color: '#d1e7d9', marginBottom: '14px' }} />
-                <p style={{ fontWeight: 700, fontSize: '1.1rem', color: '#1c2b22', marginBottom: '6px' }}>Sonuç bulunamadı</p>
-                <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Farklı tarih veya havalimanı deneyin.</p>
+              <div style={{ textAlign: 'center', padding: '60px 20px', background: '#ffffff', border: '1px solid rgba(77,124,95,0.14)', borderRadius: '16px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+                <Plane size={36} style={{ color: '#c1c8c2', marginBottom: '14px' }} />
+                <p style={{ fontWeight: 700, fontSize: '1.1rem', color: '#1c2b22', marginBottom: '6px' }}>No results found</p>
+                <p style={{ color: '#6c8274', fontSize: '0.9rem' }}>Try a different date or airport.</p>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -626,284 +559,424 @@ export default function HomePage() {
         </section>
       )}
 
-      {/* ── Stats strip ──────────────────────────────────────── */}
-      <section style={{ padding:'60px 0', background:'#f4f9f5', borderTop:'1px solid rgba(34,197,94,0.1)', borderBottom:'1px solid rgba(34,197,94,0.1)' }}>
+      {/* ── Popüler Ekolojik Rotalar (Bento Grid) ─────────────── */}
+      <section className="fade-up" style={{ padding: '96px 0', background: '#f8f9fa' }}>
         <div className="container">
-          <div className="fade-up" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:'0' }}>
-            {[
-              {value:'2M+', label:'Mutlu Yolcu', sub:'Dünya genelinde', Icon: () => (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              )},
-              {value:'300+', label:'Havalimanı', sub:'6 kıtada', Icon: () => (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-              )},
-              {value:'50+', label:'Havayolu Ortağı', sub:'Seçkin taşıyıcılar', Icon: () => (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-              )},
-              {value:'120K t', label:'CO₂ Tasarrufu', sub:'2023 yılında', Icon: () => (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
-              )},
-            ].map((s, idx, arr) => (
-              <div key={s.label} style={{
-                padding: '32px 28px',
-                borderRight: idx < arr.length - 1 ? '1px solid rgba(34,197,94,0.12)' : 'none',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
-                position: 'relative',
-                cursor: 'default',
+          {/* Section Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '56px', flexWrap: 'wrap', gap: '20px' }}>
+            <div style={{ maxWidth: '500px' }}>
+              <h2 style={{
+                fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif",
+                fontSize: 'clamp(1.8rem, 4vw, 2.6rem)',
+                fontWeight: 800,
+                color: '#002d1c',
+                marginBottom: '12px',
+                lineHeight: 1.15,
               }}>
-                <div style={{
-                  width: '44px', height: '44px', borderRadius: '12px',
-                  background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  marginBottom: '4px',
-                }}>
-                  <s.Icon />
-                </div>
-                <div>
-                  <div style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'clamp(2rem,3vw,2.6rem)', fontWeight:800, color:'#1a4d33', letterSpacing:'-0.04em', lineHeight:1 }}>{s.value}</div>
-                  <div style={{ fontSize:'0.92rem', fontWeight:700, color:'#1c2b22', marginTop:'6px', fontFamily:"'Plus Jakarta Sans',sans-serif" }}>{s.label}</div>
-                  <div style={{ fontSize:'0.75rem', color:'#6b7280', marginTop:'2px', fontFamily:"'Inter',sans-serif" }}>{s.sub}</div>
-                </div>
-                <div style={{ position:'absolute', bottom:0, left:'28px', right:'28px', height:'2px', background:'linear-gradient(90deg,rgba(34,197,94,0.5) 0%,transparent 100%)', borderRadius:'2px' }} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── How it works ─────────────────────────────────────── */}
-      <section style={{ padding:'88px 0', background:'var(--bg-base)', position:'relative', overflow:'hidden' }}>
-        <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:'800px', height:'400px', background:'radial-gradient(ellipse,rgba(34,197,94,0.05) 0%,transparent 70%)', pointerEvents:'none' }} />
-        <div className="container" style={{ position:'relative' }}>
-          <div className="fade-up" style={{ textAlign:'center', marginBottom:'56px' }}>
-            <div style={{ display:'inline-flex', alignItems:'center', gap:'6px', background:'rgba(34,197,94,0.08)', border:'1px solid rgba(34,197,94,0.18)', borderRadius:'20px', padding:'4px 14px', fontSize:'0.72rem', fontWeight:700, color:'#22c55e', letterSpacing:'0.07em', textTransform:'uppercase', marginBottom:'14px' }}>✦ Nasıl Çalışır?</div>
-            <h2 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'2.2rem', fontWeight:800, letterSpacing:'-0.04em', lineHeight:1.15, margin:'0 auto', color:'#1a4d33' }}>3 Adımda Yeşil Seyahat</h2>
-            <p style={{ color:'#6b7280', fontSize:'0.95rem', marginTop:'10px' }}>Sürdürülebilir bir yolculuk planlamak bu kadar kolay</p>
-          </div>
-          <div className="fade-up" style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:'28px' }}>
-            {[
-              {step:'01', Icon: MapPinned, title:'Rota Seç', desc:'Kalkış ve varış havalimanını belirle, tarih seç. 300+ havalimanına anında erişim.'},
-              {step:'02', Icon: BarChart2, title:'Uçuşları Karşılaştır', desc:'Fiyat, süre ve karbon etkisine göre en iyi uçuşu seç. Tam şeffaflık.'},
-              {step:'03', Icon: Leaf, title:'Ekolojiyle Uç', desc:'Rezervasyonunu tamamla, karbon dengeleme programlarına katıl ve gezini kaydet.'},
-            ].map((item) => (
-              <div key={item.step} style={{ background:'var(--bg-card)', border:'1px solid rgba(34,197,94,0.13)', borderRadius:'20px', padding:'36px 28px', position:'relative', boxShadow:'0 4px 24px rgba(0,0,0,0.06)', transition:'transform 0.3s ease,box-shadow 0.3s ease,border-color 0.3s ease' }}
-                onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-6px)';e.currentTarget.style.boxShadow='0 20px 48px rgba(34,197,94,0.12),0 8px 16px rgba(0,0,0,0.08)';e.currentTarget.style.borderColor='rgba(34,197,94,0.35)';}}
-                onMouseLeave={e=>{e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='0 4px 24px rgba(0,0,0,0.06)';e.currentTarget.style.borderColor='rgba(34,197,94,0.13)';}}>
-                <div style={{ position:'absolute', top:0, left:'28px', right:'28px', height:'2px', background:'linear-gradient(90deg,rgba(34,197,94,0.6),transparent)', borderRadius:'0 0 2px 2px' }} />
-                <div style={{ fontFamily:"'DM Mono',monospace", fontSize:'0.72rem', fontWeight:700, color:'rgba(34,197,94,0.4)', letterSpacing:'0.1em', marginBottom:'16px' }}>ADIM {item.step}</div>
-                <div style={{ width:'48px', height:'48px', borderRadius:'14px', background:'rgba(34,197,94,0.09)', border:'1px solid rgba(34,197,94,0.2)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:'18px' }}>
-                  <item.Icon size={22} style={{ color:'#16a34a', strokeWidth:1.75 }} />
-                </div>
-                <h3 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'1.1rem', fontWeight:800, letterSpacing:'-0.02em', color:'var(--text-primary)', marginBottom:'10px' }}>{item.title}</h3>
-                <p style={{ fontSize:'0.875rem', color:'var(--text-muted)', lineHeight:1.7, fontFamily:"'Inter',sans-serif", margin:0 }}>{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Popular Destinations ── */}
-      <PopularDestinations />
-
-      {/* ── Havayolu Ortaklarımız ── */}
-      <section className="fade-up" style={{ padding: '72px 0', background: '#f8faf9', overflow: 'hidden' }}>
-        <div className="container">
-          {/* Header */}
-          <div style={{ marginBottom: '44px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#16a34a', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: '14px' }}>
-              <CheckCircle2 size={10} /> Güvenilir Ortaklar
+                Popular Eco Routes
+              </h2>
+              <p style={{ color: '#6c8274', fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '0.95rem', lineHeight: 1.65 }}>
+                Discover destinations with the lowest carbon emissions and sustainable tourism certifications.
+              </p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-              <div>
-                <h2 style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.15, margin: 0, color: '#1a4d33' }}>
-                  Havayolu Ortaklarımız
-                </h2>
-                <p style={{ color: '#6b7280', fontSize: '0.95rem', marginTop: '8px', margin: '8px 0 0' }}>Seçkin havayolu şirketleriyle güvenli ve konforlu seyahat edin</p>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: '#6b7280' }}>
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#22c55e', animation: 'pulse-dot 2s ease-in-out infinite' }} />
-                Canlı ortak ağı
-              </div>
-            </div>
-            <div style={{ marginTop: '24px', height: '1px', background: 'linear-gradient(90deg, rgba(34,197,94,0.4) 0%, rgba(34,197,94,0.08) 70%, transparent 100%)' }} />
+            <Link
+              to="/flights"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontFamily: "'Inter', sans-serif", fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1rem', color: '#002d1c', textDecoration: 'none' }}
+            >
+              <span>View All</span>
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>chevron_right</span>
+            </Link>
           </div>
-        </div>
 
-        {/* Full-width marquee track */}
-        {loadingAirlines ? <div className="container"><LoadingSpinner /></div> : errorAirlines ? <div className="container"><ErrorMessage message={errorAirlines} /></div> : (
-          <div style={{ position: 'relative' }}>
-            {/* Left fade */}
-            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '80px', background: 'linear-gradient(90deg, #f8faf9 0%, transparent 100%)', zIndex: 2, pointerEvents: 'none' }} />
-            {/* Right fade */}
-            <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '80px', background: 'linear-gradient(270deg, #f8faf9 0%, transparent 100%)', zIndex: 2, pointerEvents: 'none' }} />
-
-            <div style={{ overflow: 'hidden', padding: '8px 0 12px', paddingLeft: 'max(20px, calc((100vw - 1200px) / 2))' }}>
-              <div style={{
-                display: 'flex',
-                gap: '16px',
-                width: 'max-content',
-                animation: 'marquee-ltr 400s linear infinite',
-              }}>
-                {[...airlines, ...airlines].map((a, idx) => (
-                  <div key={`${a.id}-${idx}`} style={{
-                    flexShrink: 0,
-                    width: '260px',
-                    background: '#ffffff',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '14px',
-                    padding: '18px 20px',
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: '14px',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04)',
+          {/* Bento Grid */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(12, 1fr)',
+            gridTemplateRows: 'repeat(2, 360px)',
+            gap: '20px',
+          }}>
+            {ECO_DESTINATIONS.map((dest, i) => {
+              const isLarge = dest.large;
+              return (
+                <div
+                  key={dest.id}
+                  style={{
+                    gridColumn: isLarge ? 'span 8' : 'span 4',
+                    gridRow: isLarge ? 'span 2' : 'span 1',
                     position: 'relative',
+                    borderRadius: '16px',
                     overflow: 'hidden',
-                  }}>
-                    {/* Subtle left accent bar */}
-                    <div style={{ position: 'absolute', left: 0, top: '16px', bottom: '16px', width: '3px', background: 'linear-gradient(180deg, #22c55e 0%, #86efac 100%)', borderRadius: '0 3px 3px 0' }} />
-
-                    {/* Logo / Monogram */}
-                    {a.logoUrl ? (
-                      <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#f9fafb', border: '1px solid #e5e7eb', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
-                        <img src={a.logoUrl} alt={a.name} style={{ width: '38px', height: '38px', objectFit: 'contain' }} />
-                      </div>
-                    ) : (
-                      <AirlineMonogram name={a.name} size={48} />
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.querySelector('img').style.transform = 'scale(1.08)'; }}
+                  onMouseLeave={e => { e.currentTarget.querySelector('img').style.transform = 'scale(1)'; }}
+                >
+                  <img
+                    src={dest.image}
+                    alt={dest.name}
+                    style={{
+                      width: '100%', height: '100%', objectFit: 'cover', display: 'block',
+                      transition: 'transform 0.7s ease',
+                      borderRadius: 0,
+                    }}
+                  />
+                  <div style={{
+                    position: 'absolute', inset: 0,
+                    background: 'linear-gradient(to top, rgba(0,45,28,0.85) 0%, rgba(0,45,28,0.2) 50%, transparent 100%)',
+                  }} />
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, padding: isLarge ? '40px' : '24px' }}>
+                    {isLarge && (
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', gap: '6px',
+                        background: 'rgba(177,240,206,0.15)',
+                        border: '1px solid rgba(177,240,206,0.35)',
+                        color: '#b1f0ce',
+                        padding: '4px 12px',
+                        borderRadius: '20px',
+                        fontSize: '10px', fontWeight: 700,
+                        fontFamily: "'Inter', sans-serif",
+                        letterSpacing: '0.05em',
+                        textTransform: 'uppercase',
+                        marginBottom: '16px',
+                        backdropFilter: 'blur(8px)',
+                      }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>eco</span>
+                        {dest.badge}
+                      </span>
                     )}
+                    <h3 style={{
+                      fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif",
+                      fontSize: isLarge ? '2.4rem' : '1.4rem',
+                      fontWeight: 800,
+                      color: '#ffffff',
+                      marginBottom: '8px',
+                      lineHeight: 1.1,
+                    }}>
+                      {dest.name}
+                    </h3>
+                    <p style={{ color: 'rgba(177,240,206,0.8)', fontSize: isLarge ? '1rem' : '0.875rem', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                      {dest.desc}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
-                    {/* Info */}
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: '0.875rem', fontWeight: 700, color: '#111827', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.3 }}>
-                        {a.name}
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '5px', flexWrap: 'wrap' }}>
-                        {a.country && (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.69rem', color: '#6b7280', fontFamily: 'Inter, sans-serif' }}>
-                            <MapPin size={9} style={{ flexShrink: 0 }} />{a.country}
-                          </span>
-                        )}
-                        {a.country && (
-                          <span style={{ width: '3px', height: '3px', borderRadius: '50%', background: '#d1d5db', flexShrink: 0 }} />
-                        )}
-                        {a.averageRating ? (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.69rem', fontWeight: 700, color: '#16a34a' }}>
-                            <Star size={9} style={{ fill: '#16a34a', color: '#16a34a' }} />{a.averageRating.toFixed(1)}
-                          </span>
-                        ) : (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '0.69rem', fontWeight: 600, color: '#16a34a' }}>
-                            <CheckCircle2 size={9} />Onaylı
-                          </span>
-                        )}
-                      </div>
+      {/* ── Neden EcoWings? (Editorial) ───────────────────────── */}
+      <section className="fade-up" style={{ padding: '96px 0', background: '#f0f5f1', borderTop: '1px solid rgba(77,124,95,0.1)' }}>
+        <div className="container">
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1.4fr',
+            gap: '64px',
+            alignItems: 'center',
+          }}>
+            {/* Sol sütun — başlık + feature listesi */}
+            <div>
+              <h2 style={{
+                fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif",
+                fontSize: 'clamp(2rem, 4vw, 3rem)',
+                fontWeight: 800,
+                color: '#002d1c',
+                lineHeight: 1.15,
+                marginBottom: '48px',
+              }}>
+                Why Choose EcoWings?
+              </h2>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
+                {[
+                  {
+                    icon: 'auto_awesome',
+                    title: 'Smart Route Optimization',
+                    desc: 'We calculate flight routes based on wind currents and fuel efficiency in seconds.',
+                  },
+                  {
+                    icon: 'forest',
+                    title: 'Instant Carbon Offsetting',
+                    desc: 'For every flight, we automatically donate to certified reforestation projects.',
+                  },
+                  {
+                    icon: 'verified',
+                    title: 'Green Certified Partners',
+                    desc: 'We only work with airlines that meet the highest sustainability standards.',
+                  },
+                ].map((item) => (
+                  <div key={item.title} style={{ display: 'flex', alignItems: 'flex-start', gap: '20px' }}>
+                    <div style={{
+                      width: '48px', height: '48px', flexShrink: 0,
+                      borderRadius: '12px',
+                      background: '#b1f0ce',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '22px', color: '#002d1c' }}>{item.icon}</span>
+                    </div>
+                    <div>
+                      <h4 style={{
+                        fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif",
+                        fontWeight: 700,
+                        fontSize: '1.1rem',
+                        color: '#002d1c',
+                        marginBottom: '8px',
+                      }}>
+                        {item.title}
+                      </h4>
+                      <p style={{ color: '#6c8274', fontSize: '0.95rem', lineHeight: 1.7, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                        {item.desc}
+                      </p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
+
+            {/* Sağ sütun — fotoğraf + stat overlay */}
+            <div style={{ position: 'relative' }}>
+              <div style={{
+                borderRadius: '24px',
+                overflow: 'hidden',
+                aspectRatio: '4/5',
+                boxShadow: '0 32px 80px rgba(0,45,28,0.18)',
+              }}>
+                <img
+                  src="/eco-foto.png"
+                  alt="Nature Detail"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', borderRadius: 0, transition: 'filter 0s' }}
+                />
+              </div>
+              {/* Stat kart overlay */}
+              <div style={{
+                position: 'absolute',
+                bottom: '-24px',
+                left: '-24px',
+                background: '#ffffff',
+                padding: '28px 32px',
+                borderRadius: '16px',
+                boxShadow: '0 16px 48px rgba(0,0,0,0.1)',
+                border: '1px solid rgba(0,45,28,0.06)',
+                maxWidth: '220px',
+              }}>
+                <div style={{
+                  fontFamily: "'Manrope', sans-serif",
+                  fontSize: '2.6rem',
+                  fontWeight: 800,
+                  color: '#002d1c',
+                  lineHeight: 1,
+                  marginBottom: '8px',
+                }}>
+                  12.5M+
+                </div>
+                <p style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.12rem',
+                  color: '#6c8274',
+                  lineHeight: 1.4,
+                }}>
+                  Tons of CO₂ Saved
+                </p>
+              </div>
+            </div>
           </div>
-        )}
-        <style>{`
-          @keyframes marquee-ltr {
-            0%   { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-          @keyframes pulse-dot {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50%       { opacity: 0.5; transform: scale(0.7); }
-          }
-        `}</style>
+        </div>
       </section>
 
-      {/* ── Son Yorumlar ── */}
-      <section className="fade-up" style={{ padding: '72px 0', background: 'var(--bg-base)', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', bottom: '-100px', right: '10%', width: '500px', height: '400px', background: 'radial-gradient(ellipse, rgba(34,197,94,0.05) 0%, transparent 70%)', pointerEvents: 'none' }} />
-        <div className="container" style={{ position: 'relative' }}>
-          {/* Header */}
-          <div style={{ marginBottom: '40px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: '14px' }}>
-              <Star size={10} /> Yolcu Deneyimleri
+      {/* ── Havayolu Ortaklarımız (API-driven) ───────────────── */}
+      <section className="fade-up" style={{ background: '#f4f6f4', padding: '80px 0', borderTop: '1px solid rgba(77,124,95,0.08)' }}>
+        <div className="container">
+
+          {/* ── Header ── */}
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '64px', gap: '32px', flexWrap: 'wrap' }}>
+            <div style={{ maxWidth: '600px' }}>
+              <h2 style={{ fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif", fontSize: 'clamp(2rem, 4vw, 2.75rem)', fontWeight: 800, letterSpacing: '-0.02em', color: '#002d1c', margin: '0 0 16px 0', lineHeight: 1.15 }}>
+                Airline Partners
+              </h2>
+              <p style={{ color: '#6c8274', fontSize: '1rem', lineHeight: 1.65, margin: 0 }}>
+                Curated partnerships that transcend standard loyalty. We only align with carriers who mirror our commitment to discretion, precision, and sovereign service.
+              </p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-              <div>
-                <h2 style={{ fontSize: '2.2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.15, margin: 0, color: '#1a4d33' }}>
-                  Son Yorumlar
-                </h2>
-                <p style={{ color: '#6b7280', fontSize: '0.95rem', marginTop: '8px' }}>Gerçek yolculardan gerçek deneyimler</p>
-              </div>
-              <Link to="/comments" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 22px', borderRadius: '10px', border: '1px solid rgba(34,197,94,0.3)', color: '#22c55e', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none', background: 'rgba(34,197,94,0.05)', transition: 'all 0.2s ease', whiteSpace: 'nowrap' }}>
-                Tüm Yorumlar <ArrowRight size={14} />
-              </Link>
-            </div>
-            <div style={{ marginTop: '20px', height: '1px', background: 'linear-gradient(90deg, rgba(34,197,94,0.4) 0%, rgba(34,197,94,0.1) 60%, transparent 100%)' }} />
+            <Link
+              to="/airlines"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', color: '#3d6b52', fontWeight: 700, fontSize: '0.9rem', letterSpacing: '-0.01em', paddingBottom: '8px', borderBottom: '1px solid rgba(61,107,82,0.25)', textDecoration: 'none', whiteSpace: 'nowrap', transition: 'border-color 0.2s' }}
+              onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(61,107,82,0.85)')}
+              onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(61,107,82,0.25)')}
+            >
+              View All Partnerships
+              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span>
+            </Link>
           </div>
 
+          {/* ── Partner Cards Grid ── */}
+          {loadingAirlines ? (
+            <LoadingSpinner />
+          ) : errorAirlines ? (
+            <ErrorMessage message={errorAirlines} />
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '24px' }}>
+              {airlines.slice(0, 4).map((a, idx) => {
+                const cardIcons = ['flight_takeoff', 'travel_explore', 'diamond', 'ac_unit'];
+                const cardDescriptions = [
+                  'A trusted partner delivering flawless journeys with curated routes and priority boarding privileges.',
+                  'Elegance meets the sky. Discover the Mediterranean through exclusive routes and premium in-flight excellence.',
+                  'The pinnacle of global connectivity. Unmatched suites and personalised service across the Middle East and beyond.',
+                  'Minimalist design, maximum efficiency. Sustainable travel through Northern landscapes with elite reward programmes.',
+                ];
+                return (
+                  <div
+                    key={a.id}
+                    style={{
+                      background: '#ffffff',
+                      padding: '32px',
+                      borderRadius: '16px',
+                      height: '400px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                      border: '1px solid rgba(0,45,28,0.07)',
+                      transition: 'box-shadow 0.45s ease, transform 0.45s ease',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.boxShadow = '0 24px 64px rgba(0,0,0,0.11)';
+                      e.currentTarget.style.transform = 'translateY(-3px)';
+                      const iconWrap = e.currentTarget.querySelector('.partner-icon-wrap');
+                      if (iconWrap) iconWrap.style.filter = 'grayscale(0)';
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.04)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      const iconWrap = e.currentTarget.querySelector('.partner-icon-wrap');
+                      if (iconWrap) iconWrap.style.filter = 'grayscale(1)';
+                    }}
+                  >
+                    <div>
+                      {/* Icon block */}
+                      <div
+                        className="partner-icon-wrap"
+                        style={{ width: '64px', height: '64px', background: '#e8ede9', marginBottom: '28px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', filter: 'grayscale(1)', transition: 'filter 0.45s ease' }}
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: '32px', color: '#002d1c' }}>{cardIcons[idx % 4]}</span>
+                      </div>
+
+                      {/* Airline name */}
+                      <h3 style={{ fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif", fontSize: '1.3rem', fontWeight: 800, color: '#002d1c', margin: '0 0 8px 0', lineHeight: 1.25 }}>
+                        {a.name}
+                      </h3>
+
+                      {/* Country */}
+                      {a.country && (
+                        <p style={{ fontSize: '0.78rem', color: '#6c8274', display: 'flex', alignItems: 'center', gap: '5px', margin: '0 0 16px 0' }}>
+                          <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>public</span>
+                          {a.country}
+                        </p>
+                      )}
+
+                      {/* Description */}
+                      <p style={{ fontSize: '0.84rem', lineHeight: 1.7, color: '#6c8274', margin: 0 }}>
+                        {cardDescriptions[idx % 4]}
+                      </p>
+                    </div>
+
+                    {/* CTA link */}
+                    <a
+                      href="#"
+                      style={{ marginTop: '24px', color: '#3d6b52', fontWeight: 700, fontSize: '0.73rem', letterSpacing: '0.09em', textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}
+                    >
+                      View Benefits
+                      <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>open_in_new</span>
+                    </a>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ── Son Yorumlar (API-driven) ─────────────────────────── */}
+      <section className="fade-up" style={{ padding: '72px 0 84px', background: '#f0f5f1', borderTop: '1px solid rgba(77,124,95,0.1)' }}>
+        <div className="container">
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '40px' }}>
+            <div>
+              <span style={{ display: 'block', fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#3d8a5c', marginBottom: '8px', fontFamily: "'Inter', sans-serif" }}>
+                Passenger Experiences
+              </span>
+              <h2 style={{ fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif", fontSize: '1.75rem', fontWeight: 800, color: '#002d1c', lineHeight: 1.2, margin: 0 }}>
+                Recent Reviews
+              </h2>
+            </div>
+            <Link to="/comments" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '9px 20px', borderRadius: '8px', border: '1px solid rgba(0,45,28,0.18)', color: '#002d1c', fontWeight: 600, fontSize: '0.8rem', textDecoration: 'none', background: 'transparent', transition: 'all 0.2s', whiteSpace: 'nowrap' }}>
+              All Reviews <ArrowRight size={13} />
+            </Link>
+          </div>
+          <div style={{ height: '1px', background: 'linear-gradient(90deg, rgba(0,45,28,0.2) 0%, transparent 80%)', marginBottom: '32px' }} />
+
           {loadingReviews ? <LoadingSpinner /> : errorReviews ? <ErrorMessage message={errorReviews} /> : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
-              {reviews.map((r) => {
-                const initials = (r.userName || '?').slice(0, 1).toUpperCase();
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', alignItems: 'start' }}>
+              {reviews.slice(-3).map((r, idx) => {
+                const isFeatured = idx === 1;
+                const initials = (r.userName || '?').slice(0, 2).toUpperCase();
                 const hue = (r.userName || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
                 const filled = Math.max(0, Math.min(5, Math.round(r.rating)));
                 return (
                   <div key={r.id} style={{
-                    background: 'var(--bg-card)',
-                    border: '1px solid rgba(34,197,94,0.12)',
-                    borderLeft: '4px solid rgba(34,197,94,0.5)',
-                    borderRadius: '16px',
-                    padding: '28px 24px 22px',
-                    display: 'flex', flexDirection: 'column', gap: '16px',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                    position: 'relative', overflow: 'hidden',
-                  }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.transform = 'translateY(-3px)';
-                      e.currentTarget.style.boxShadow = '0 12px 36px rgba(34,197,94,0.1), 0 4px 12px rgba(0,0,0,0.08)';
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.06)';
-                    }}
-                  >
-                    {/* Decorative giant quote */}
-                    <div style={{ position: 'absolute', top: '8px', right: '16px', fontSize: '5rem', lineHeight: 1, color: 'rgba(34,197,94,0.07)', fontFamily: 'Georgia, serif', fontWeight: 900, pointerEvents: 'none', userSelect: 'none' }}>&ldquo;</div>
-
-                    {/* Star rating */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                    padding: '28px',
+                    borderRadius: '14px',
+                    display: 'flex', flexDirection: 'column', gap: '20px',
+                    background: isFeatured ? '#002d1c' : '#ffffff',
+                    boxShadow: isFeatured ? '0 16px 40px rgba(0,45,28,0.28)' : '0 1px 6px rgba(0,0,0,0.05)',
+                    border: isFeatured ? 'none' : '1px solid rgba(0,45,28,0.07)',
+                    transform: isFeatured ? 'translateY(-16px)' : 'none',
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                  }}>
+                    {/* Stars */}
+                    <div style={{ display: 'flex', gap: '3px' }}>
                       {Array.from({ length: 5 }).map((_, i) => (
-                        <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill={i < filled ? '#22c55e' : 'none'} stroke={i < filled ? '#22c55e' : '#374151'} strokeWidth="2">
+                        <svg key={i} width="13" height="13" viewBox="0 0 24 24"
+                          fill={i < filled ? (isFeatured ? '#4ade80' : '#002d1c') : 'none'}
+                          stroke={i < filled ? (isFeatured ? '#4ade80' : '#002d1c') : (isFeatured ? 'rgba(255,255,255,0.25)' : '#d1d9d4')}
+                          strokeWidth="2">
                           <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
                         </svg>
                       ))}
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#22c55e', marginLeft: '4px' }}>{filled}/5</span>
                     </div>
 
                     {/* Comment */}
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '0.93rem', lineHeight: 1.7, fontStyle: 'italic', margin: 0, position: 'relative', zIndex: 1 }}>
+                    <p style={{
+                      fontSize: '0.92rem', fontWeight: 400, lineHeight: 1.75, fontStyle: 'italic',
+                      color: isFeatured ? 'rgba(255,255,255,0.88)' : '#2d4438',
+                      margin: 0, flex: 1,
+                    }}>
                       &ldquo;{r.comment}&rdquo;
                     </p>
 
                     {/* Divider */}
-                    <div style={{ height: '1px', background: 'rgba(34,197,94,0.1)' }} />
+                    <div style={{ height: '1px', background: isFeatured ? 'rgba(255,255,255,0.1)' : 'rgba(0,45,28,0.07)' }} />
 
-                    {/* Footer: avatar + name + date */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {/* Reviewer */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{
-                        width: '36px', height: '36px', borderRadius: '50%',
-                        background: `linear-gradient(135deg, hsl(${hue},55%,22%) 0%, hsl(${hue},45%,15%) 100%)`,
-                        border: `1.5px solid hsl(${hue},55%,35%)`,
+                        width: '38px', height: '38px', borderRadius: '50%', flexShrink: 0,
+                        background: isFeatured ? `hsl(${hue},40%,35%)` : `hsl(${hue},30%,92%)`,
+                        border: isFeatured ? '1.5px solid rgba(74,222,128,0.4)' : `1px solid hsl(${hue},25%,82%)`,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '0.8rem', fontWeight: 800, color: `hsl(${hue},70%,70%)`,
-                        fontFamily: "'Plus Jakarta Sans', sans-serif",
-                        flexShrink: 0,
+                        fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.04em',
+                        color: isFeatured ? '#d1fae5' : `hsl(${hue},50%,28%)`,
+                        userSelect: 'none',
                       }}>{initials}</div>
                       <div>
-                        <div style={{ fontWeight: 700, fontSize: '0.875rem', color: '#1a4d33' }}>{r.userName}</div>
+                        <div style={{ fontWeight: 700, fontSize: '0.84rem', color: isFeatured ? '#ffffff' : '#002d1c', lineHeight: 1.3 }}>
+                          {r.userName}
+                        </div>
                         {r.createdDate && (
-                          <div style={{ fontSize: '0.72rem', color: '#6b7280', marginTop: '1px' }}>
-                            {new Date(r.createdDate).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                          <div style={{ fontSize: '0.7rem', marginTop: '2px', color: isFeatured ? 'rgba(255,255,255,0.45)' : '#8fa899' }}>
+                            {new Date(r.createdDate).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
                           </div>
                         )}
                       </div>
@@ -916,29 +989,108 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Bottom CTA ───────────────────────────────────────── */}
-      <section className="fade-up" style={{ padding:'96px 0', background:'var(--bg-surface)', borderTop:'1px solid rgba(34,197,94,0.1)', position:'relative', overflow:'hidden' }}>
-        <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:'700px', height:'500px', background:'radial-gradient(ellipse,rgba(34,197,94,0.1) 0%,transparent 65%)', pointerEvents:'none' }} />
-        <div className="container" style={{ textAlign:'center', position:'relative' }}>
-          <div style={{ display:'inline-flex', alignItems:'center', gap:'6px', background:'rgba(34,197,94,0.1)', border:'1px solid rgba(34,197,94,0.25)', borderRadius:'100px', padding:'5px 16px', fontSize:'0.72rem', fontWeight:700, color:'#22c55e', letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:'24px' }}>🌿 Bugün Başla</div>
-          <h2 style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:'clamp(2rem,4vw,3.2rem)', fontWeight:800, letterSpacing:'-0.04em', lineHeight:1.1, margin:'0 auto 20px', color:'#1a4d33', maxWidth:'640px' }}>Sürdürülebilir Seyahate Hazır Mısın?</h2>
-          <p style={{ color:'var(--text-muted)', fontSize:'1.05rem', maxWidth:'480px', margin:'0 auto 40px', lineHeight:1.7, fontFamily:"'Inter',sans-serif" }}>Ücretsiz hesap oluştur, karbon ayak izini takip et ve daha yeşil bir dünya için uç.</p>
-          <div style={{ display:'flex', gap:'16px', justifyContent:'center', flexWrap:'wrap' }}>
+      {/* ── Newsletter / CTA ─────────────────────────────────── */}
+      <section className="fade-up" style={{ padding: '96px 0', background: '#00452e', position: 'relative', overflow: 'hidden' }}>
+        {/* Subtle background texture */}
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(177,240,206,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(177,240,206,0.06) 0%, transparent 50%)', pointerEvents: 'none' }} />
+
+        <div className="container" style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
+          <h2 style={{
+            fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif",
+            fontSize: 'clamp(2rem, 5vw, 3rem)',
+            fontWeight: 800,
+            color: '#ffffff',
+            lineHeight: 1.15,
+            marginBottom: '20px',
+          }}>
+            Let's Protect the Future Together
+          </h2>
+          <p style={{
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontSize: '1.05rem',
+            color: 'rgba(177,240,206,0.75)',
+            marginBottom: '44px',
+            lineHeight: 1.7,
+          }}>
+            Join our newsletter to stay informed about new eco routes and exclusive offers.
+          </p>
+
+          <form
+            className="airport-dropdown-exclude"
+            onSubmit={e => e.preventDefault()}
+            style={{ display: 'flex', flexDirection: 'row', gap: '12px', maxWidth: '560px', margin: '0 auto', flexWrap: 'wrap' }}
+          >
+            <input
+              type="email"
+              placeholder="Your email address"
+              style={{
+                flex: 1,
+                minWidth: '200px',
+                background: 'rgba(255,255,255,0.1)',
+                border: '1px solid rgba(177,240,206,0.3)',
+                borderRadius: '12px',
+                padding: '16px 20px',
+                color: '#ffffff',
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: '0.95rem',
+                outline: 'none',
+              }}
+            />
+            <button
+              type="submit"
+              style={{
+                background: '#b1f0ce',
+                color: '#002d1c',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '16px 32px',
+                fontFamily: "'Manrope', sans-serif",
+                fontWeight: 800,
+                fontSize: '0.95rem',
+                cursor: 'pointer',
+                transition: 'background 0.2s ease, transform 0.15s ease',
+                whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#b1f0ce'; e.currentTarget.style.transform = 'translateY(0)'; }}
+            >
+              Subscribe
+            </button>
+          </form>
+
+          {/* Alt CTA linkleri */}
+          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '40px', flexWrap: 'wrap' }}>
             <Link to="/signup"
-              style={{ display:'inline-flex', alignItems:'center', gap:'8px', padding:'15px 36px', borderRadius:'12px', background:'linear-gradient(135deg,#22c55e,#16a34a)', color:'#051005', fontWeight:700, fontSize:'0.95rem', textDecoration:'none', boxShadow:'0 4px 20px rgba(34,197,94,0.35)', transition:'all 0.2s ease' }}
-              onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-2px)';e.currentTarget.style.boxShadow='0 8px 28px rgba(34,197,94,0.45)';}}
-              onMouseLeave={e=>{e.currentTarget.style.transform='translateY(0)';e.currentTarget.style.boxShadow='0 4px 20px rgba(34,197,94,0.35)';}}>
-              🌱 Ücretsiz Kaydol <ArrowRight size={16} />
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '13px 32px', borderRadius: '10px', background: 'rgba(177,240,206,0.12)', border: '1px solid rgba(177,240,206,0.25)', color: '#b1f0ce', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', transition: 'all 0.2s ease' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(177,240,206,0.2)'; e.currentTarget.style.borderColor = 'rgba(177,240,206,0.5)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(177,240,206,0.12)'; e.currentTarget.style.borderColor = 'rgba(177,240,206,0.25)'; }}
+            >
+              🌱 Sign Up Free <ArrowRight size={16} />
             </Link>
             <Link to="/flights"
-              style={{ display:'inline-flex', alignItems:'center', gap:'8px', padding:'15px 36px', borderRadius:'12px', border:'1px solid rgba(34,197,94,0.3)', color:'#22c55e', fontWeight:700, fontSize:'0.95rem', textDecoration:'none', background:'rgba(34,197,94,0.05)', transition:'all 0.2s ease' }}
-              onMouseEnter={e=>{e.currentTarget.style.background='rgba(34,197,94,0.12)';e.currentTarget.style.borderColor='rgba(34,197,94,0.5)';}}
-              onMouseLeave={e=>{e.currentTarget.style.background='rgba(34,197,94,0.05)';e.currentTarget.style.borderColor='rgba(34,197,94,0.3)';}}>
-              Uçuşları Keşfet <ArrowRight size={16} />
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '13px 32px', borderRadius: '10px', background: 'transparent', border: '1px solid rgba(177,240,206,0.2)', color: 'rgba(177,240,206,0.8)', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', transition: 'all 0.2s ease' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(177,240,206,0.5)'; e.currentTarget.style.color = '#b1f0ce'; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(177,240,206,0.2)'; e.currentTarget.style.color = 'rgba(177,240,206,0.8)'; }}
+            >
+              Explore Flights <ArrowRight size={16} />
             </Link>
           </div>
         </div>
       </section>
+
     </div>
   );
 }
+
+/*
+ * ── Endpoint Koruması Teyidi ─────────────────────────────────────
+ * GET  /api/Flights           → flightService.getFlights()           ✓ KORUNDU
+ * GET  /api/Airline           → apiClient.get('/api/Airline')        ✓ KORUNDU
+ * GET  /api/Airport           → apiClient.get('/api/Airport')        ✓ KORUNDU
+ * GET  /api/AirlineReview     → apiClient.get('/api/AirlineReview')  ✓ KORUNDU
+ * GET  /api/FlightSearch/...  → flightService.searchFlightsApi(...)  ✓ KORUNDU
+ *
+ * Tüm request metodları, JWT Bearer header interceptor'ı ve
+ * query parametreleri (origin, destination, date, adults, travelClass)
+ * değiştirilmeden korunmuştur.
+ * ──────────────────────────────────────────────────────────────── */

@@ -4,7 +4,7 @@
    ═══════════════════════════════════════════════════════════════ */
 
 /* ── Google Fonts ─────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
 
 /* ── Design Tokens ────────────────────────────────────────── */
 :root {
@@ -698,6 +698,11 @@ select option {
   to   { opacity: 1; }
 }
 
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
 @keyframes hamburgerTopOpen {
   0%   { transform: translateY(0) rotate(0); }
   50%  { transform: translateY(7px) rotate(0); }
@@ -786,4 +791,37 @@ select option {
 @media (min-width: 768px) {
   .auth-left-panel  { display: flex !important; }
   .auth-mobile-header { display: none; }
+}
+
+/* ── HomePage dark hero scoped overrides ──────────────────
+   Bu kurallar yalnızca .ecowings-home wrapper içindeki
+   hero section'ı etkiler; diğer sayfalar etkilenmez.
+   ──────────────────────────────────────────────────────── */
+.ecowings-home section:first-of-type {
+  background: linear-gradient(135deg, #002d1c 0%, #00452e 100%) !important;
+  overflow: visible !important;
+}
+.ecowings-home section:first-of-type::before {
+  display: none !important;
+}
+.ecowings-home section:first-of-type h1 {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  -webkit-text-fill-color: #ffffff !important;
+  filter: none !important;
+}
+
+/* ── Travel Planner Page scoped overrides ─────────────────
+   The hero uses a <div> (not <section>) so section:first-of-type
+   rules don't apply. These rules fix heading clipping inside
+   the tp-hero div just in case any parent rule leaks through.
+   ──────────────────────────────────────────────────────── */
+.travel-planner-page .tp-hero h1,
+.travel-planner-page .tp-hero h2 {
+  -webkit-text-fill-color: unset !important;
+  background: none !important;
+  background-clip: unset !important;
+  -webkit-background-clip: unset !important;
+  filter: none !important;
 }
