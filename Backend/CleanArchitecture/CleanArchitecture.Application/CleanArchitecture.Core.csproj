@@ -10,7 +10,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
-    <PackageReference Include="BCrypt" Version="1.0.0" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="BertTokenizer" Version="1.0.0" />
     <PackageReference Include="BERTTokenizers" Version="1.2.0" />
