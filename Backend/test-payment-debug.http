@@ -1,0 +1,62 @@
+### 1. Book and Pay ile bilet oluştur
+POST https://localhost:5000/api/flights/book-and-pay
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "flightNumber": "TEST123",
+  "departureAirportCode": "IST",
+  "destinationAirportCode": "JFK",
+  "departureTime": "2024-12-25T10:00:00",
+  "estimatedArrivalTime": "2024-12-25T18:00:00",
+  "price": 100.00,
+  "airlineCode": "TK",
+  "userEmail": "test@example.com"
+}
+
+### Response:
+# {
+#   "ticketId": 123,
+#   "paymentUrl": "https://checkout.stripe.com/..."
+# }
+
+###
+
+### 2. Ticket durumunu kontrol et (ticketId'yi yukarıdan alın)
+GET https://localhost:5000/api/payment/check-ticket/123
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Response beklenen:
+# {
+#   "ticketId": 123,
+#   "isPaid": false,  <-- Ödeme öncesi false olmalı
+#   "pnrCode": null,
+#   "price": 100.00
+# }
+
+###
+
+### 3. (ÖDEMEYİ YAPTIN SONRA) - Tekrar kontrol et
+GET https://localhost:5000/api/payment/check-ticket/123
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Response beklenen:
+# {
+#   "ticketId": 123,
+#   "isPaid": true,   <-- Ödeme sonrası true olmalı
+#   "pnrCode": "ABC12345"
+# }
+
+###
+
+### 4. (Eğer hala false ise) Manuel olarak işaretle (sadece test için)
+POST https://localhost:5000/api/payment/test-mark-paid/123
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### Response:
+# {
+#   "message": "Ticket marked as paid successfully",
+#   "ticketId": 123,
+#   "isPaid": true,
+#   "pnrCode": "XYZ12345"
+# }

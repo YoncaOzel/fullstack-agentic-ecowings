@@ -1,0 +1,36 @@
+﻿using CleanArchitecture.Core.Entities;
+using CleanArchitecture.Core.Interfaces.Repositories;
+using CleanArchitecture.Infrastructure.Contexts;
+using CleanArchitecture.Infrastructure.Repository;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+
+namespace CleanArchitecture.Infrastructure.Repositories
+{
+    public class UserRepositoryAsync : GenericRepositoryAsync<User>, IUserRepositoryAsync
+    {
+        private readonly ApplicationDbContext _dbContext;
+
+        public UserRepositoryAsync(ApplicationDbContext dbContext) : base(dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        public override async Task<User> AddAsync(User entity)
+        {
+            await _dbContext.Database.ExecuteSqlRawAsync(
+                "SELECT setval(pg_get_serial_sequence('\"Users\"', 'Id'), COALESCE((SELECT MAX(\"Id\") FROM \"Users\"), 0) + 1, false)");
+            return await base.AddAsync(entity);
+        }
+
+        public async Task<User> GetByEmailAsync(string email)
+        {
+            return await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        public async Task<bool> ExistsByEmailAsync(string email)
+        {
+            return await _dbContext.Users.AnyAsync(u => u.Email == email);
+        }
+    }
+}
