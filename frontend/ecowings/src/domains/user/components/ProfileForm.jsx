@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { User, AtSign, Mail, Save, Check } from 'lucide-react';
 import userService from '../services/userService';
 
 export default function ProfileForm({ profile, onUpdate }) {
@@ -25,132 +24,314 @@ export default function ProfileForm({ profile, onUpdate }) {
         onUpdate?.((prev) => ({ ...prev, ...form }));
         setTimeout(() => setSuccess(false), 3000);
       } else {
-        setError(res.data?.message || 'Güncelleme başarısız.');
+        setError(res.data?.message || 'Update failed.');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Bir hata oluştu.');
+      setError(err.response?.data?.message || 'An error occurred.');
     } finally {
       setSaving(false);
     }
   };
 
+  const inputBase = {
+    width: '100%',
+    border: 'none',
+    outline: 'none',
+    boxShadow: 'none',
+    WebkitAppearance: 'none',
+    MozAppearance: 'none',
+    appearance: 'none',
+    borderRadius: '12px',
+    padding: '16px 20px',
+    fontSize: '15px',
+    fontFamily: "'DM Sans', sans-serif",
+    color: '#2b3437',
+    transition: 'background 0.25s ease',
+    boxSizing: 'border-box',
+  };
+
   const inputStyle = (key) => ({
-    width: '100%', background: focused === key ? '#f0f7f2' : '#f8faf9',
-    border: `1px solid ${focused === key ? '#22c55e' : '#d1e7d9'}`,
-    borderRadius: '10px', padding: '12px 14px', color: '#1c2b22',
-    fontSize: '14px', fontFamily: 'Inter,sans-serif', outline: 'none',
-    boxShadow: focused === key ? '0 0 0 3px rgba(34,197,94,0.1)' : 'none',
-    transition: 'border-color 0.2s,box-shadow 0.2s,background 0.2s',
+    ...inputBase,
+    background: focused === key ? '#eaeff1' : '#f1f4f6',
   });
+
+  const labelStyle = {
+    fontSize: '11px',
+    fontWeight: 600,
+    letterSpacing: '0.05em',
+    textTransform: 'uppercase',
+    color: '#586064',
+    marginBottom: '10px',
+    display: 'block',
+    fontFamily: "'DM Sans', sans-serif",
+  };
 
   return (
     <form onSubmit={handleSubmit}>
-      {/* Section header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '28px' }}>
-        <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <User size={16} style={{ color: '#22c55e' }} />
-        </div>
-        <div>
-          <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#166534', margin: 0, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Profil Bilgileri</h3>
-          <p style={{ fontSize: '0.78rem', color: '#6b7280', margin: 0, marginTop: '2px' }}>Adı, soyadı ve kullanıcı adını düzenle</p>
-        </div>
-      </div>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap');
 
-      {/* Alerts */}
+        @keyframes pf-spin { to { transform: rotate(360deg); } }
+
+        .pf-grid input,
+        .pf-grid input:focus,
+        .pf-grid input:active,
+        .pf-grid input:focus-visible {
+          border: none !important;
+          outline: none !important;
+          box-shadow: none !important;
+          -webkit-appearance: none !important;
+          appearance: none !important;
+        }
+
+        .pf-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 32px 40px;
+        }
+
+        @media (max-width: 640px) {
+          .pf-grid { grid-template-columns: 1fr; }
+        }
+
+        .pf-field { display: flex; flex-direction: column; }
+
+        .pf-input-wrap { position: relative; }
+
+        .pf-input-icon {
+          position: absolute;
+          right: 16px;
+          top: 50%;
+          transform: translateY(-50%);
+          pointer-events: none;
+          display: flex;
+          align-items: center;
+        }
+
+        .pf-divider {
+          border: none;
+          border-top: 1px solid rgba(43, 52, 55, 0.05);
+          margin: 32px 0 0;
+        }
+
+        .pf-footer {
+          padding-top: 32px;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        @media (min-width: 480px) {
+          .pf-footer {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+          }
+        }
+
+        .pf-last-updated {
+          font-size: 13px;
+          color: rgba(88, 96, 100, 0.55);
+          font-style: italic;
+          font-family: 'DM Sans', sans-serif;
+        }
+
+        .pf-save-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 14px 36px;
+          border-radius: 100px;
+          border: none;
+          font-size: 14px;
+          font-weight: 600;
+          font-family: 'DM Sans', sans-serif;
+          letter-spacing: 0.01em;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          background: linear-gradient(135deg, #1b6d24, #076019);
+          color: #e5ffdd;
+          box-shadow: 0 12px 24px -6px rgba(27,109,36,0.28);
+        }
+
+        .pf-save-btn:hover:not(:disabled) {
+          box-shadow: 0 16px 32px -6px rgba(27,109,36,0.38);
+          transform: scale(1.02);
+        }
+
+        .pf-save-btn:active:not(:disabled) {
+          transform: scale(0.96);
+        }
+
+        .pf-save-btn:disabled {
+          opacity: 0.55;
+          cursor: not-allowed;
+        }
+
+        .pf-spinner {
+          width: 14px;
+          height: 14px;
+          border: 2px solid rgba(229,255,221,0.3);
+          border-top-color: #e5ffdd;
+          border-radius: 50%;
+          display: inline-block;
+          animation: pf-spin 0.7s linear infinite;
+        }
+
+        .pf-alert {
+          border-radius: 10px;
+          padding: 12px 16px;
+          font-size: 13.5px;
+          font-family: 'DM Sans', sans-serif;
+          margin-bottom: 28px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .pf-alert.error {
+          background: rgba(159, 64, 61, 0.06);
+          border: 1px solid rgba(159, 64, 61, 0.15);
+          color: #9f403d;
+        }
+
+        .pf-alert.success {
+          background: rgba(27, 109, 36, 0.06);
+          border: 1px solid rgba(27, 109, 36, 0.15);
+          color: #1b6d24;
+          font-weight: 500;
+        }
+      `}</style>
+
       {error && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '10px', padding: '10px 14px', marginBottom: '20px' }}>
-          <span style={{ fontSize: '0.85rem', color: '#fca5a5' }}>⚠ {error}</span>
+        <div className="pf-alert error">
+          <AlertIcon /> {error}
         </div>
       )}
       {success && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: '10px', padding: '10px 14px', marginBottom: '20px' }}>
-          <Check size={14} style={{ color: '#4ade80' }} />
-          <span style={{ fontSize: '0.85rem', color: '#4ade80', fontWeight: 600 }}>Profil başarıyla güncellendi!</span>
+        <div className="pf-alert success">
+          <CheckIcon /> Profile updated successfully!
         </div>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', maxWidth: '480px' }}>
-        {/* Name row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
-            <label style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(34,197,94,0.7)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Ad</label>
-            <input
-              value={form.firstName}
-              onChange={(e) => setForm((p) => ({ ...p, firstName: e.target.value }))}
-              onFocus={() => setFocused('firstName')}
-              onBlur={() => setFocused('')}
-              required
-              style={inputStyle('firstName')}
-            />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
-            <label style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(34,197,94,0.7)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Soyad</label>
-            <input
-              value={form.lastName}
-              onChange={(e) => setForm((p) => ({ ...p, lastName: e.target.value }))}
-              onFocus={() => setFocused('lastName')}
-              onBlur={() => setFocused('')}
-              required
-              style={inputStyle('lastName')}
-            />
-          </div>
+      <div className="pf-grid">
+        {/* AD */}
+        <div className="pf-field">
+          <label style={labelStyle}>FIRST NAME</label>
+          <input
+            value={form.firstName}
+            onChange={(e) => setForm((p) => ({ ...p, firstName: e.target.value }))}
+            onFocus={() => setFocused('firstName')}
+            onBlur={() => setFocused('')}
+            required
+            style={inputStyle('firstName')}
+          />
         </div>
 
-        {/* Username */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
-          <label style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(34,197,94,0.7)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Kullanıcı Adı</label>
-          <div style={{ position: 'relative' }}>
-            <AtSign size={13} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(34,197,94,0.5)', pointerEvents: 'none' }} />
+        {/* SOYAD */}
+        <div className="pf-field">
+          <label style={labelStyle}>LAST NAME</label>
+          <input
+            value={form.lastName}
+            onChange={(e) => setForm((p) => ({ ...p, lastName: e.target.value }))}
+            onFocus={() => setFocused('lastName')}
+            onBlur={() => setFocused('')}
+            required
+            style={inputStyle('lastName')}
+          />
+        </div>
+
+        {/* KULLANICI ADI */}
+        <div className="pf-field">
+          <label style={labelStyle}>USERNAME</label>
+          <div className="pf-input-wrap">
             <input
               value={form.userName}
               onChange={(e) => setForm((p) => ({ ...p, userName: e.target.value }))}
               onFocus={() => setFocused('userName')}
               onBlur={() => setFocused('')}
               required
-              style={{ ...inputStyle('userName'), paddingLeft: '34px' }}
+              style={{ ...inputStyle('userName'), paddingRight: '44px' }}
             />
+            <span className="pf-input-icon">
+              <CheckCircleIcon />
+            </span>
           </div>
         </div>
 
-        {/* Email (readonly) */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
-          <label style={{ fontSize: '11px', fontWeight: 700, color: 'rgba(107,114,128,0.6)', letterSpacing: '0.6px', textTransform: 'uppercase' }}>E-posta <span style={{ fontWeight: 400, fontSize: '10px' }}>(değiştirilemez)</span></label>
-          <div style={{ position: 'relative' }}>
-            <Mail size={13} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(107,114,128,0.4)', pointerEvents: 'none' }} />
+        {/* E-POSTA */}
+        <div className="pf-field">
+          <label style={{ ...labelStyle, color: 'rgba(88, 96, 100, 0.5)' }}>
+            EMAIL
+          </label>
+          <div className="pf-input-wrap">
             <input
               value={profile?.email || ''}
-              disabled
-              style={{ ...inputStyle('email'), paddingLeft: '34px', opacity: 0.5, cursor: 'not-allowed' }}
+              readOnly
+              style={{
+                ...inputBase,
+                background: 'rgba(241,244,246,0.5)',
+                color: 'rgba(43, 52, 55, 0.45)',
+                cursor: 'not-allowed',
+                paddingRight: '44px',
+              }}
             />
+            <span className="pf-input-icon" style={{ opacity: 0.3 }}>
+              <LockIcon />
+            </span>
           </div>
         </div>
+      </div>
 
-        {/* Submit */}
-        <button
-          type="submit"
-          disabled={saving}
-          style={{
-            alignSelf: 'flex-start',
-            display: 'inline-flex', alignItems: 'center', gap: '8px',
-            padding: '13px 28px', borderRadius: '10px', border: 'none',
-            background: saving ? 'rgba(34,197,94,0.4)' : 'linear-gradient(135deg,#22c55e 0%,#16a34a 100%)',
-            color: '#080e08', fontWeight: 700, fontSize: '14px',
-            cursor: saving ? 'not-allowed' : 'pointer',
-            boxShadow: saving ? 'none' : '0 4px 18px rgba(34,197,94,0.28)',
-            transition: 'all 0.2s',
-          }}
-          onMouseEnter={e => { if (!saving) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 8px 26px rgba(34,197,94,0.4)'; } }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = saving ? 'none' : '0 4px 18px rgba(34,197,94,0.28)'; }}
-        >
+      <hr className="pf-divider" />
+
+      <div className="pf-footer">
+        <span className="pf-last-updated">
+          Last updated: {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+        </span>
+        <button type="submit" disabled={saving} className="pf-save-btn">
           {saving ? (
-            <><span style={{ width: '13px', height: '13px', border: '2px solid rgba(8,14,8,0.3)', borderTopColor: '#080e08', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.7s linear infinite' }} /> Kaydediliyor…</>
+            <><span className="pf-spinner" /> Saving…</>
           ) : (
-            <><Save size={14} /> Değişiklikleri Kaydet</>
+            'Save Changes'
           )}
         </button>
       </div>
-
-      <style>{`@keyframes spin { to { transform:rotate(360deg); } }`}</style>
     </form>
+  );
+}
+
+function CheckCircleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="#1b6d24" xmlns="http://www.w3.org/2000/svg">
+      <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.59L6.41 12l1.42-1.42L11 13.17l5.17-5.17 1.42 1.41L11 16.59z"/>
+    </svg>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+  );
+}
+
+function AlertIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
   );
 }

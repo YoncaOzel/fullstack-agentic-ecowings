@@ -1,100 +1,196 @@
 import { Link } from 'react-router-dom';
+import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from 'react-icons/fa';
+
+const sections = [
+  {
+    title: "Explore",
+    links: [
+      { name: "Flights", href: "/flights" },
+      { name: "Campaigns", href: "/campaigns" },
+      { name: "FAQ", href: "/faq" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { name: "About Us", href: "#" },
+      { name: "Sustainability", href: "#" },
+      { name: "Blog", href: "#" },
+      { name: "Careers", href: "#" },
+    ],
+  },
+  {
+    title: "Support",
+    links: [
+      { name: "Help Center", href: "/faq" },
+      { name: "Reviews", href: "/comments" },
+      { name: "Privacy Policy", href: "#" },
+      { name: "Terms of Service", href: "#" },
+    ],
+  },
+];
+
+const socialLinks = [
+  { icon: <FaInstagram size={18} />, href: "https://instagram.com", label: "Instagram" },
+  { icon: <FaFacebook size={18} />, href: "https://facebook.com", label: "Facebook" },
+  { icon: <FaTwitter size={18} />, href: "https://twitter.com", label: "Twitter" },
+  { icon: <FaLinkedin size={18} />, href: "https://linkedin.com", label: "LinkedIn" },
+];
+
+const legalLinks = [
+  { name: "Terms and Conditions", href: "#" },
+  { name: "Privacy Policy", href: "#" },
+];
 
 export default function Footer() {
   return (
-    <footer style={{ background: '#1b5e20', color: '#fff', padding: '48px 0 24px' }}>
-      <div className="container">
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '40px',
-          marginBottom: '40px',
-        }}>
-          {/* Brand */}
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <span style={{ fontSize: '1.6rem' }}>🌿</span>
-              <span style={{ fontWeight: 700, fontSize: '1.3rem' }}>EcoWings</span>
+    <footer>
+      <div style={{ padding: '80px 0 0' }}>
+        <div className="container">
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '40px',
+          }}>
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '40px',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+            }}>
+              {/* Brand column */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '300px' }}>
+                <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
+                  <span style={{
+                    fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif",
+                    fontWeight: 800,
+                    fontSize: '1.25rem',
+                    color: 'var(--text-primary)',
+                    letterSpacing: '-0.02em',
+                  }}>
+                    EcoWings
+                  </span>
+                </Link>
+                <p style={{
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  fontSize: '0.9rem',
+                  lineHeight: 1.7,
+                  color: 'var(--text-muted)',
+                  margin: 0,
+                }}>
+                  A smart flight search platform for sustainable travel. Fly greener, live better.
+                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                  {socialLinks.map((social) => (
+                    <a
+                      key={social.label}
+                      href={social.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={social.label}
+                      style={{
+                        color: 'var(--text-muted)',
+                        transition: 'color 0.2s ease',
+                        display: 'flex',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.color = 'var(--green-primary)'}
+                      onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+                    >
+                      {social.icon}
+                    </a>
+                  ))}
+                </div>
+              </div>
+
+              {/* Link columns */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: '40px 60px',
+                flex: '1 1 auto',
+                maxWidth: '640px',
+              }}>
+                {sections.map((section) => (
+                  <div key={section.title}>
+                    <h3 style={{
+                      fontFamily: "'Manrope', sans-serif",
+                      fontWeight: 700,
+                      fontSize: '0.8rem',
+                      letterSpacing: '0.1em',
+                      textTransform: 'uppercase',
+                      color: 'var(--text-primary)',
+                      marginBottom: '20px',
+                    }}>
+                      {section.title}
+                    </h3>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      {section.links.map((link) => (
+                        <li key={link.name}>
+                          <Link
+                            to={link.href}
+                            style={{
+                              fontFamily: "'Inter', sans-serif",
+                              fontSize: '0.875rem',
+                              color: 'var(--text-muted)',
+                              textDecoration: 'none',
+                              transition: 'color 0.2s ease',
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.color = 'var(--green-primary)'}
+                            onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+                          >
+                            {link.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
             </div>
-            <p style={{ color: '#a5d6a7', fontSize: '0.9rem', lineHeight: '1.6', margin: 0 }}>
-              Sürdürülebilir seyahat için akıllı uçuş arama platformu.
-              Daha yeşil bir dünya için uçalım.
-            </p>
-          </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 style={{ fontWeight: 600, marginBottom: '16px', fontSize: '1rem' }}>Hızlı Bağlantılar</h4>
-            <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {[
-                { to: '/', label: 'Ana Sayfa' },
-                { to: '/flights', label: 'Uçuşlar' },
-                { to: '/campaigns', label: 'Kampanyalar' },
-                { to: '/comments', label: 'Yorumlar' },
-                { to: '/lucky-flight', label: 'Şanslı Uçuş' },
-                { to: '/faq', label: 'Sıkça Sorulan Sorular' },
-              ].map((l) => (
-                <li key={l.to}>
-                  <Link to={l.to} style={{
-                    color: '#a5d6a7',
-                    fontSize: '0.9rem',
-                    textDecoration: 'none',
-                    transition: 'color 0.15s',
-                  }}
-                    onMouseEnter={(e) => e.currentTarget.style.color = '#81c784'}
-                    onMouseLeave={(e) => e.currentTarget.style.color = '#a5d6a7'}
-                  >
-                    {l.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {/* Bottom bar */}
+            <div style={{
+              borderTop: '1px solid var(--border)',
+              padding: '28px 0',
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '12px',
+            }}>
+              <p style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: '0.78rem',
+                color: 'var(--text-muted)',
+                margin: 0,
+                fontWeight: 500,
+              }}>
+                © {new Date().getFullYear()} EcoWings. All rights reserved.
+              </p>
+              <ul style={{ display: 'flex', flexWrap: 'wrap', gap: '24px', listStyle: 'none', padding: 0, margin: 0 }}>
+                {legalLinks.map((link) => (
+                  <li key={link.name}>
+                    <a
+                      href={link.href}
+                      style={{
+                        fontFamily: "'Inter', sans-serif",
+                        fontSize: '0.78rem',
+                        fontWeight: 500,
+                        color: 'var(--text-muted)',
+                        textDecoration: 'none',
+                        transition: 'color 0.2s ease',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.color = 'var(--green-primary)'}
+                      onMouseLeave={e => e.currentTarget.style.color = 'var(--text-muted)'}
+                    >
+                      {link.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-
-          {/* Contact */}
-          <div>
-            <h4 style={{ fontWeight: 600, marginBottom: '16px', fontSize: '1rem' }}>İletişim</h4>
-            <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <li style={{ color: '#a5d6a7', fontSize: '0.9rem' }}>📧 info@ecowings.com</li>
-              <li style={{ color: '#a5d6a7', fontSize: '0.9rem' }}>📞 +90 212 000 00 00</li>
-              <li>
-                <a href="https://twitter.com" target="_blank" rel="noreferrer"
-                  style={{ color: '#a5d6a7', fontSize: '0.9rem', textDecoration: 'none' }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#81c784'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#a5d6a7'}
-                >
-                  𝕏 Twitter
-                </a>
-              </li>
-              <li>
-                <a href="https://instagram.com" target="_blank" rel="noreferrer"
-                  style={{ color: '#a5d6a7', fontSize: '0.9rem', textDecoration: 'none' }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#81c784'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = '#a5d6a7'}
-                >
-                  📸 Instagram
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Bottom bar */}
-        <div style={{
-          borderTop: '1px solid rgba(255,255,255,0.15)',
-          paddingTop: '20px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: '8px',
-        }}>
-          <p style={{ color: '#a5d6a7', fontSize: '0.85rem', margin: 0 }}>
-            © {new Date().getFullYear()} EcoWings. Tüm hakları saklıdır.
-          </p>
-          <p style={{ color: '#81c784', fontSize: '0.85rem', margin: 0 }}>
-            🌱 Karbon ayak izini azalt
-          </p>
         </div>
       </div>
     </footer>

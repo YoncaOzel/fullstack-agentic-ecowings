@@ -3,12 +3,11 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Link } from 'react-router-dom';
 import { Plane, ArrowRight } from 'lucide-react';
+import { AnimatedTestimonials } from '../components/ui/animated-testimonials';
 import apiClient from '../shared/services/apiClient';
 import flightService from '../domains/flights/services/flightService';
 import AmadeusFlightCard from '../domains/flights/components/AmadeusFlightCard';
 import AirportSelect from '../domains/flights/components/AirportSelect';
-import LoadingSpinner from '../shared/components/LoadingSpinner';
-import ErrorMessage from '../shared/components/ErrorMessage';
 
 /* ── Custom input for the homepage date picker ── */
 const DatePickerInput = forwardRef(({ value, onClick }, ref) => (
@@ -83,6 +82,10 @@ function SearchSkeletonCard() {
   );
 }
 
+function modeLabel(mode) {
+  return mode || 'Alternative';
+}
+
 /* ── Airline initial badge when logoUrl is missing ── */
 
 
@@ -114,16 +117,161 @@ const ECO_DESTINATIONS = [
   },
 ];
 
+const MOCK_REVIEWS = [
+  {
+    id: 1,
+    name: "Emily Carter",
+    role: "Frequent Flyer",
+    company: "Amsterdam → London",
+    content: "Excellent flight experience! The staff was very professional, and the cabin was clean. Everything was on time. I would definitely recommend this airline.",
+    rating: 5,
+    avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+  },
+  {
+    id: 2,
+    name: "James Hoffmann",
+    role: "Business Traveller",
+    company: "Berlin → Paris",
+    content: "It was a fantastic flight from start to finish. The cabin crew was incredibly attentive, and the service was top-notch. Highly recommended for a stress-free journey!",
+    rating: 5,
+    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+  },
+  {
+    id: 3,
+    name: "Sofia Andersen",
+    role: "Eco Traveller",
+    company: "Oslo → Copenhagen",
+    content: "Smooth flight, comfortable seating, and most importantly, we landed right on time. The staff's hospitality made the trip even better. 5 stars!",
+    rating: 5,
+    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+  },
+];
+
+const CTA_MARQUEE_ITEMS = [
+  'Eco Travelers',
+  'Business Flyers',
+  'EcoWings',
+  'Sustainable Explorer',
+  'Carbon-Conscious Commuters'
+];
+
+function MarqueeTrack() {
+  return (
+    <div className="animate-marquee-vertical" style={{ display: 'flex', flexDirection: 'column', '--duration': '22s' }}>
+      {CTA_MARQUEE_ITEMS.map((item, i) => (
+        <div key={i} className="cta-marquee-item" style={{
+          fontSize: 'clamp(2rem, 4vw, 3.8rem)',
+          fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif",
+          fontWeight: 300,
+          letterSpacing: '-0.02em',
+          color: 'var(--text-primary)',
+          padding: '28px 0',
+          whiteSpace: 'nowrap',
+        }}>
+          {item}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function CTASection() {
+  const marqueeRef = useRef(null);
+
+  useEffect(() => {
+    const container = marqueeRef.current;
+    if (!container) return;
+    let frame;
+    const update = () => {
+      const items = container.querySelectorAll('.cta-marquee-item');
+      const rect = container.getBoundingClientRect();
+      const centerY = rect.top + rect.height / 2;
+      items.forEach(item => {
+        const iRect = item.getBoundingClientRect();
+        const dist = Math.abs(centerY - (iRect.top + iRect.height / 2));
+        item.style.opacity = 1 - Math.min(dist / (rect.height / 2), 1) * 0.78;
+      });
+      frame = requestAnimationFrame(update);
+    };
+    frame = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  return (
+    <section className="fade-up" style={{ background: 'linear-gradient(to bottom, #f5f7f5 0%, var(--bg-base) 8%)', padding: '80px 0', overflow: 'hidden' }}>
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 32px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '64px', alignItems: 'center' }}>
+
+        {/* Left */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '520px' }}>
+          <h2 style={{
+            fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif",
+            fontSize: 'clamp(2.8rem, 5vw, 4.5rem)',
+            fontWeight: 500,
+            lineHeight: 1.1,
+            letterSpacing: '-0.03em',
+            color: 'var(--text-primary)',
+          }}>
+            Get Started in Minutes
+          </h2>
+          <p style={{
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontSize: '1.1rem',
+            color: 'var(--text-muted)',
+            lineHeight: 1.7,
+          }}>
+            Discover eco-friendly flights and reduce your carbon footprint. Join our community of conscious travelers and book your sustainable journey today!  
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+            <Link to="/signup" style={{
+              display: 'inline-flex', alignItems: 'center',
+              padding: '14px 28px', borderRadius: '8px',
+              background: 'var(--text-primary)', color: 'var(--bg-base)',
+              fontFamily: "'Manrope', sans-serif", fontWeight: 600,
+              fontSize: '0.85rem', letterSpacing: '0.06em', textDecoration: 'none',
+              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.04)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(28,43,34,0.18)'; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
+            >
+              REGISTER NOW
+            </Link>
+            <Link to="/flights" style={{
+              display: 'inline-flex', alignItems: 'center',
+              padding: '14px 28px', borderRadius: '8px',
+              background: 'transparent', color: 'var(--text-primary)',
+              border: '1.5px solid var(--border-hover)',
+              fontFamily: "'Manrope', sans-serif", fontWeight: 600,
+              fontSize: '0.85rem', letterSpacing: '0.06em', textDecoration: 'none',
+              transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+            }}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.04)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(28,43,34,0.10)'; }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}
+            >
+              EXPLORE FLIGHTS
+            </Link>
+          </div>
+        </div>
+
+        {/* Right — vertical marquee */}
+        <div ref={marqueeRef} style={{ position: 'relative', height: '560px', overflow: 'hidden' }}>
+          <MarqueeTrack />
+          <MarqueeTrack />
+          <div style={{ pointerEvents: 'none', position: 'absolute', top: 0, left: 0, right: 0, height: '200px', background: 'linear-gradient(to bottom, var(--bg-base) 0%, transparent 100%)', zIndex: 10 }} />
+          <div style={{ pointerEvents: 'none', position: 'absolute', bottom: 0, left: 0, right: 0, height: '200px', background: 'linear-gradient(to top, var(--bg-base) 0%, transparent 100%)', zIndex: 10 }} />
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
 export default function HomePage() {
   const [flights, setFlights] = useState([]);
   const [allFlights, setAllFlights] = useState([]);
-  const [airlines, setAirlines] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loadingFlights, setLoadingFlights] = useState(true);
-  const [loadingAirlines, setLoadingAirlines] = useState(true);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [errorFlights, setErrorFlights] = useState('');
-  const [errorAirlines, setErrorAirlines] = useState('');
   const [errorReviews, setErrorReviews] = useState('');
 
   // Airports for dropdowns
@@ -135,6 +283,29 @@ export default function HomePage() {
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
   const resultsRef = useRef(null);
+
+  const [ecoStatus, setEcoStatus] = useState('idle'); // idle | loading | done | no-alt | error
+  const [ecoResult, setEcoResult] = useState(null);   // { mode, emissionKg }
+
+  const handleEcoCheck = async () => {
+    setEcoStatus('loading');
+    try {
+      const fromAirport = airports.find(a => a.code === searchForm.from);
+      const toAirport   = airports.find(a => a.code === searchForm.to);
+      const originCity  = fromAirport ? `${fromAirport.city}, ${fromAirport.country}` : searchForm.from;
+      const destCity    = toAirport   ? `${toAirport.city}, ${toAirport.country}`     : searchForm.to;
+      const res = await flightService.getAlternativeTransport(originCity, destCity);
+      const alt = res.data?.data;
+      if (!alt || alt.mode === 'There is no reasonable alternative way') {
+        setEcoStatus('no-alt');
+        return;
+      }
+      setEcoResult(alt);
+      setEcoStatus('done');
+    } catch {
+      setEcoStatus('error');
+    }
+  };
 
   // allFlights: arama için tam liste; flights: featured 6 adet
 
@@ -148,14 +319,6 @@ export default function HomePage() {
       })
       .catch(() => setErrorFlights('Could not load flights.'))
       .finally(() => setLoadingFlights(false));
-
-    apiClient.get('/api/Airline')
-      .then((res) => {
-        if (Array.isArray(res.data)) setAirlines(res.data);
-        else setErrorAirlines(res.data?.message || 'Could not load airlines.');
-      })
-      .catch(() => setErrorAirlines('Could not load airlines.'))
-      .finally(() => setLoadingAirlines(false));
 
     apiClient.get('/api/Airport')
       .then((res) => { if (Array.isArray(res.data)) setAirports(res.data); })
@@ -178,7 +341,7 @@ export default function HomePage() {
     );
     document.querySelectorAll('.fade-up').forEach((el) => obs.observe(el));
     return () => obs.disconnect();
-  }, [loadingFlights, loadingAirlines, loadingReviews]);
+  }, [loadingFlights, loadingReviews]);
 
   // travelClass değerini API enum'una çevirir
   const toApiTravelClass = (cls) => {
@@ -200,6 +363,8 @@ export default function HomePage() {
     setSearchError('');
     setSearching(true);
     setSearchResults(null);
+    setEcoStatus('idle');
+    setEcoResult(null);
     try {
       const res = await flightService.searchFlightsApi(
         origin,
@@ -218,7 +383,19 @@ export default function HomePage() {
         return matchOrigin && matchDest;
       });
 
-      setSearchResults(filtered);
+      // Emisyonu kendi içinde karşılaştır: alt %33 → Low, orta %33 → Medium, üst %33 → High
+      const withEmissionClass = (() => {
+        const sorted = [...filtered].sort((a, b) => (a.carbonEmission ?? 0) - (b.carbonEmission ?? 0));
+        const n = sorted.length;
+        const emissionMap = new Map(sorted.map((f, i) => {
+          const pct = n === 1 ? 0.5 : i / (n - 1);
+          const cls = pct < 0.34 ? 'Low' : pct < 0.67 ? 'Medium' : 'High';
+          return [f, cls];
+        }));
+        return filtered.map(f => ({ ...f, emissionClass: emissionMap.get(f) }));
+      })();
+
+      setSearchResults(withEmissionClass);
       setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
     } catch (err) {
       const msg =
@@ -240,7 +417,7 @@ export default function HomePage() {
         position: 'relative',
         minHeight: '870px',
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         overflow: 'visible',
         background: 'linear-gradient(135deg, #002d1c 0%, #00452e 100%)',
         paddingTop: '72px',
@@ -253,7 +430,16 @@ export default function HomePage() {
             muted
             loop
             playsInline
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', opacity: 0.5 }}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              objectPosition: 'center top',
+              display: 'block',
+              opacity: 0.5,
+              transform: 'scale(1.16)',
+              transformOrigin: 'center top',
+            }}
           />
           <div style={{
             position: 'absolute', inset: 0,
@@ -261,7 +447,7 @@ export default function HomePage() {
           }} />
         </div>
 
-        <div className="container" style={{ position: 'relative', zIndex: 2, padding: '80px 24px' }}>
+        <div className="container" style={{ position: 'relative', zIndex: 2, padding: '64px 24px 80px' }}>
           <div style={{ maxWidth: '840px' }}>
             {/* Eyebrow label */}
             <span style={{
@@ -549,11 +735,192 @@ export default function HomePage() {
                 <p style={{ color: '#6c8274', fontSize: '0.9rem' }}>Try a different date or airport.</p>
               </div>
             ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                {searchResults.map((f, i) => (
-                  <AmadeusFlightCard key={f.flightNumber ? `${f.flightNumber}-${i}` : i} flight={f} />
-                ))}
-              </div>
+              <>
+                {/* ── Green Alternatives Panel ── */}
+                <div style={{
+                  marginBottom: '20px',
+                  background: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                }}>
+                  {/* Header row */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '16px 20px',
+                    borderBottom: '1px solid #f1f5f9',
+                    background: '#fafcfb',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{
+                        width: '32px', height: '32px', borderRadius: '8px',
+                        background: '#ecfdf5', border: '1px solid #bbf7d0',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                      }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#166534', lineHeight: 1 }}>eco</span>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a', fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1 }}>
+                          Lower-Emission Alternatives
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '3px' }}>
+                          Travel options with a smaller carbon footprint for this route
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleEcoCheck}
+                      disabled={ecoStatus === 'loading' || ecoStatus === 'done'}
+                      style={{
+                        fontSize: '0.68rem', fontWeight: 700,
+                        color: ecoStatus === 'done' ? '#166534' : ecoStatus === 'loading' ? '#6b8f7a' : '#166534',
+                        background: ecoStatus === 'done' ? '#dcfce7' : '#ecfdf5',
+                        border: '1px solid #bbf7d0',
+                        borderRadius: '999px', padding: '5px 14px',
+                        textTransform: 'uppercase', letterSpacing: '0.06em',
+                        cursor: (ecoStatus === 'loading' || ecoStatus === 'done') ? 'default' : 'pointer',
+                        transition: 'all 0.15s ease',
+                        display: 'inline-flex', alignItems: 'center', gap: '5px',
+                      }}
+                      onMouseEnter={e => { if (ecoStatus === 'idle' || ecoStatus === 'error') e.currentTarget.style.background = '#d1fae5'; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = ecoStatus === 'done' ? '#dcfce7' : '#ecfdf5'; }}
+                    >
+                      {ecoStatus === 'loading' ? 'Calculating…' : ecoStatus === 'done' ? '✓ Eco Data' : 'Eco Data'}
+                    </button>
+                  </div>
+
+                  {/* Body */}
+                  <div style={{ padding: '16px 20px' }}>
+                    {ecoStatus === 'idle' && (
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: '12px',
+                        padding: '12px 14px',
+                        background: '#f8fafc', border: '1px solid #e2e8f0',
+                        borderRadius: '10px',
+                      }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#94a3b8', flexShrink: 0 }}>info</span>
+                        <span style={{ fontSize: '0.82rem', color: '#64748b', lineHeight: 1.5 }}>
+                          Click the <strong>Eco Data</strong> button to compare lower-emission travel alternatives for this route.
+                        </span>
+                      </div>
+                    )}
+
+                    {ecoStatus === 'loading' && (
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: '12px',
+                        padding: '12px 14px',
+                        background: '#f8fafc', border: '1px solid #e2e8f0',
+                        borderRadius: '10px',
+                      }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#4ade80', flexShrink: 0, animation: 'spin 1s linear infinite' }}>refresh</span>
+                        <span style={{ fontSize: '0.82rem', color: '#64748b', lineHeight: 1.5 }}>
+                          Calculating lower-emission travel alternatives…
+                        </span>
+                        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                      </div>
+                    )}
+
+                    {ecoStatus === 'no-alt' && (
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: '12px',
+                        padding: '12px 14px',
+                        background: '#f8fafc', border: '1px solid #e2e8f0',
+                        borderRadius: '10px',
+                      }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#94a3b8', flexShrink: 0 }}>info</span>
+                        <span style={{ fontSize: '0.82rem', color: '#64748b', lineHeight: 1.5 }}>
+                          No suitable land/sea alternatives were found for this route.
+                        </span>
+                      </div>
+                    )}
+
+                    {ecoStatus === 'error' && (
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: '12px',
+                        padding: '12px 14px',
+                        background: '#fff1f2', border: '1px solid #fecdd3',
+                        borderRadius: '10px',
+                      }}>
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#e11d48', flexShrink: 0 }}>error</span>
+                        <span style={{ fontSize: '0.82rem', color: '#9f1239', lineHeight: 1.5 }}>
+                          Could not fetch data. Click the Eco Data button to try again.
+                        </span>
+                      </div>
+                    )}
+
+                    {ecoStatus === 'done' && ecoResult && (() => {
+                      const flightKg = searchResults?.[0]?.carbonEmission;
+                      const pct = flightKg > 0 ? Math.round(((flightKg - ecoResult.emissionKg) / flightKg) * 100) : null;
+                      const savingsLabel = pct === null ? null : pct >= 95 ? 'HIGH' : pct >= 85 ? 'MEDIUM' : pct >= 70 ? 'LOW' : null;
+                      const savingsColor = savingsLabel === 'HIGH' ? '#166534' : savingsLabel === 'MEDIUM' ? '#92400e' : savingsLabel === 'LOW' ? '#1e40af' : '#64748b';
+                      const savingsBg   = savingsLabel === 'HIGH' ? '#dcfce7' : savingsLabel === 'MEDIUM' ? '#fef9c3' : savingsLabel === 'LOW' ? '#dbeafe' : '#f1f5f9';
+                      const barWidth    = pct !== null ? Math.max(8, 100 - pct) : 80;
+                      return (
+                        <div style={{
+                          background: '#f8fafc', border: '1px solid #e2e8f0',
+                          borderRadius: '12px', padding: '14px 16px',
+                          display: 'flex', flexDirection: 'column', gap: '10px',
+                          maxWidth: '320px',
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: '#0f172a', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                              {modeLabel(ecoResult.mode)}
+                            </span>
+                            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                              {savingsLabel && (
+                                <span style={{
+                                  fontSize: '0.66rem', fontWeight: 700,
+                                  color: savingsColor, background: savingsBg,
+                                  border: `1px solid ${savingsBg}`,
+                                  borderRadius: '999px', padding: '2px 8px',
+                                  textTransform: 'uppercase', letterSpacing: '0.05em',
+                                }}>
+                                  {savingsLabel} savings
+                                </span>
+                              )}
+                              {pct !== null && (
+                                <span style={{
+                                  fontSize: '0.66rem', fontWeight: 700,
+                                  color: '#166534', background: '#ecfdf5',
+                                  border: '1px solid #bbf7d0',
+                                  borderRadius: '999px', padding: '2px 8px',
+                                  textTransform: 'uppercase', letterSpacing: '0.05em',
+                                }}>
+                                  {pct}% less
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                              <span style={{ fontSize: '0.68rem', color: '#64748b', fontWeight: 600 }}>CO₂ Emissions</span>
+                              <span style={{ fontSize: '0.68rem', fontWeight: 700, color: '#0f172a', fontFamily: "'DM Mono', monospace" }}>
+                                {ecoResult.emissionKg.toFixed(1)} kg
+                              </span>
+                            </div>
+                            <div style={{ height: '4px', background: '#e2e8f0', borderRadius: '99px', overflow: 'hidden' }}>
+                              <div style={{
+                                height: '100%',
+                                width: `${barWidth}%`,
+                                background: 'linear-gradient(90deg, #16a34a 0%, #4ade80 100%)',
+                                borderRadius: '99px',
+                              }} />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  {searchResults.map((f, i) => (
+                    <AmadeusFlightCard key={f.flightNumber ? `${f.flightNumber}-${i}` : i} flight={f} />
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </section>
@@ -786,297 +1153,449 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Havayolu Ortaklarımız (API-driven) ───────────────── */}
-      <section className="fade-up" style={{ background: '#f4f6f4', padding: '80px 0', borderTop: '1px solid rgba(77,124,95,0.08)' }}>
+      {/* ── Airline Partners — Editorial ─────────────────────── */}
+      <section className="fade-up" style={{ background: '#f4f6f4', padding: '100px 0 80px', borderTop: '1px solid rgba(77,124,95,0.08)' }}>
         <div className="container">
 
-          {/* ── Header ── */}
-          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '64px', gap: '32px', flexWrap: 'wrap' }}>
-            <div style={{ maxWidth: '600px' }}>
-              <h2 style={{ fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif", fontSize: 'clamp(2rem, 4vw, 2.75rem)', fontWeight: 800, letterSpacing: '-0.02em', color: '#002d1c', margin: '0 0 16px 0', lineHeight: 1.15 }}>
-                Airline Partners
-              </h2>
-              <p style={{ color: '#6c8274', fontSize: '1rem', lineHeight: 1.65, margin: 0 }}>
-                Curated partnerships that transcend standard loyalty. We only align with carriers who mirror our commitment to discretion, precision, and sovereign service.
+          {/* Eyebrow */}
+          <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            background: 'rgba(0,69,46,0.07)', border: '1px solid rgba(0,69,46,0.18)',
+            borderRadius: '20px', padding: '4px 16px',
+            fontSize: '10px', fontWeight: 700, fontFamily: "'Inter', sans-serif",
+            letterSpacing: '0.18em', textTransform: 'uppercase', color: '#00452e',
+            marginBottom: '36px',
+          }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>flight</span>
+            Airline Partnerships
+          </span>
+
+          {/* Headline + divider */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '48px', flexWrap: 'wrap', marginBottom: '64px' }}>
+            <h2 style={{
+              fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif",
+              fontSize: 'clamp(2.4rem, 5vw, 3.5rem)',
+              fontWeight: 800,
+              letterSpacing: '-0.03em',
+              color: '#002d1c',
+              lineHeight: 1.1,
+              margin: 0,
+              maxWidth: '560px',
+            }}>
+              Partners That Share<br />Our Green Commitment
+            </h2>
+            <p style={{
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              fontSize: '1.05rem',
+              color: '#6c8274',
+              lineHeight: 1.75,
+              maxWidth: '440px',
+              margin: 0,
+              paddingTop: '8px',
+            }}>
+              EcoWings doesn't simply list carriers — it certifies them. Every airline in our network has been independently evaluated against rigorous environmental and operational standards before earning a place on our platform.
+            </p>
+          </div>
+
+          {/* Horizontal rule */}
+          <div style={{ borderTop: '1px solid rgba(0,45,28,0.1)', marginBottom: '64px' }} />
+
+          {/* Two-column editorial body */}
+          <div className="airline-partners-editorial-grid" style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '64px 80px',
+            alignItems: 'start',
+          }}>
+            {/* Left column */}
+            <div>
+              <h3 style={{
+                fontFamily: "'Manrope', sans-serif",
+                fontSize: '1.25rem',
+                fontWeight: 800,
+                color: '#002d1c',
+                letterSpacing: '-0.02em',
+                marginBottom: '20px',
+              }}>
+                A Network Built on Accountability
+              </h3>
+              <p style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: '1rem',
+                color: '#4a6358',
+                lineHeight: 1.85,
+                marginBottom: '24px',
+              }}>
+                The aviation industry accounts for roughly 2.5% of global CO₂ emissions — and EcoWings was founded on the conviction that this number must come down. Our airline partnerships are the cornerstone of that mission. We work exclusively with carriers who publish verified emissions data, invest in sustainable aviation fuel (SAF) research, and hold recognised green certifications such as IATA Environmental Assessment or CORSIA compliance.
+              </p>
+              <p style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: '1rem',
+                color: '#4a6358',
+                lineHeight: 1.85,
+              }}>
+                Each partner airline undergoes a structured onboarding review covering fleet age and fuel efficiency per seat-kilometre, ground operations energy sourcing, carbon offset programme quality, and passenger transparency practices. Airlines that fall below our threshold are not listed — regardless of network size or brand recognition.
               </p>
             </div>
-            <Link
-              to="/airlines"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', color: '#3d6b52', fontWeight: 700, fontSize: '0.9rem', letterSpacing: '-0.01em', paddingBottom: '8px', borderBottom: '1px solid rgba(61,107,82,0.25)', textDecoration: 'none', whiteSpace: 'nowrap', transition: 'border-color 0.2s' }}
-              onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(61,107,82,0.85)')}
-              onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(61,107,82,0.25)')}
-            >
-              View All Partnerships
-              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span>
-            </Link>
-          </div>
 
-          {/* ── Partner Cards Grid ── */}
-          {loadingAirlines ? (
-            <LoadingSpinner />
-          ) : errorAirlines ? (
-            <ErrorMessage message={errorAirlines} />
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '24px' }}>
-              {airlines.slice(0, 4).map((a, idx) => {
-                const cardIcons = ['flight_takeoff', 'travel_explore', 'diamond', 'ac_unit'];
-                const cardDescriptions = [
-                  'A trusted partner delivering flawless journeys with curated routes and priority boarding privileges.',
-                  'Elegance meets the sky. Discover the Mediterranean through exclusive routes and premium in-flight excellence.',
-                  'The pinnacle of global connectivity. Unmatched suites and personalised service across the Middle East and beyond.',
-                  'Minimalist design, maximum efficiency. Sustainable travel through Northern landscapes with elite reward programmes.',
-                ];
-                return (
-                  <div
-                    key={a.id}
-                    style={{
-                      background: '#ffffff',
-                      padding: '32px',
-                      borderRadius: '16px',
-                      height: '400px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
-                      border: '1px solid rgba(0,45,28,0.07)',
-                      transition: 'box-shadow 0.45s ease, transform 0.45s ease',
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.boxShadow = '0 24px 64px rgba(0,0,0,0.11)';
-                      e.currentTarget.style.transform = 'translateY(-3px)';
-                      const iconWrap = e.currentTarget.querySelector('.partner-icon-wrap');
-                      if (iconWrap) iconWrap.style.filter = 'grayscale(0)';
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.04)';
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      const iconWrap = e.currentTarget.querySelector('.partner-icon-wrap');
-                      if (iconWrap) iconWrap.style.filter = 'grayscale(1)';
-                    }}
-                  >
-                    <div>
-                      {/* Icon block */}
-                      <div
-                        className="partner-icon-wrap"
-                        style={{ width: '64px', height: '64px', background: '#e8ede9', marginBottom: '28px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', filter: 'grayscale(1)', transition: 'filter 0.45s ease' }}
-                      >
-                        <span className="material-symbols-outlined" style={{ fontSize: '32px', color: '#002d1c' }}>{cardIcons[idx % 4]}</span>
-                      </div>
-
-                      {/* Airline name */}
-                      <h3 style={{ fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif", fontSize: '1.3rem', fontWeight: 800, color: '#002d1c', margin: '0 0 8px 0', lineHeight: 1.25 }}>
-                        {a.name}
-                      </h3>
-
-                      {/* Country */}
-                      {a.country && (
-                        <p style={{ fontSize: '0.78rem', color: '#6c8274', display: 'flex', alignItems: 'center', gap: '5px', margin: '0 0 16px 0' }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>public</span>
-                          {a.country}
-                        </p>
-                      )}
-
-                      {/* Description */}
-                      <p style={{ fontSize: '0.84rem', lineHeight: 1.7, color: '#6c8274', margin: 0 }}>
-                        {cardDescriptions[idx % 4]}
-                      </p>
-                    </div>
-
-                    {/* CTA link */}
-                    <a
-                      href="#"
-                      style={{ marginTop: '24px', color: '#3d6b52', fontWeight: 700, fontSize: '0.73rem', letterSpacing: '0.09em', textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center', gap: '6px', textDecoration: 'none' }}
-                    >
-                      View Benefits
-                      <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>open_in_new</span>
-                    </a>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ── Son Yorumlar (API-driven) ─────────────────────────── */}
-      <section className="fade-up" style={{ padding: '72px 0 84px', background: '#f0f5f1', borderTop: '1px solid rgba(77,124,95,0.1)' }}>
-        <div className="container">
-          {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px', marginBottom: '40px' }}>
+            {/* Right column */}
             <div>
-              <span style={{ display: 'block', fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#3d8a5c', marginBottom: '8px', fontFamily: "'Inter', sans-serif" }}>
-                Passenger Experiences
-              </span>
-              <h2 style={{ fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif", fontSize: '1.75rem', fontWeight: 800, color: '#002d1c', lineHeight: 1.2, margin: 0 }}>
-                Recent Reviews
-              </h2>
-            </div>
-            <Link to="/comments" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '9px 20px', borderRadius: '8px', border: '1px solid rgba(0,45,28,0.18)', color: '#002d1c', fontWeight: 600, fontSize: '0.8rem', textDecoration: 'none', background: 'transparent', transition: 'all 0.2s', whiteSpace: 'nowrap' }}>
-              All Reviews <ArrowRight size={13} />
-            </Link>
-          </div>
-          <div style={{ height: '1px', background: 'linear-gradient(90deg, rgba(0,45,28,0.2) 0%, transparent 80%)', marginBottom: '32px' }} />
-
-          {loadingReviews ? <LoadingSpinner /> : errorReviews ? <ErrorMessage message={errorReviews} /> : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', alignItems: 'start' }}>
-              {reviews.slice(-3).map((r, idx) => {
-                const isFeatured = idx === 1;
-                const initials = (r.userName || '?').slice(0, 2).toUpperCase();
-                const hue = (r.userName || '').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % 360;
-                const filled = Math.max(0, Math.min(5, Math.round(r.rating)));
-                return (
-                  <div key={r.id} style={{
-                    padding: '28px',
-                    borderRadius: '14px',
-                    display: 'flex', flexDirection: 'column', gap: '20px',
-                    background: isFeatured ? '#002d1c' : '#ffffff',
-                    boxShadow: isFeatured ? '0 16px 40px rgba(0,45,28,0.28)' : '0 1px 6px rgba(0,0,0,0.05)',
-                    border: isFeatured ? 'none' : '1px solid rgba(0,45,28,0.07)',
-                    transform: isFeatured ? 'translateY(-16px)' : 'none',
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                  }}>
-                    {/* Stars */}
-                    <div style={{ display: 'flex', gap: '3px' }}>
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <svg key={i} width="13" height="13" viewBox="0 0 24 24"
-                          fill={i < filled ? (isFeatured ? '#4ade80' : '#002d1c') : 'none'}
-                          stroke={i < filled ? (isFeatured ? '#4ade80' : '#002d1c') : (isFeatured ? 'rgba(255,255,255,0.25)' : '#d1d9d4')}
-                          strokeWidth="2">
-                          <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26" />
-                        </svg>
-                      ))}
-                    </div>
-
-                    {/* Comment */}
-                    <p style={{
-                      fontSize: '0.92rem', fontWeight: 400, lineHeight: 1.75, fontStyle: 'italic',
-                      color: isFeatured ? 'rgba(255,255,255,0.88)' : '#2d4438',
-                      margin: 0, flex: 1,
-                    }}>
-                      &ldquo;{r.comment}&rdquo;
-                    </p>
-
-                    {/* Divider */}
-                    <div style={{ height: '1px', background: isFeatured ? 'rgba(255,255,255,0.1)' : 'rgba(0,45,28,0.07)' }} />
-
-                    {/* Reviewer */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{
-                        width: '38px', height: '38px', borderRadius: '50%', flexShrink: 0,
-                        background: isFeatured ? `hsl(${hue},40%,35%)` : `hsl(${hue},30%,92%)`,
-                        border: isFeatured ? '1.5px solid rgba(74,222,128,0.4)' : `1px solid hsl(${hue},25%,82%)`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.04em',
-                        color: isFeatured ? '#d1fae5' : `hsl(${hue},50%,28%)`,
-                        userSelect: 'none',
-                      }}>{initials}</div>
-                      <div>
-                        <div style={{ fontWeight: 700, fontSize: '0.84rem', color: isFeatured ? '#ffffff' : '#002d1c', lineHeight: 1.3 }}>
-                          {r.userName}
-                        </div>
-                        {r.createdDate && (
-                          <div style={{ fontSize: '0.7rem', marginTop: '2px', color: isFeatured ? 'rgba(255,255,255,0.45)' : '#8fa899' }}>
-                            {new Date(r.createdDate).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ── Newsletter / CTA ─────────────────────────────────── */}
-      <section className="fade-up" style={{ padding: '96px 0', background: '#00452e', position: 'relative', overflow: 'hidden' }}>
-        {/* Subtle background texture */}
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(177,240,206,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(177,240,206,0.06) 0%, transparent 50%)', pointerEvents: 'none' }} />
-
-        <div className="container" style={{ textAlign: 'center', maxWidth: '720px', margin: '0 auto', padding: '0 24px', position: 'relative', zIndex: 1 }}>
-          <h2 style={{
-            fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif",
-            fontSize: 'clamp(2rem, 5vw, 3rem)',
-            fontWeight: 800,
-            color: '#ffffff',
-            lineHeight: 1.15,
-            marginBottom: '20px',
-          }}>
-            Let's Protect the Future Together
-          </h2>
-          <p style={{
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
-            fontSize: '1.05rem',
-            color: 'rgba(177,240,206,0.75)',
-            marginBottom: '44px',
-            lineHeight: 1.7,
-          }}>
-            Join our newsletter to stay informed about new eco routes and exclusive offers.
-          </p>
-
-          <form
-            className="airport-dropdown-exclude"
-            onSubmit={e => e.preventDefault()}
-            style={{ display: 'flex', flexDirection: 'row', gap: '12px', maxWidth: '560px', margin: '0 auto', flexWrap: 'wrap' }}
-          >
-            <input
-              type="email"
-              placeholder="Your email address"
-              style={{
-                flex: 1,
-                minWidth: '200px',
-                background: 'rgba(255,255,255,0.1)',
-                border: '1px solid rgba(177,240,206,0.3)',
-                borderRadius: '12px',
-                padding: '16px 20px',
-                color: '#ffffff',
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                fontSize: '0.95rem',
-                outline: 'none',
-              }}
-            />
-            <button
-              type="submit"
-              style={{
-                background: '#b1f0ce',
-                color: '#002d1c',
-                border: 'none',
-                borderRadius: '12px',
-                padding: '16px 32px',
+              <h3 style={{
                 fontFamily: "'Manrope', sans-serif",
+                fontSize: '1.25rem',
                 fontWeight: 800,
-                fontSize: '0.95rem',
-                cursor: 'pointer',
-                transition: 'background 0.2s ease, transform 0.15s ease',
-                whiteSpace: 'nowrap',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#b1f0ce'; e.currentTarget.style.transform = 'translateY(0)'; }}
-            >
-              Subscribe
-            </button>
-          </form>
-
-          {/* Alt CTA linkleri */}
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '40px', flexWrap: 'wrap' }}>
-            <Link to="/signup"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '13px 32px', borderRadius: '10px', background: 'rgba(177,240,206,0.12)', border: '1px solid rgba(177,240,206,0.25)', color: '#b1f0ce', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', transition: 'all 0.2s ease' }}
-              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(177,240,206,0.2)'; e.currentTarget.style.borderColor = 'rgba(177,240,206,0.5)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(177,240,206,0.12)'; e.currentTarget.style.borderColor = 'rgba(177,240,206,0.25)'; }}
-            >
-              🌱 Sign Up Free <ArrowRight size={16} />
-            </Link>
-            <Link to="/flights"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '13px 32px', borderRadius: '10px', background: 'transparent', border: '1px solid rgba(177,240,206,0.2)', color: 'rgba(177,240,206,0.8)', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', transition: 'all 0.2s ease' }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = 'rgba(177,240,206,0.5)'; e.currentTarget.style.color = '#b1f0ce'; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(177,240,206,0.2)'; e.currentTarget.style.color = 'rgba(177,240,206,0.8)'; }}
-            >
-              Explore Flights <ArrowRight size={16} />
-            </Link>
+                color: '#002d1c',
+                letterSpacing: '-0.02em',
+                marginBottom: '20px',
+              }}>
+                What Partnership Means in Practice
+              </h3>
+              <p style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: '1rem',
+                color: '#4a6358',
+                lineHeight: 1.85,
+                marginBottom: '24px',
+              }}>
+                When you book through EcoWings, you receive a carbon footprint estimate for every itinerary alongside the ticket price. This data is sourced directly from our partner airlines' declared fuel burn figures — not approximations. Our partners also commit to route-level reporting, enabling us to highlight the lowest-emission option whenever multiple carriers operate the same city pair.
+              </p>
+              <p style={{
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: '1rem',
+                color: '#4a6358',
+                lineHeight: 1.85,
+              }}>
+                Beyond data, our partnerships unlock tangible benefits for eco-conscious travellers: priority boarding on select routes, loyalty points redeemable for carbon offsets rather than merchandise, and access to dedicated quiet cabins designed to reduce onboard energy consumption. Flying greener should never mean flying with less comfort.
+              </p>
+            </div>
           </div>
+
+          {/* Stats strip */}
+          <div className="airline-partners-stats-strip" style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '1px',
+            background: 'rgba(0,45,28,0.1)',
+            borderRadius: '20px',
+            overflow: 'hidden',
+            marginTop: '72px',
+            border: '1px solid rgba(0,45,28,0.1)',
+          }}>
+            {[
+              { value: '180+', label: 'Partner Airlines Worldwide' },
+              { value: '94%', label: 'CORSIA-Compliant Carriers' },
+              { value: '340+', label: 'Eco-Certified Routes' },
+              { value: '2.1M+', label: 'Travellers Matched Annually' },
+            ].map((stat) => (
+              <div
+                key={stat.label}
+                style={{
+                  background: '#ffffff',
+                  padding: '40px 32px',
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{
+                  fontFamily: "'Manrope', sans-serif",
+                  fontSize: 'clamp(2rem, 3.5vw, 2.75rem)',
+                  fontWeight: 800,
+                  color: '#002d1c',
+                  letterSpacing: '-0.04em',
+                  lineHeight: 1,
+                  marginBottom: '10px',
+                }}>
+                  {stat.value}
+                </div>
+                <p style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '0.78rem',
+                  fontWeight: 600,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  color: '#6c8274',
+                  margin: 0,
+                  lineHeight: 1.4,
+                }}>
+                  {stat.label}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Pull quote */}
+          <blockquote style={{
+            margin: '72px 0 0',
+            padding: '0 0 0 32px',
+            borderLeft: '3px solid #002d1c',
+          }}>
+            <p style={{
+              fontFamily: "'Manrope', sans-serif",
+              fontSize: 'clamp(1.2rem, 2.5vw, 1.6rem)',
+              fontWeight: 700,
+              color: '#002d1c',
+              lineHeight: 1.4,
+              letterSpacing: '-0.02em',
+              marginBottom: '16px',
+            }}>
+              "Sustainability is not a checkbox. It is the foundation upon which every EcoWings partnership is built, audited, and renewed — year after year."
+            </p>
+            <cite style={{
+              fontFamily: "'Inter', sans-serif",
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              textTransform: 'uppercase',
+              letterSpacing: '0.12em',
+              color: '#6c8274',
+              fontStyle: 'normal',
+            }}>
+              EcoWings Partnership Standards Board
+            </cite>
+          </blockquote>
+
         </div>
       </section>
+
+      {/* ── Son Yorumlar ─────────────────────────────────────── */}
+      <AnimatedTestimonials
+        title="Recent Reviews"
+        subtitle="Hear from real EcoWings passengers about their green travel experience."
+        badgeText="Passenger Experiences"
+        testimonials={MOCK_REVIEWS}
+      />
+
+      {/* ── EcoWings Editorial ───────────────────────────────── */}
+      <section className="fade-up" style={{ background: '#ffffff', padding: '100px 0', borderTop: '1px solid rgba(77,124,95,0.1)' }}>
+        <div className="container">
+
+          {/* Top eyebrow + headline row */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', marginBottom: '72px' }}>
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              background: 'rgba(0,69,46,0.07)', border: '1px solid rgba(0,69,46,0.18)',
+              borderRadius: '20px', padding: '4px 16px',
+              fontSize: '10px', fontWeight: 700, fontFamily: "'Inter', sans-serif",
+              letterSpacing: '0.18em', textTransform: 'uppercase', color: '#00452e',
+              marginBottom: '28px',
+            }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>eco</span>
+              Our Story
+            </span>
+
+            <h2 style={{
+              fontFamily: "'Manrope', 'Plus Jakarta Sans', sans-serif",
+              fontSize: 'clamp(2.4rem, 5vw, 4rem)',
+              fontWeight: 800,
+              letterSpacing: '-0.04em',
+              color: '#002d1c',
+              lineHeight: 1.1,
+              maxWidth: '720px',
+              marginBottom: '24px',
+            }}>
+              Aviation That Gives Back<br />to the Planet
+            </h2>
+
+            <p style={{
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              fontSize: '1.1rem',
+              color: '#6c8274',
+              lineHeight: 1.8,
+              maxWidth: '600px',
+            }}>
+              EcoWings was born from a simple belief: that flying shouldn't cost the Earth — literally. We set out to prove that sustainable air travel is not a compromise, but the most intelligent choice a modern traveller can make.
+            </p>
+          </div>
+
+          {/* Horizontal rule */}
+          <div style={{ borderTop: '1px solid rgba(0,45,28,0.08)', marginBottom: '72px' }} />
+
+          {/* Three-column manifesto */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: '48px 64px',
+            marginBottom: '80px',
+          }}>
+            {[
+              {
+                number: '01',
+                title: 'The Problem We Chose to Solve',
+                body: 'Commercial aviation emits over 900 million tonnes of CO₂ annually. Yet for decades, travellers had no transparent way to understand — let alone reduce — the footprint of their journey. EcoWings changes that equation with real data, honest numbers, and meaningful alternatives.',
+              },
+              {
+                number: '02',
+                title: 'Technology in Service of Nature',
+                body: 'Our platform fuses live Amadeus flight data with proprietary carbon scoring algorithms. Every route you see is ranked not just by price or duration, but by its verified environmental impact. Smarter booking starts with smarter information.',
+              },
+              {
+                number: '03',
+                title: 'A Community of Conscious Flyers',
+                body: "Over two million travellers have chosen EcoWings for their journeys. Together, we've offset the equivalent of planting 8.4 million trees — and counting. Every ticket is a vote for the kind of aviation industry we want to exist in twenty years.",
+              },
+            ].map((item) => (
+              <div key={item.number} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                <span style={{
+                  fontFamily: "'Manrope', sans-serif",
+                  fontSize: '3.2rem',
+                  fontWeight: 800,
+                  color: 'rgba(0,45,28,0.07)',
+                  letterSpacing: '-0.06em',
+                  lineHeight: 1,
+                }}>
+                  {item.number}
+                </span>
+                <div style={{ width: '36px', height: '2px', background: '#002d1c' }} />
+                <h3 style={{
+                  fontFamily: "'Manrope', sans-serif",
+                  fontSize: '1.15rem',
+                  fontWeight: 800,
+                  color: '#002d1c',
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.3,
+                }}>
+                  {item.title}
+                </h3>
+                <p style={{
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  fontSize: '0.97rem',
+                  color: '#4a6358',
+                  lineHeight: 1.85,
+                }}>
+                  {item.body}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Full-width highlight strip */}
+          <div style={{
+            background: 'linear-gradient(135deg, #002d1c 0%, #00452e 100%)',
+            borderRadius: '24px',
+            padding: '56px 64px',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '48px',
+            alignItems: 'center',
+          }}>
+            <div>
+              <p style={{
+                fontFamily: "'Manrope', sans-serif",
+                fontSize: 'clamp(1.35rem, 2.5vw, 1.9rem)',
+                fontWeight: 700,
+                color: '#ffffff',
+                lineHeight: 1.45,
+                letterSpacing: '-0.02em',
+                marginBottom: '20px',
+              }}>
+                "We don't ask travellers to sacrifice comfort for conscience. We make the conscious choice the <em style={{ fontStyle: 'italic', color: '#b1f0ce' }}>best</em> choice."
+              </p>
+              <cite style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                textTransform: 'uppercase',
+                letterSpacing: '0.14em',
+                color: 'rgba(177,240,206,0.65)',
+                fontStyle: 'normal',
+              }}>
+                — EcoWings Founding Team
+              </cite>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+              {[
+                { value: '8.4M', unit: 'Trees Equivalent Offset' },
+                { value: '63%', unit: 'Lower Avg. Emissions vs Industry' },
+                { value: '2M+', unit: 'Eco-Conscious Travellers' },
+                { value: '2019', unit: 'Founded — Oslo, Norway' },
+              ].map((stat) => (
+                <div key={stat.unit} style={{
+                  background: 'rgba(255,255,255,0.07)',
+                  border: '1px solid rgba(177,240,206,0.18)',
+                  borderRadius: '14px',
+                  padding: '24px 22px',
+                }}>
+                  <div style={{
+                    fontFamily: "'Manrope', sans-serif",
+                    fontSize: '1.85rem',
+                    fontWeight: 800,
+                    color: '#b1f0ce',
+                    letterSpacing: '-0.04em',
+                    lineHeight: 1,
+                    marginBottom: '8px',
+                  }}>
+                    {stat.value}
+                  </div>
+                  <p style={{
+                    fontFamily: "'Inter', sans-serif",
+                    fontSize: '0.72rem',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    color: 'rgba(177,240,206,0.55)',
+                    margin: 0,
+                    lineHeight: 1.4,
+                  }}>
+                    {stat.unit}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Bottom values row */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '1px',
+            background: 'rgba(0,45,28,0.08)',
+            borderRadius: '16px',
+            overflow: 'hidden',
+            marginTop: '48px',
+            border: '1px solid rgba(0,45,28,0.08)',
+          }}>
+            {[
+              { icon: 'radar', label: 'Radical Transparency', desc: 'Carbon data on every itinerary, sourced directly from airlines.' },
+              { icon: 'compost', label: 'Real Offsetting', desc: 'Certified reforestation. No greenwashing, ever.' },
+              { icon: 'group', label: 'Traveller-First', desc: 'Comfort and sustainability are never mutually exclusive here.' },
+              { icon: 'history_edu', label: 'Long-Term Vision', desc: 'We measure success in decades, not quarters.' },
+            ].map((val) => (
+              <div key={val.label} style={{ background: '#ffffff', padding: '36px 28px' }}>
+                <div style={{
+                  width: '44px', height: '44px', borderRadius: '10px',
+                  background: '#f0f5f1',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  marginBottom: '20px',
+                }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '22px', color: '#002d1c' }}>{val.icon}</span>
+                </div>
+                <h4 style={{
+                  fontFamily: "'Manrope', sans-serif",
+                  fontSize: '0.95rem',
+                  fontWeight: 800,
+                  color: '#002d1c',
+                  marginBottom: '10px',
+                  letterSpacing: '-0.01em',
+                }}>
+                  {val.label}
+                </h4>
+                <p style={{
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  fontSize: '0.88rem',
+                  color: '#6c8274',
+                  lineHeight: 1.7,
+                  margin: 0,
+                }}>
+                  {val.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ── Get Started CTA ──────────────────────────────────── */}
+      <CTASection />
 
     </div>
   );

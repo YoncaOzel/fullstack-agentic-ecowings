@@ -1,12 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 
-/* ─────────────────────────────────────────────────────────────────
-   FAQ SERVICE
-───────────────────────────────────────────────────────────────── */
-const FAQ_SERVICE_URL = 'http://localhost:8000';
-
-const FALLBACK =
-  `I can't respond right now, sorry! 🙏\n\nPlease try again later or contact us via our support line:\n• 📧 support@ecowings.com`;
+/* ── backend (preserved) ── */
+const FAQ_SERVICE_URL = 'http://localhost:8001';
+const FALLBACK = `I can't respond right now, sorry!\n\nPlease try again later:\n• support@ecowings.com`;
 
 async function fetchResponse(text) {
   try {
@@ -23,19 +19,6 @@ async function fetchResponse(text) {
   }
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   SUGGESTED CHIPS
-───────────────────────────────────────────────────────────────── */
-const CHIPS = [
-  { label: '✈️ How do I search for flights?', query: 'How do I search for flights on EcoWings?' },
-  { label: '🔑 I forgot my password', query: ' I forgot my password. What should I do?' },
-  { label: '🧳 What are the baggage rules?', query: 'What is the cabin baggage weight limit?' },
-  { label: '🌿 Why is it called EcoWings?', query: 'Why is it called EcoWings?' }
-];
-
-/* ─────────────────────────────────────────────────────────────────
-   RENDER HELPERS — Bold markdown (**text**) support
-───────────────────────────────────────────────────────────────── */
 function renderText(text) {
   return text.split('\n').map((line, i) => {
     const parts = line.split(/(\*\*[^*]+\*\*)/g);
@@ -44,7 +27,7 @@ function renderText(text) {
         {i > 0 && <br />}
         {parts.map((part, j) =>
           part.startsWith('**') && part.endsWith('**')
-            ? <strong key={j} style={{ color: '#1a4d33', fontWeight: 700 }}>{part.slice(2, -2)}</strong>
+            ? <strong key={j} style={{ color: '#0F3D2E', fontWeight: 700 }}>{part.slice(2, -2)}</strong>
             : part
         )}
       </span>
@@ -52,874 +35,987 @@ function renderText(text) {
   });
 }
 
-/* ─────────────────────────────────────────────────────────────────
-   MAIN COMPONENT
-───────────────────────────────────────────────────────────────── */
+/* ── data ── */
+const TOPICS = [
+  {
+    key: 'flights', label: 'Flights', sub: 'Bookings & cancellations', count: 12,
+    svg: <><path d="M2 12 22 4l-4 18-5-7-7-3Z"/></>,
+  },
+  {
+    key: 'account', label: 'Account', sub: 'Security & preferences', count: 8,
+    svg: <><path d="M12 3 4 6v6c0 5 3 8 8 9 5-1 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></>,
+  },
+  {
+    key: 'baggage', label: 'Baggage', sub: 'Allowances & tracking', count: 6,
+    svg: <><rect x="5" y="7" width="14" height="14" rx="2"/><path d="M9 7V4h6v3M9 12h6"/></>,
+  },
+  {
+    key: 'eco', label: 'Eco-Points', sub: 'Rewards & sustainability', count: 9,
+    svg: <><path d="M11 20C5 20 3 15 3 12c0-3 2-7 8-9 0 6 3 8 6 9-1 5-3 8-6 8Z"/></>,
+  },
+  {
+    key: 'payment', label: 'Payments', sub: 'Refunds & receipts', count: 7,
+    svg: <><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/></>,
+  },
+];
+
+
+const FAQ_DATA = {
+  flights: {
+    label: 'Flights', count: 12,
+    items: [
+      {
+        q: 'How do I change or cancel a flight?',
+        a: '<p>You can change or cancel any booking from <strong>My Trips</strong> up to 2 hours before departure. Standard fares are refundable to original payment within 7 business days; Light fares are refundable to EcoWings credit, valid for 12 months.</p><p>If you booked through a partner airline, fees follow the operating carrier\'s policy — we\'ll show the exact figure before you confirm.</p>',
+      },
+      {
+        q: 'What does the eco-route badge actually mean?',
+        a: '<p>The badge marks the lowest-impact option for your search, weighted across three factors: aircraft generation (newer = more efficient), routing (fewer detours, optimal cruise altitude), and load factor at booking time.</p><ul><li><strong>Eco-recommended</strong> — top 25% of options, lowest emissions per passenger-km.</li><li><strong>Fast &amp; efficient</strong> — direct route, mid-tier emissions.</li><li><strong>Standard</strong> — every other valid option.</li></ul>',
+      },
+      {
+        q: 'Can I rebook to another date for free?',
+        a: '<p>Yes — within 24 hours of booking, all changes are free. After that, fee depends on fare type and how close to departure you are. Eco-recommended fares come with a 50% reduced change fee, our way of nudging the greener choice.</p>',
+      },
+      {
+        q: 'What happens if my flight is delayed or cancelled?',
+        a: '<p>We re-route you automatically and send the new itinerary by SMS, email, and inside the app. If the delay exceeds 3 hours on a covered route, you\'re entitled to compensation per the operating airline\'s terms — we file the claim on your behalf, no paperwork required.</p>',
+      },
+      {
+        q: 'Do you support multi-city or open-jaw bookings?',
+        a: '<p>Yes. Add up to 6 segments in one search using the <em>Multi-city</em> tab. We score the entire itinerary\'s carbon footprint together, not segment by segment, so the eco-recommendations actually optimize for the whole trip.</p>',
+      },
+    ],
+  },
+  account: {
+    label: 'Account', count: 8,
+    items: [
+      {
+        q: 'How do I enable two-factor authentication?',
+        a: '<p>Open <strong>Settings → Security</strong> and tap <em>Add 2FA</em>. We recommend an authenticator app over SMS for stronger protection. Recovery codes are generated immediately — store them somewhere safe.</p>',
+      },
+      {
+        q: 'Can I have multiple travelers on one account?',
+        a: '<p>Yes. Add up to 8 travelers (family or colleagues) under <strong>Profile → Travelers</strong>. Their documents and preferences are stored separately, but bookings show up under one calendar.</p>',
+      },
+      {
+        q: 'How do I export my booking history?',
+        a: '<p>From <strong>Settings → Data</strong>, request an export. You\'ll receive a CSV (and optional PDF) with every booking, payment, and impact metric within 24 hours.</p>',
+      },
+      {
+        q: "What's the difference between profiles and travelers?",
+        a: '<p>Your <em>profile</em> is the account holder — login, billing, preferences. <em>Travelers</em> are anyone you book for: their passport details, frequent flyer numbers, and meal preferences live there.</p>',
+      },
+    ],
+  },
+  baggage: {
+    label: 'Baggage', count: 6,
+    items: [
+      {
+        q: "What's included in my fare?",
+        a: '<p>Every fare includes one personal item (under-seat). Carry-on (8 kg) is included on Standard and above; checked bags depend on route and fare. The exact allowance is shown above the fare summary, never hidden in the fine print.</p>',
+      },
+      {
+        q: 'Can I track my checked bag in real time?',
+        a: '<p>Yes — once your bag is tagged at the airport, it appears in <strong>My Trips → Live tracking</strong> with each scan event. Alerts fire if it\'s flagged for re-routing.</p>',
+      },
+      {
+        q: 'What if my bag is lost or damaged?',
+        a: '<p>File a Property Irregularity Report (PIR) at the airport within 7 days of arrival, then submit it through the app. Most claims resolve within 21 days; we\'ll keep you posted at every step.</p>',
+      },
+    ],
+  },
+  eco: {
+    label: 'Eco-Points', count: 9,
+    items: [
+      {
+        q: 'How are Eco-Points earned?',
+        a: '<p>You earn 1 point per kg of CO₂ avoided versus the highest-emission option for the same route. Picking the eco-recommended flight, flying direct, or choosing newer aircraft all earn more.</p><p>Points stack in your wallet and never expire while your account is active.</p>',
+      },
+      {
+        q: 'What can I redeem Eco-Points for?',
+        a: '<p>Three things, in this order of impact: discounts on future bookings, donations to verified reforestation partners, or sustainable aviation fuel (SAF) contributions logged transparently to your impact dashboard.</p>',
+      },
+      {
+        q: 'Are Eco-Points the same as carbon offsets?',
+        a: '<p>No. Offsets are bought from a market; Eco-Points are <em>earned</em> by the choices you make at booking time. We\'re skeptical of offset-only models — points reward avoidance first, mitigation second.</p>',
+      },
+      {
+        q: 'Can I share my Eco-Points with family?',
+        a: '<p>Yes — pool them with up to 4 family members under one Eco-Wallet. Useful when planning a household trip together.</p>',
+      },
+    ],
+  },
+  payment: {
+    label: 'Payments', count: 7,
+    items: [
+      {
+        q: 'Which payment methods do you accept?',
+        a: '<p>Visa, Mastercard, Amex, Apple Pay, Google Pay, and SEPA bank transfer in supported regions. We don\'t add card surcharges.</p>',
+      },
+      {
+        q: 'When am I actually charged?',
+        a: '<p>At booking confirmation, never before. If a fare changes between search and checkout, we re-quote and ask you to re-confirm — no silent price jumps.</p>',
+      },
+      {
+        q: 'How do refunds work?',
+        a: '<p>Refunds return to your original payment method within 5–10 business days for cards, 1–3 for SEPA. EcoWings credit refunds are instant.</p>',
+      },
+    ],
+  },
+};
+
+/* ── inline SVG helpers ── */
+const Svg = ({ size = 18, children, style }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"
+    strokeLinejoin="round" style={style}>
+    {children}
+  </svg>
+);
+
 export default function FAQPage() {
-  const [messages, setMessages] = useState([
-    {
-      id: 0,
-      role: 'ai',
-      text: 'Hello! I\'m your EcoWings digital assistant. I can help you manage your bookings, check flight statuses, or explain our latest sustainability initiatives. How can I guide you today?',
-      done: true,
-    },
-  ]);
-  const [input, setInput] = useState('');
+  /* ── existing chat state ── */
+  const [messages, setMessages] = useState([{
+    id: 0, role: 'ai', done: true,
+    text: "Hi — I'm your EcoWings Assistant. I can help you manage bookings, check flight statuses, or explain our latest sustainability initiatives. How can I guide you today?",
+  }]);
+  const [input, setInput]     = useState('');
   const [loading, setLoading] = useState(false);
-  const [inputFocused, setInputFocused] = useState(false);
-  const [searchInput, setSearchInput] = useState('');
-  const messagesContainerRef = useRef(null);
+  const msgsRef  = useRef(null);
   const inputRef = useRef(null);
 
-  /* Scroll to bottom inside the chat box */
+  /* ── new UI state ── */
+  const [activeTopic, setActiveTopic]   = useState('flights');
+  const [openFaqIndex, setOpenFaqIndex] = useState(0);
+  const [votes, setVotes]               = useState({});
+  const [searchValue, setSearchValue]   = useState('');
+  const faqRef = useRef(null);
+
   useEffect(() => {
-    const el = messagesContainerRef.current;
-    if (!el) return;
-    el.scrollTop = el.scrollHeight;
+    const el = msgsRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [messages, loading]);
 
-  /* ── Typewriter effect ── */
-  const typewriterEffect = (fullText, msgId) => {
+  /* ── typewriter (preserved) ── */
+  const typewriter = (fullText, msgId) => {
     let i = 0;
-    const interval = setInterval(() => {
+    const iv = setInterval(() => {
       i++;
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === msgId
-            ? { ...m, text: fullText.slice(0, i), done: i >= fullText.length }
-            : m
-        )
-      );
-      if (i >= fullText.length) clearInterval(interval);
+      setMessages(prev => prev.map(m =>
+        m.id === msgId ? { ...m, text: fullText.slice(0, i), done: i >= fullText.length } : m
+      ));
+      if (i >= fullText.length) clearInterval(iv);
     }, 18);
   };
 
-  /* ── Send handler (accepts optional overrideText for hero search bar) ── */
-  const handleSend = async (overrideText) => {
-    const trimmed = (overrideText ?? input).trim();
+  /* ── handleSend (preserved) ── */
+  const handleSend = async (override) => {
+    const trimmed = (override ?? input).trim();
     if (!trimmed || loading) return;
-
-    const userMsgId = Date.now();
-    const aiMsgId = userMsgId + 1;
-
-    setMessages((prev) => [...prev, { id: userMsgId, role: 'user', text: trimmed, done: true }]);
+    const uid = Date.now(), aid = uid + 1;
+    setMessages(p => [...p, { id: uid, role: 'user', text: trimmed, done: true }]);
     setInput('');
     setLoading(true);
-
     const answer = await fetchResponse(trimmed);
-
     setLoading(false);
-    setMessages((prev) => [...prev, { id: aiMsgId, role: 'ai', text: '', done: false }]);
-    setTimeout(() => typewriterEffect(answer, aiMsgId), 60);
+    setMessages(p => [...p, { id: aid, role: 'ai', text: '', done: false }]);
+    setTimeout(() => typewriter(answer, aid), 60);
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
+  const handleKeyDown = e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+  };
+
+  const handleTopicClick = (key) => {
+    setActiveTopic(key);
+    setOpenFaqIndex(0);
+    setTimeout(() => faqRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  };
+
+  const handleAskAssistant = () => {
+    if (searchValue.trim()) {
+      handleSend(searchValue);
+      setSearchValue('');
     }
-  };
-
-  const handleChip = (query) => {
-    if (loading) return;
-    setInput(query);
     inputRef.current?.focus();
   };
 
-  /* ── Hero search handler ── */
-  const handleHeroSearch = () => {
-    if (!searchInput.trim() || loading) return;
-    handleSend(searchInput);
-    setSearchInput('');
-  };
+  const currentTopic = FAQ_DATA[activeTopic];
 
-  const handleHeroKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleHeroSearch();
-    }
-  };
-
-  /* ── Fade-up intersection observer for hero elements ── */
-  useEffect(() => {
-    const els = document.querySelectorAll('.faq-fade-up');
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add('visible'); });
-    }, { threshold: 0.1 });
-    els.forEach((el) => obs.observe(el));
-    return () => obs.disconnect();
-  }, []);
-
-  /* ─── Render ─────────────────────────────────────────── */
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-base)', paddingBottom: '80px' }}>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-      {/* ══ HERO ══════════════════════════════════════════ */}
-      <section style={{
-        paddingTop: '80px',
-        paddingBottom: '56px',
-        textAlign: 'center',
-        position: 'relative',
-        overflow: 'hidden',
-      }}>
-        {/* Ambient orbs */}
-        <div style={{
-          position: 'absolute', top: '-80px', left: '50%', transform: 'translateX(-50%)',
-          width: '700px', height: '340px',
-          background: 'radial-gradient(ellipse, rgba(77,124,95,0.10) 0%, transparent 70%)',
-          pointerEvents: 'none',
-          animation: 'pulseOrb 6s ease-in-out infinite',
-        }} />
+        .fw-root {
+          --forest-900:#0B2E22; --forest-800:#0F3D2E; --forest-700:#164A38;
+          --forest-600:#1F6B4A; --forest-500:#2E8B5F;
+          --sage-200:#D6E4DA; --sage-100:#E8F0EA; --sage-50:#F1F6F2;
+          --cream:#FAFAF7; --ink:#1A1A1A; --ink-60:#5A5F5C; --ink-40:#8A8E8B;
+          --line:#E5E7E3;
+          --shadow-sm: 0 1px 2px rgba(15,61,46,.04), 0 2px 8px rgba(15,61,46,.04);
+          --shadow-md: 0 4px 12px rgba(15,61,46,.06), 0 16px 40px rgba(15,61,46,.08);
+          font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+          color: var(--ink);
+          background: var(--cream);
+          -webkit-font-smoothing: antialiased;
+          line-height: 1.5;
+          min-height: 100vh;
+        }
+        .fw-root * { box-sizing: border-box; }
 
-        <div className="faq-fade-up fade-up">
-          <h1 style={{
-            fontSize: 'clamp(2.2rem, 5vw, 3.5rem)',
-            fontWeight: 800,
-            fontFamily: "'Manrope', sans-serif",
-            letterSpacing: '-0.03em',
-            color: '#1a4d33',
-            margin: '0 0 32px',
-            lineHeight: 1.1,
-          }}>
-            How can we help?
-          </h1>
+        /* ── HERO ── */
+        .fw-hero {
+          background:
+            radial-gradient(800px 360px at 80% 0%, rgba(46,139,95,.10), transparent 60%),
+            radial-gradient(600px 280px at 0% 100%, rgba(46,139,95,.08), transparent 60%),
+            var(--cream);
+          border-bottom: 1px solid var(--line);
+          padding: 88px 32px 56px;
+        }
+        .fw-hero-inner { max-width: 1240px; margin: 0 auto; }
+        .fw-eyebrow {
+          display: inline-flex; align-items: center; gap: 10px;
+          color: var(--forest-700); font-size: 12px; font-weight: 600;
+          letter-spacing: 0.18em; text-transform: uppercase;
+        }
+        .fw-eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--forest-700); }
+        .fw-hero h1 {
+          font-family: "Plus Jakarta Sans", sans-serif;
+          margin-top: 18px;
+          font-size: clamp(40px, 5.4vw, 72px);
+          font-weight: 700; max-width: 18ch;
+          letter-spacing: -0.02em; line-height: 1.05;
+        }
+        .fw-hero h1 em {
+          font-family: "Instrument Serif", serif;
+          font-style: italic; font-weight: 400;
+          color: var(--forest-700);
+        }
+        .fw-hero p {
+          margin-top: 18px; max-width: 60ch;
+          color: var(--ink-60); font-size: 17px; line-height: 1.65;
+        }
 
-          {/* Glassmorphic search bar */}
-          <div style={{ maxWidth: '640px', margin: '0 auto', position: 'relative' }}>
-            <div style={{
-              position: 'absolute', inset: '-4px',
-              background: 'rgba(77,124,95,0.06)',
-              borderRadius: '9999px',
-              filter: 'blur(8px)',
-            }} />
-            <div style={{
-              position: 'relative',
-              background: 'rgba(255,255,255,0.80)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              borderRadius: '9999px',
-              display: 'flex',
-              alignItems: 'center',
-              padding: '12px 12px 12px 24px',
-              boxShadow: '0 4px 24px rgba(77,124,95,0.10)',
-              border: '1px solid rgba(77,124,95,0.15)',
-            }}>
-              <span className="material-symbols-outlined" style={{ color: 'var(--text-secondary)', marginRight: '14px', fontSize: '22px' }}>search</span>
-              <input
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                onKeyDown={handleHeroKeyDown}
-                placeholder="Search for flights, booking issues, or Eco-Points..."
-                style={{
-                  flex: 1,
-                  background: 'transparent',
-                  border: 'none',
-                  outline: 'none',
-                  fontSize: '1rem',
-                  color: 'var(--text-primary)',
-                  fontFamily: "'Inter', sans-serif",
-                }}
-              />
-              <button
-                onClick={handleHeroSearch}
-                disabled={loading}
-                style={{
-                  background: '#1a4d33',
-                  color: '#ffffff',
-                  border: 'none',
-                  borderRadius: '9999px',
-                  padding: '10px 24px',
-                  fontWeight: 600,
-                  fontSize: '0.9rem',
-                  fontFamily: "'Inter', sans-serif",
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  opacity: loading ? 0.6 : 1,
-                  transition: 'opacity 0.2s ease',
-                  flexShrink: 0,
-                  marginLeft: '8px',
-                }}
-              >
-                Search
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+        /* ── LAYOUT ── */
+        .fw-wrap { max-width: 1240px; margin: 0 auto; padding: 56px 32px 96px; }
+        .fw-grid {
+          display: grid;
+          grid-template-columns: 320px 1fr;
+          gap: 40px;
+          align-items: flex-start;
+        }
 
-      {/* ══ TWO-COLUMN BODY ═══════════════════════════════ */}
-      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 32px' }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(12, 1fr)',
-          gap: '48px',
-          alignItems: 'start',
-        }}>
+        /* ── SIDEBAR ── */
+        .fw-side { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 24px; }
+        .fw-side-card {
+          background: #fff; border: 1px solid var(--line);
+          border-radius: 24px; padding: 24px;
+        }
+        .fw-side-label {
+          font-size: 11px; font-weight: 600; letter-spacing: 0.18em;
+          text-transform: uppercase; color: var(--ink-40); margin-bottom: 16px;
+        }
 
-          {/* ── LEFT COLUMN ── */}
-          <div style={{ gridColumn: 'span 4', display: 'flex', flexDirection: 'column', gap: '40px' }}>
+        /* Topics */
+        .fw-topics { display: flex; flex-direction: column; gap: 6px; }
+        .fw-topic {
+          all: unset; box-sizing: border-box; display: flex; align-items: center; gap: 14px;
+          padding: 14px; border-radius: 14px;
+          border: 1px solid transparent; background: transparent;
+          text-align: left; cursor: pointer; width: 100%;
+          transition: all .2s ease;
+        }
+        .fw-topic:hover { background: var(--sage-50); }
+        .fw-topic.active {
+          background: var(--sage-50);
+          border-color: rgba(46,139,95,0.25);
+          box-shadow: var(--shadow-sm);
+        }
+        .fw-topic-ico {
+          width: 36px; height: 36px; border-radius: 10px;
+          background: var(--sage-100); color: var(--forest-700);
+          display: grid; place-items: center; flex-shrink: 0;
+          transition: all .2s ease;
+        }
+        .fw-topic.active .fw-topic-ico,
+        .fw-topic:hover .fw-topic-ico { background: var(--forest-800); color: #fff; }
+        .fw-topic-text { flex: 1; min-width: 0; }
+        .fw-topic-text .fw-ttl { font-weight: 700; font-size: 14.5px; color: var(--ink); }
+        .fw-topic-text .fw-sub { font-size: 12.5px; color: var(--ink-40); margin-top: 2px; display: block; }
+        .fw-topic-arrow { color: var(--ink-40); transition: transform .2s ease; flex-shrink: 0; }
+        .fw-topic:hover .fw-topic-arrow { transform: translateX(3px); color: var(--forest-700); }
+        .fw-topic-count {
+          margin-left: auto; font-size: 11.5px; font-weight: 600;
+          color: var(--ink-40); background: var(--cream);
+          border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px;
+        }
+        .fw-topic.active .fw-topic-count { background: #fff; color: var(--forest-700); border-color: rgba(46,139,95,0.3); }
 
-            {/* Popular Categories */}
-            <section>
-              <h2 style={{
-                fontSize: '0.7rem',
-                fontWeight: 700,
-                textTransform: 'uppercase',
-                letterSpacing: '0.12em',
-                color: 'var(--text-muted)',
-                marginBottom: '20px',
-                paddingLeft: '4px',
-                fontFamily: "'Inter', sans-serif",
-              }}>
-                Popular Categories
-              </h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {[
-                  { icon: 'flight_takeoff', label: 'Flights', sub: 'Bookings & Cancellations', bg: 'rgba(34,197,94,0.12)', iconColor: '#1a4d33', chip: CHIPS[0] },
-                  { icon: 'account_balance_wallet', label: 'Account', sub: 'Security & Preferences', bg: 'rgba(34,197,94,0.18)', iconColor: '#2f5e42', chip: CHIPS[1] },
-                  { icon: 'luggage', label: 'Baggage', sub: 'Allowances & Tracking', bg: 'rgba(77,124,95,0.15)', iconColor: '#384d3e', chip: CHIPS[2] },
-                  { icon: 'eco', label: 'Eco-Points', sub: 'Rewards & Sustainability', bg: 'rgba(34,197,94,0.22)', iconColor: '#2f5e42', chip: CHIPS[3] },
-                ].map((cat) => (
-                  <CategoryCard
-                    key={cat.label}
-                    icon={cat.icon}
-                    label={cat.label}
-                    sub={cat.sub}
-                    iconBg={cat.bg}
-                    iconColor={cat.iconColor}
-                    onClick={() => handleChip(cat.chip.query)}
-                    disabled={loading}
-                  />
-                ))}
-              </div>
-            </section>
+        /* Stats */
+        .fw-stats { display: flex; flex-direction: column; gap: 18px; }
+        .fw-stat { padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+        .fw-stat:last-child { border-bottom: none; padding-bottom: 0; }
+        .fw-stat .fw-num {
+          font-size: 30px; font-weight: 700; letter-spacing: -0.02em; line-height: 1;
+          color: var(--ink);
+        }
+        .fw-stat .fw-num em {
+          font-family: "Instrument Serif", serif; font-style: italic;
+          font-weight: 400; color: var(--forest-700);
+        }
+        .fw-stat .fw-lbl { margin-top: 8px; font-size: 13px; color: var(--ink-60); line-height: 1.45; }
 
-            {/* Forest Image Card */}
-            <div style={{
-              borderRadius: '24px',
-              overflow: 'hidden',
-              position: 'relative',
-              aspectRatio: '1 / 1',
-              cursor: 'pointer',
-              boxShadow: '0 20px 60px rgba(26,77,51,0.20)',
-            }}>
-              <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9wADNEPIvqP3VxM9TyW2CXi0Fk8FnU6TAp_SatMAwwFHfsHWtVPBdzh_8zUGWGeJviip2sXScjS_0nc5OEi-PmFasKkRy4pUmQvt_Tk4p0x5G7jNE2OPuBRyofzDIyu1ihv6zgxeTgI_gtXa7iaBNX6H3uTpNCUMny4eABjsxSxwT1cbhWlFevVBqlkphDCDjYmHAr_wmh_1jzET6gMlDZ0HAPsCj32_5z9cdI2xww376a1x-WzhQjqdSwUAJ3DgLkM3TRJ4DBZyF"
-                alt="Lush green misty forest canopy"
-                style={{
-                  position: 'absolute', inset: 0,
-                  width: '100%', height: '100%',
-                  objectFit: 'cover',
-                  transition: 'transform 0.7s ease',
-                }}
-                onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.08)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
-              />
-              <div style={{
-                position: 'absolute', inset: 0,
-                background: 'linear-gradient(to top, rgba(26,77,51,0.92) 0%, rgba(26,77,51,0.40) 50%, transparent 100%)',
-              }} />
-              <div style={{ position: 'absolute', bottom: 0, padding: '32px', color: '#ffffff' }}>
-                <span style={{
-                  display: 'inline-block',
-                  padding: '4px 12px',
-                  borderRadius: '9999px',
-                  background: 'rgba(188,238,207,0.25)',
-                  color: '#bceecf',
-                  fontSize: '0.65rem',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.1em',
-                  marginBottom: '16px',
-                  fontFamily: "'Inter', sans-serif",
-                }}>
-                  Sustainability Report
-                </span>
-                <h4 style={{
-                  fontSize: '1.25rem',
-                  fontWeight: 700,
-                  fontFamily: "'Manrope', sans-serif",
-                  lineHeight: 1.3,
-                  margin: '0 0 8px',
-                }}>
-                  Our commitment to 2030 Carbon Neutrality.
-                </h4>
-                <p style={{
-                  fontSize: '0.8rem',
-                  color: 'rgba(188,238,207,0.80)',
-                  margin: 0,
-                  fontFamily: "'Inter', sans-serif",
-                }}>
-                  Read how your flights contribute to reforestation.
-                </p>
-              </div>
-            </div>
-          </div>
+        /* Contact card */
+        .fw-contact-card {
+          background: var(--forest-900); color: #fff;
+          border-radius: 24px; padding: 24px;
+          position: relative; overflow: hidden;
+          border: 1px solid rgba(255,255,255,0.05);
+        }
+        .fw-contact-card::before {
+          content: ""; position: absolute; inset: 0;
+          background: radial-gradient(400px 200px at 100% 0%, rgba(46,139,95,.30), transparent 60%);
+          pointer-events: none;
+        }
+        .fw-contact-card > * { position: relative; }
+        .fw-contact-card .fw-ttl { font-size: 16px; font-weight: 700; }
+        .fw-contact-card .fw-sub { font-size: 13px; color: rgba(255,255,255,0.65); margin-top: 6px; line-height: 1.5; }
+        .fw-contact-row {
+          display: flex; align-items: center; gap: 12px;
+          margin-top: 16px; padding: 12px;
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+          color: #fff; text-decoration: none; transition: background .2s ease;
+          cursor: pointer;
+        }
+        .fw-contact-row:hover { background: rgba(255,255,255,0.08); }
+        .fw-contact-ic {
+          width: 32px; height: 32px; border-radius: 9px;
+          background: rgba(46,139,95,0.25); color: #BFE3CC;
+          display: grid; place-items: center; flex-shrink: 0;
+        }
+        .fw-contact-nm { font-size: 13.5px; font-weight: 600; }
+        .fw-contact-ds { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 1px; }
 
-          {/* ── RIGHT COLUMN — CHAT ── */}
-          <div style={{ gridColumn: 'span 8' }}>
-            <div style={{
-              background: '#ffffff',
-              borderRadius: '28px',
-              boxShadow: '0 24px 80px rgba(26,77,51,0.08)',
-              border: '1px solid rgba(77,124,95,0.10)',
-              overflow: 'hidden',
-              display: 'flex',
-              flexDirection: 'column',
-              height: '750px',
-            }}>
+        /* ── MAIN ── */
+        .fw-main { display: flex; flex-direction: column; gap: 24px; }
 
-              {/* Chat header */}
-              <div style={{
-                padding: '20px 28px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                background: '#ffffff',
-                borderBottom: '1px solid rgba(77,124,95,0.08)',
-                flexShrink: 0,
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                  <div style={{ position: 'relative' }}>
-                    <div style={{
-                      width: '48px', height: '48px',
-                      borderRadius: '50%',
-                      background: 'linear-gradient(135deg, rgba(77,124,95,0.30), rgba(26,77,51,0.20))',
-                      border: '1px solid rgba(77,124,95,0.25)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: '#1a4d33',
-                    }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '22px', fontVariationSettings: "'FILL' 1" }}>spa</span>
-                    </div>
-                    <div style={{
-                      position: 'absolute', bottom: 0, right: 0,
-                      width: '14px', height: '14px',
-                      background: '#10b981',
-                      border: '2px solid #ffffff',
-                      borderRadius: '50%',
-                    }} />
-                  </div>
-                  <div>
-                    <div style={{
-                      fontWeight: 700,
-                      color: '#1a4d33',
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                      fontSize: '0.95rem',
-                    }}>
-                      EcoWings Assistant
-                    </div>
-                    <div style={{
-                      display: 'flex', alignItems: 'center', gap: '6px',
-                      fontSize: '0.72rem',
-                      color: 'var(--text-muted)',
-                      fontFamily: "'Inter', sans-serif",
-                    }}>
-                      <span style={{
-                        width: '6px', height: '6px',
-                        borderRadius: '50%',
-                        background: '#10b981',
-                        display: 'inline-block',
-                      }} />
-                      Always online to help
-                    </div>
-                  </div>
-                </div>
-                <button style={{
-                  width: '36px', height: '36px',
-                  borderRadius: '50%',
-                  background: 'transparent',
-                  border: 'none',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: 'var(--text-secondary)',
-                  cursor: 'pointer',
-                  transition: 'background 0.2s ease',
-                  padding: 0,
-                }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(77,124,95,0.08)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                >
-                  <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>more_horiz</span>
-                </button>
-              </div>
+        /* Search */
+        .fw-search-card {
+          background: #fff; border: 1px solid var(--line); border-radius: 20px;
+          padding: 8px 8px 8px 20px;
+          display: flex; align-items: center; gap: 12px;
+          box-shadow: var(--shadow-sm); transition: all .2s ease;
+        }
+        .fw-search-card:focus-within {
+          border-color: var(--forest-600);
+          box-shadow: 0 0 0 4px rgba(46,139,95,.10);
+        }
+        .fw-search-input {
+          flex: 1; border: none; outline: none; background: transparent;
+          font: inherit; font-size: 16px; padding: 14px 0; color: var(--ink);
+        }
+        .fw-search-input::placeholder { color: var(--ink-40); }
+        .fw-search-key {
+          display: inline-flex; align-items: center; gap: 4px;
+          font-size: 11px; font-weight: 600; color: var(--ink-40);
+          background: var(--cream); border: 1px solid var(--line);
+          border-radius: 6px; padding: 4px 7px; white-space: nowrap;
+        }
+        .fw-ask-btn {
+          all: unset; padding: 12px 20px; border-radius: 14px;
+          background: var(--forest-800); color: #fff;
+          font-weight: 600; font-size: 14px;
+          cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+          transition: all .2s ease; white-space: nowrap;
+        }
+        .fw-ask-btn:hover { background: var(--forest-700); transform: translateY(-1px); box-shadow: var(--shadow-md); }
 
-              {/* Messages area */}
-              <div
-                ref={messagesContainerRef}
-                style={{
-                  flex: 1,
-                  overflowY: 'auto',
-                  padding: '28px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '28px',
-                  background: 'rgba(245,247,245,0.40)',
-                  scrollbarWidth: 'thin',
-                  scrollbarColor: 'rgba(77,124,95,0.25) transparent',
-                }}
-              >
-                {messages.map((msg) =>
-                  msg.role === 'user'
-                    ? <UserMessage key={msg.id} text={msg.text} />
-                    : <AiMessage key={msg.id} text={msg.text} done={msg.done} />
-                )}
+        /* Chat panel */
+        .fw-chat {
+          background: #fff; border: 1px solid var(--line);
+          border-radius: 24px; overflow: hidden; box-shadow: var(--shadow-md);
+        }
+        .fw-chat-head {
+          display: flex; align-items: center; gap: 14px;
+          padding: 18px 22px; border-bottom: 1px solid var(--line);
+          background: linear-gradient(180deg, #fff, var(--cream));
+        }
+        .fw-assistant-av {
+          width: 40px; height: 40px; border-radius: 12px;
+          background: linear-gradient(160deg, var(--forest-700), var(--forest-900));
+          display: grid; place-items: center; color: #BFE3CC;
+          flex-shrink: 0; box-shadow: 0 6px 14px rgba(15,61,46,.18);
+        }
+        .fw-chat-meta { flex: 1; min-width: 0; }
+        .fw-chat-nm { font-weight: 700; font-size: 15px; }
+        .fw-chat-st {
+          display: inline-flex; align-items: center; gap: 6px;
+          margin-top: 2px; font-size: 12.5px; color: var(--forest-700); font-weight: 500;
+        }
+        .fw-pulse {
+          width: 7px; height: 7px; border-radius: 50%; background: var(--forest-500);
+          box-shadow: 0 0 0 0 rgba(46,139,95,.6);
+          animation: fwPulse 1.6s ease-out infinite;
+        }
+        @keyframes fwPulse {
+          0%  { box-shadow: 0 0 0 0 rgba(46,139,95,.5); }
+          100%{ box-shadow: 0 0 0 10px rgba(46,139,95,0); }
+        }
+        .fw-enc-chip {
+          display: inline-flex; align-items: center; gap: 6px;
+          font-size: 11px; font-weight: 600; letter-spacing: 0.16em;
+          text-transform: uppercase; color: var(--forest-700);
+          background: var(--sage-50); border: 1px solid rgba(46,139,95,0.2);
+          border-radius: 999px; padding: 6px 12px;
+        }
 
-                {/* Loading dots */}
-                {loading && (
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', animation: 'msgSlideIn 0.25s ease both' }}>
-                    <AiAvatar />
-                    <div style={{
-                      padding: '14px 18px',
-                      background: '#ffffff',
-                      borderRadius: '20px 20px 20px 4px',
-                      border: '1px solid rgba(77,124,95,0.06)',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                      display: 'flex', alignItems: 'center', gap: '6px',
-                    }}>
-                      {[0, 1, 2].map((i) => (
-                        <span key={i} style={{
-                          width: '7px', height: '7px',
-                          borderRadius: '50%',
-                          background: 'var(--green-primary)',
-                          display: 'inline-block',
-                          opacity: 0.8,
-                          animation: `dotBounce 1.2s ease-in-out infinite ${i * 0.18}s`,
-                        }} />
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+        /* Chat body */
+        .fw-chat-body {
+          padding: 24px 22px;
+          display: flex; flex-direction: column; gap: 18px;
+          min-height: 380px; max-height: 520px;
+          overflow-y: auto;
+          background: radial-gradient(400px 200px at 100% 0%, rgba(46,139,95,.05), transparent 60%);
+        }
+        .fw-chat-body::-webkit-scrollbar { width: 6px; }
+        .fw-chat-body::-webkit-scrollbar-thumb { background: var(--sage-200); border-radius: 999px; }
 
-              {/* Input bar */}
-              <div style={{
-                padding: '20px 28px 24px',
-                background: '#ffffff',
-                borderTop: '1px solid rgba(77,124,95,0.08)',
-                flexShrink: 0,
-              }}>
-                <div style={{
-                  position: 'relative',
-                  display: 'flex',
-                  alignItems: 'center',
-                }}>
-                  <textarea
-                    ref={inputRef}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    onFocus={() => setInputFocused(true)}
-                    onBlur={() => setInputFocused(false)}
-                    placeholder="Type your message here..."
-                    rows={1}
-                    disabled={loading}
-                    style={{
-                      flex: 1,
-                      background: 'rgba(77,124,95,0.05)',
-                      border: `1.5px solid ${inputFocused ? 'rgba(77,124,95,0.40)' : 'transparent'}`,
-                      borderRadius: '16px',
-                      padding: '14px 120px 14px 20px',
-                      color: 'var(--text-primary)',
-                      fontFamily: "'Inter', sans-serif",
-                      fontSize: '0.9rem',
-                      lineHeight: '1.5',
-                      resize: 'none',
-                      outline: 'none',
-                      maxHeight: '120px',
-                      overflowY: 'auto',
-                      caretColor: '#1a4d33',
-                      opacity: loading ? 0.5 : 1,
-                      transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
-                      boxShadow: inputFocused ? '0 0 0 3px rgba(77,124,95,0.08)' : 'none',
-                    }}
-                    onInput={(e) => {
-                      e.target.style.height = 'auto';
-                      e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
-                    }}
-                  />
-                  <div style={{
-                    position: 'absolute', right: '8px',
-                    display: 'flex', alignItems: 'center', gap: '2px',
-                  }}>
-                    <button style={{
-                      width: '36px', height: '36px',
-                      background: 'transparent', border: 'none',
-                      borderRadius: '10px', cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: 'var(--text-secondary)',
-                      transition: 'background 0.2s ease',
-                      padding: 0,
-                    }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(77,124,95,0.08)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                    >
-                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>attach_file</span>
-                    </button>
-                    <button style={{
-                      width: '36px', height: '36px',
-                      background: 'transparent', border: 'none',
-                      borderRadius: '10px', cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: 'var(--text-secondary)',
-                      transition: 'background 0.2s ease',
-                      padding: 0,
-                    }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(77,124,95,0.08)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                    >
-                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>mood</span>
-                    </button>
-                    <SendButton onClick={handleSend} disabled={!input.trim() || loading} />
-                  </div>
-                </div>
-                <p style={{
-                  textAlign: 'center',
-                  color: 'var(--text-muted)',
-                  fontSize: '0.65rem',
-                  margin: '12px 0 0',
-                  fontFamily: "'Inter', sans-serif",
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                  fontWeight: 500,
-                }}>
-                  EcoWings AI uses verified flight data · Human agents available 24/7
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        .fw-msg { display: flex; gap: 12px; max-width: 90%; animation: fwMsgIn .3s ease both; }
+        .fw-msg.fw-bot { align-self: flex-start; }
+        .fw-msg.fw-user { align-self: flex-end; flex-direction: row-reverse; }
+        @keyframes fwMsgIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
 
-        {/* ══ BROWSE KNOWLEDGE BASE ════════════════════════ */}
-        <section style={{ marginTop: '80px' }}>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-end',
-            marginBottom: '36px',
-            flexWrap: 'wrap',
-            gap: '16px',
-          }}>
-            <div>
-              <h2 style={{
-                fontSize: 'clamp(1.5rem, 3vw, 2rem)',
-                fontWeight: 800,
-                fontFamily: "'Manrope', sans-serif",
-                color: '#1a4d33',
-                margin: '0 0 8px',
-                letterSpacing: '-0.02em',
-              }}>
-                Browse Knowledge Base
-              </h2>
-              <p style={{
-                color: 'var(--text-secondary)',
-                margin: 0,
-                fontFamily: "'Inter', sans-serif",
-                fontSize: '0.95rem',
-              }}>
-                Find detailed guides curated by our travel experts.
-              </p>
-            </div>
-            <button style={{
-              background: 'transparent',
-              border: 'none',
-              color: '#1a4d33',
-              fontWeight: 700,
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontSize: '0.9rem',
-              cursor: 'pointer',
-              display: 'flex', alignItems: 'center', gap: '8px',
-              padding: 0,
-              transition: 'gap 0.2s ease',
-            }}
-              onMouseEnter={(e) => { e.currentTarget.style.gap = '14px'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.gap = '8px'; }}
-            >
-              View all documentation
-              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>arrow_forward</span>
-            </button>
-          </div>
+        .fw-msg-av {
+          width: 32px; height: 32px; border-radius: 10px;
+          flex-shrink: 0; display: grid; place-items: center;
+          font-size: 11px; font-weight: 700;
+        }
+        .fw-msg.fw-bot .fw-msg-av {
+          background: linear-gradient(160deg, var(--forest-700), var(--forest-900));
+          color: #BFE3CC;
+        }
+        .fw-msg.fw-user .fw-msg-av { background: var(--sage-100); color: var(--forest-800); }
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '24px',
-          }}>
-            {[
-              {
-                icon: 'verified_user',
-                title: 'Booking Protection',
-                desc: 'Understand how our comprehensive travel protection works for delayed or cancelled flights.',
-                bullets: ['Claims process', 'Eligibility rules'],
-              },
-              {
-                icon: 'public',
-                title: 'Sustainable Travel',
-                desc: 'Learn about SAF (Sustainable Aviation Fuel) and how to redeem points for climate projects.',
-                bullets: ['SAF contributions', 'Reward partners'],
-              },
-              {
-                icon: 'credit_card',
-                title: 'Payments & Refunds',
-                desc: 'Information on accepted payment methods, currency conversion, and refund timelines.',
-                bullets: ['Refund status', 'Card security'],
-              },
-            ].map((card) => (
-              <KnowledgeCard key={card.title} {...card} />
-            ))}
+        .fw-bubble { border-radius: 16px; padding: 14px 16px; font-size: 14.5px; line-height: 1.6; }
+        .fw-msg.fw-bot .fw-bubble {
+          background: var(--sage-50); border: 1px solid rgba(46,139,95,0.12);
+          color: var(--ink); border-top-left-radius: 6px;
+        }
+        .fw-msg.fw-user .fw-bubble {
+          background: var(--forest-800); color: #fff;
+          border-top-right-radius: 6px;
+        }
+        .fw-cursor {
+          display: inline-block; width: 2px; height: .85em;
+          background: var(--ink-40); margin-left: 2px; vertical-align: -1px;
+          animation: fwBlink .9s steps(2) infinite;
+        }
+        @keyframes fwBlink { 50% { opacity: 0; } }
+
+        .fw-typing { display: inline-flex; gap: 4px; padding: 4px 0; }
+        .fw-typing span {
+          width: 7px; height: 7px; border-radius: 50%;
+          background: var(--forest-600);
+          animation: fwBounce 1.2s ease-in-out infinite;
+        }
+        .fw-typing span:nth-child(2) { animation-delay: .15s; }
+        .fw-typing span:nth-child(3) { animation-delay: .3s; }
+        @keyframes fwBounce {
+          0%, 60%, 100% { transform: translateY(0); opacity: .4; }
+          30% { transform: translateY(-4px); opacity: 1; }
+        }
+
+        /* Suggested chips */
+        .fw-suggested button {
+          all: unset; background: #fff; border: 1px solid var(--line);
+          color: var(--ink); border-radius: 999px; padding: 8px 14px;
+          font-size: 13px; font-weight: 500; cursor: pointer;
+          transition: all .2s ease; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .fw-suggested button:hover {
+          border-color: var(--forest-600); color: var(--forest-700);
+          background: var(--sage-50); transform: translateY(-1px);
+        }
+        .fw-chip-arrow { color: var(--ink-40); transition: all .2s ease; }
+        .fw-suggested button:hover .fw-chip-arrow { color: var(--forest-700); transform: translateX(2px); }
+
+        /* Composer */
+        .fw-composer-wrap { padding: 12px 14px 14px; border-top: 1px solid var(--line); background: var(--cream); }
+        .fw-composer {
+          background: #fff; border: 1px solid var(--line); border-radius: 16px;
+          padding: 10px 10px 10px 18px;
+          display: flex; align-items: center; gap: 10px; transition: all .2s ease;
+        }
+        .fw-composer:focus-within {
+          border-color: var(--forest-600);
+          box-shadow: 0 0 0 4px rgba(46,139,95,.10);
+        }
+        .fw-composer-input {
+          flex: 1; border: none; outline: none; background: transparent;
+          font: inherit; font-size: 15px; padding: 10px 0; color: var(--ink);
+          resize: none; max-height: 160px; scrollbar-width: thin;
+        }
+        .fw-composer-input::placeholder { color: var(--ink-40); }
+        .fw-icobtn {
+          all: unset; border: none; background: transparent;
+          width: 36px; height: 36px; border-radius: 10px;
+          display: grid; place-items: center;
+          color: var(--ink-40); cursor: pointer; transition: all .15s ease;
+        }
+        .fw-icobtn:hover { color: var(--forest-700); background: var(--sage-50); }
+        .fw-send-btn {
+          all: unset; width: 40px; height: 40px; border-radius: 12px;
+          background: var(--forest-800); color: #fff;
+          display: grid; place-items: center; cursor: pointer;
+          transition: all .2s ease; flex-shrink: 0;
+        }
+        .fw-send-btn:hover { background: var(--forest-700); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+        .fw-send-btn:disabled { background: var(--sage-200); cursor: not-allowed; transform: none; }
+        .fw-composer-foot {
+          display: flex; align-items: center; justify-content: center; gap: 14px;
+          margin-top: 10px; font-size: 12px; color: var(--ink-40);
+        }
+        .fw-dot-sep {
+          width: 3px; height: 3px; border-radius: 50%;
+          background: var(--ink-40); display: inline-block;
+        }
+
+        /* ── FAQ block ── */
+        .fw-faq-block {
+          background: #fff; border: 1px solid var(--line);
+          border-radius: 24px; padding: 28px 28px 8px;
+        }
+        .fw-faq-head {
+          display: flex; align-items: flex-end; justify-content: space-between; gap: 16px;
+          padding-bottom: 20px; border-bottom: 1px solid var(--line); margin-bottom: 8px;
+        }
+        .fw-faq-head h2 {
+          font-size: 28px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.05;
+        }
+        .fw-faq-head h2 em {
+          font-family: "Instrument Serif", serif; font-style: italic;
+          font-weight: 400; color: var(--forest-700);
+        }
+        .fw-faq-head p { margin: 6px 0 0; color: var(--ink-60); font-size: 14.5px; }
+        .fw-faq-tag {
+          display: inline-flex; align-items: center; gap: 8px;
+          font-size: 12px; font-weight: 600; color: var(--forest-700);
+          background: var(--sage-50); border: 1px solid rgba(46,139,95,0.2);
+          border-radius: 999px; padding: 8px 14px; flex-shrink: 0; white-space: nowrap;
+        }
+        .fw-faq-tag b { color: var(--ink); }
+
+        /* Accordion */
+        .fw-qa { border-bottom: 1px solid var(--line); transition: background .2s ease; }
+        .fw-qa:last-child { border-bottom: none; }
+        .fw-qa-q {
+          all: unset; width: 100%; padding: 22px 4px;
+          text-align: left; cursor: pointer;
+          display: flex; align-items: center; gap: 16px; color: var(--ink);
+          font: inherit; transition: color .15s ease;
+        }
+        .fw-qa-q:hover { color: var(--forest-700); }
+        .fw-qnum {
+          font-family: "Instrument Serif", serif; font-style: italic;
+          color: var(--forest-700); font-size: 16px; width: 28px; flex-shrink: 0;
+        }
+        .fw-qttl { flex: 1; font-size: 16.5px; font-weight: 600; letter-spacing: -0.005em; }
+        .fw-plus {
+          width: 32px; height: 32px; border-radius: 10px;
+          background: var(--cream); border: 1px solid var(--line);
+          color: var(--ink-60); display: grid; place-items: center; flex-shrink: 0;
+          transition: all .25s ease;
+        }
+        .fw-qa.fw-open .fw-plus {
+          background: var(--forest-800); color: #fff; border-color: var(--forest-800);
+          transform: rotate(45deg);
+        }
+        .fw-qa-a {
+          max-height: 0; overflow: hidden;
+          transition: max-height .35s cubic-bezier(.2,.7,.2,1);
+        }
+        .fw-qa-a-inner {
+          padding: 0 4px 22px 48px;
+          color: var(--ink-60); font-size: 15px; line-height: 1.7;
+        }
+        .fw-qa-a-inner p { margin: 0; }
+        .fw-qa-a-inner p + p { margin-top: 10px; }
+        .fw-qa-a-inner ul { margin: 8px 0 0; padding-left: 18px; }
+        .fw-qa-a-inner li { margin-top: 4px; }
+        .fw-qa-foot {
+          margin-top: 14px; padding-top: 14px;
+          border-top: 1px dashed var(--line);
+          display: flex; align-items: center; gap: 14px;
+          font-size: 12.5px; color: var(--ink-40);
+        }
+        .fw-vote-btn {
+          all: unset; border: 1px solid var(--line); background: #fff;
+          border-radius: 999px; padding: 6px 12px;
+          font-size: 12px; font-weight: 600; color: var(--ink-60);
+          cursor: pointer; transition: all .15s ease;
+          display: inline-flex; align-items: center; gap: 6px;
+        }
+        .fw-vote-btn:hover { border-color: var(--forest-600); color: var(--forest-700); }
+        .fw-vote-btn.fw-active { background: var(--sage-50); color: var(--forest-700); border-color: rgba(46,139,95,0.3); }
+        .fw-qa-reviewed { margin-left: auto; font-size: 12.5px; }
+
+        /* ── Bottom CTA ── */
+        .fw-cta {
+          margin-top: 8px;
+          background: var(--forest-900); color: #fff;
+          border-radius: 24px; padding: 36px;
+          display: flex; align-items: center; gap: 24px;
+          justify-content: space-between;
+          position: relative; overflow: hidden;
+        }
+        .fw-cta::before {
+          content: ""; position: absolute; inset: 0;
+          background: radial-gradient(500px 250px at 90% 0%, rgba(46,139,95,.35), transparent 60%);
+        }
+        .fw-cta > * { position: relative; }
+        .fw-cta h3 {
+          font-size: 24px; font-weight: 700; letter-spacing: -0.02em;
+        }
+        .fw-cta h3 em {
+          font-family: "Instrument Serif", serif; font-style: italic;
+          font-weight: 400; color: #BFE3CC;
+        }
+        .fw-cta p { margin: 6px 0 0; color: rgba(255,255,255,0.7); font-size: 14.5px; max-width: 50ch; }
+        .fw-cta-actions { display: flex; gap: 10px; flex-shrink: 0; }
+        .fw-cta-btn {
+          all: unset; display: inline-flex; align-items: center; gap: 8px;
+          padding: 12px 18px; border-radius: 999px;
+          font-size: 14px; font-weight: 600; cursor: pointer;
+          border: 1px solid transparent; transition: all .2s ease;
+        }
+        .fw-cta-btn.fw-primary { background: #fff; color: var(--forest-800); }
+        .fw-cta-btn.fw-primary:hover { background: var(--sage-100); transform: translateY(-1px); }
+        .fw-cta-btn.fw-ghost { background: transparent; color: #fff; border-color: rgba(255,255,255,0.2); }
+        .fw-cta-btn.fw-ghost:hover { border-color: #fff; background: rgba(255,255,255,0.05); }
+
+        /* ── Responsive ── */
+        @media (max-width: 980px) {
+          .fw-grid { grid-template-columns: 1fr; gap: 32px; }
+          .fw-side { position: static; }
+          .fw-hero { padding: 64px 24px 40px; }
+          .fw-wrap { padding: 40px 24px 72px; }
+          .fw-cta { flex-direction: column; align-items: flex-start; }
+        }
+        @media (max-width: 560px) {
+          .fw-hero { padding: 48px 20px 32px; }
+          .fw-wrap { padding: 32px 20px 56px; }
+          .fw-faq-block { padding: 20px 18px 4px; }
+          .fw-chat-body { padding: 18px 14px; }
+          .fw-chat-head { padding: 14px 16px; }
+          .fw-composer-wrap { padding: 10px; }
+          .fw-faq-head { flex-direction: column; align-items: flex-start; }
+        }
+      `}</style>
+
+      <div className="fw-root">
+
+        {/* ── HERO ── */}
+        <section className="fw-hero">
+          <div className="fw-hero-inner">
+            <span className="fw-eyebrow">Help Center · v2026.04</span>
+            <h1>How can we <em>help</em> you fly today?</h1>
+            <p>Ask our assistant, browse by topic, or jump straight to the questions our travelers ask most. Honest answers, sourced data, and a real human one click away.</p>
           </div>
         </section>
-      </div>
-    </div>
-  );
-}
 
-/* ─────────────────────────────────────────────────────────────────
-   SUB COMPONENTS
-───────────────────────────────────────────────────────────────── */
+        <div className="fw-wrap">
+          <div className="fw-grid">
 
-function CategoryCard({ icon, label, sub, iconBg, iconColor, onClick, disabled }) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <div
-      onClick={disabled ? undefined : onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        padding: '18px 20px',
-        borderRadius: '18px',
-        background: hovered ? '#ffffff' : 'rgba(255,255,255,0.60)',
-        border: `1px solid ${hovered ? 'rgba(77,124,95,0.20)' : 'transparent'}`,
-        boxShadow: hovered ? '0 4px 20px rgba(26,77,51,0.08)' : '0 2px 8px rgba(26,77,51,0.04)',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        opacity: disabled ? 0.6 : 1,
-        transition: 'all 0.2s ease',
-        gap: '14px',
-      }}
-    >
-      <div style={{
-        width: '48px', height: '48px',
-        borderRadius: '14px',
-        background: iconBg,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        flexShrink: 0,
-        transform: hovered ? 'scale(1.08)' : 'scale(1)',
-        transition: 'transform 0.2s ease',
-      }}>
-        <span className="material-symbols-outlined" style={{ color: iconColor, fontSize: '22px' }}>{icon}</span>
-      </div>
-      <div>
-        <div style={{
-          fontWeight: 600,
-          color: '#1a4d33',
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
-          fontSize: '0.9rem',
-          marginBottom: '3px',
-        }}>
-          {label}
+            {/* ── SIDEBAR ── */}
+            <aside className="fw-side">
+
+              {/* Topics */}
+              <div className="fw-side-card">
+                <div className="fw-side-label">Browse by topic</div>
+                <div className="fw-topics">
+                  {TOPICS.map(t => (
+                    <button
+                      key={t.key}
+                      className={`fw-topic${activeTopic === t.key ? ' active' : ''}`}
+                      onClick={() => handleTopicClick(t.key)}
+                    >
+                      <div className="fw-topic-ico">
+                        <Svg size={18}>{t.svg}</Svg>
+                      </div>
+                      <div className="fw-topic-text">
+                        <div className="fw-ttl">{t.label}</div>
+                        <span className="fw-sub">{t.sub}</span>
+                      </div>
+                      <span className="fw-topic-count">{t.count}</span>
+                      <span className="fw-topic-arrow">
+                        <Svg size={16}><path d="M9 18l6-6-6-6"/></Svg>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Stats */}
+              <div className="fw-side-card">
+                <div className="fw-side-label">Support stats</div>
+                <div className="fw-stats">
+                  <div className="fw-stat">
+                    <div className="fw-num">98<em>%</em></div>
+                    <div className="fw-lbl">Questions resolved without agent support.</div>
+                  </div>
+                  <div className="fw-stat">
+                    <div className="fw-num">24/7</div>
+                    <div className="fw-lbl">Human agents available in 14 languages.</div>
+                  </div>
+                  <div className="fw-stat">
+                    <div className="fw-num">2.1M<em>+</em></div>
+                    <div className="fw-lbl">Passengers helped annually.</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact card */}
+              <div className="fw-contact-card">
+                <div className="fw-ttl">Still need a human?</div>
+                <p className="fw-sub">Median response: under 4 minutes during peak hours.</p>
+                <div className="fw-contact-row">
+                  <span className="fw-contact-ic">
+                    <Svg size={16}>
+                      <path d="M21 15v3a3 3 0 0 1-3 3 17 17 0 0 1-15-15 3 3 0 0 1 3-3h3l2 5-2 2a13 13 0 0 0 6 6l2-2 5 2Z"/>
+                    </Svg>
+                  </span>
+                  <span>
+                    <div className="fw-contact-nm">+1 (415) 555-WING</div>
+                    <div className="fw-contact-ds">Toll-free · 24/7</div>
+                  </span>
+                </div>
+                <div className="fw-contact-row">
+                  <span className="fw-contact-ic">
+                    <Svg size={16}>
+                      <rect x="2" y="4" width="20" height="16" rx="2"/>
+                      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                    </Svg>
+                  </span>
+                  <span>
+                    <div className="fw-contact-nm">support@ecowings.com</div>
+                    <div className="fw-contact-ds">Email · replies within 2 h</div>
+                  </span>
+                </div>
+              </div>
+
+            </aside>
+
+            {/* ── MAIN COLUMN ── */}
+            <div className="fw-main">
+
+
+              {/* Chat panel */}
+              <div className="fw-chat">
+
+                {/* Chat header */}
+                <div className="fw-chat-head">
+                  <div className="fw-assistant-av">
+                    <Svg size={18}>
+                      <path d="M12 22c5-3 8-7 8-13a8 8 0 1 0-16 0c0 6 3 10 8 13Z"/>
+                      <path d="M12 22V8"/>
+                    </Svg>
+                  </div>
+                  <div className="fw-chat-meta">
+                    <div className="fw-chat-nm">EcoWings Assistant</div>
+                    <div className="fw-chat-st">
+                      <span className="fw-pulse" />
+                      Always online · Trained on verified support docs
+                    </div>
+                  </div>
+                  <span className="fw-enc-chip">
+                    <Svg size={12} style={{ strokeWidth: 2 }}>
+                      <rect x="4" y="11" width="16" height="10" rx="2"/>
+                      <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+                    </Svg>
+                    Encrypted
+                  </span>
+                </div>
+
+                {/* Messages */}
+                <div className="fw-chat-body" ref={msgsRef}>
+                  {messages.map(msg =>
+                    msg.role === 'user' ? (
+                      <div key={msg.id} className="fw-msg fw-user">
+                        <div className="fw-msg-av">YOU</div>
+                        <div className="fw-bubble">{msg.text}</div>
+                      </div>
+                    ) : (
+                      <div key={msg.id} className="fw-msg fw-bot">
+                        <div className="fw-msg-av">
+                          <Svg size={14}>
+                            <path d="M12 22c5-3 8-7 8-13a8 8 0 1 0-16 0c0 6 3 10 8 13Z"/>
+                            <path d="M12 22V8"/>
+                          </Svg>
+                        </div>
+                        <div className="fw-bubble">
+                          {renderText(msg.text)}
+                          {!msg.done && <span className="fw-cursor" />}
+                        </div>
+                      </div>
+                    )
+                  )}
+                  {loading && (
+                    <div className="fw-msg fw-bot">
+                      <div className="fw-msg-av">
+                        <Svg size={14}>
+                          <path d="M12 22c5-3 8-7 8-13a8 8 0 1 0-16 0c0 6 3 10 8 13Z"/>
+                          <path d="M12 22V8"/>
+                        </Svg>
+                      </div>
+                      <div className="fw-bubble">
+                        <div className="fw-typing">
+                          <span/><span/><span/>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+
+                {/* Composer */}
+                <div className="fw-composer-wrap">
+                  <div className="fw-composer">
+                    <textarea
+                      ref={inputRef}
+                      className="fw-composer-input"
+                      value={input}
+                      onChange={e => setInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Message EcoWings…"
+                      rows={1}
+                      disabled={loading}
+                      maxLength={2000}
+                      onInput={e => {
+                        e.target.style.height = 'auto';
+                        e.target.style.height = Math.min(e.target.scrollHeight, 160) + 'px';
+                      }}
+                    />
+                    <button className="fw-icobtn" title="Attach" type="button">
+                      <Svg size={18}>
+                        <path d="m21 12-9 9a5 5 0 0 1-7-7l9-9a3 3 0 0 1 4 4l-9 9a1 1 0 0 1-2-2l8-8"/>
+                      </Svg>
+                    </button>
+                    <button className="fw-icobtn" title="Voice" type="button">
+                      <Svg size={18}>
+                        <rect x="9" y="3" width="6" height="12" rx="3"/>
+                        <path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>
+                      </Svg>
+                    </button>
+                    <button
+                      className="fw-send-btn"
+                      onClick={() => handleSend()}
+                      disabled={!input.trim() || loading}
+                      title="Send"
+                    >
+                      <Svg size={16} style={{ strokeWidth: 2.2 }}>
+                        <path d="M5 12h14M13 5l7 7-7 7"/>
+                      </Svg>
+                    </button>
+                  </div>
+                  <div className="fw-composer-foot">
+                    <span>EcoWings AI</span>
+                    <span className="fw-dot-sep"/>
+                    <span>Verified flight data</span>
+                    <span className="fw-dot-sep"/>
+                    <span>Human agents 24/7</span>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* ── FAQ accordion ── */}
+              <div className="fw-faq-block" ref={faqRef}>
+                <div className="fw-faq-head">
+                  <div>
+                    <h2>Frequently <em>asked.</em></h2>
+                    <p>Answers our travelers reach for most. Updated weekly.</p>
+                  </div>
+                  <span className="fw-faq-tag">
+                    Showing <b style={{ marginLeft: 4, marginRight: 4 }}>{currentTopic.label}</b> · {currentTopic.count} articles
+                  </span>
+                </div>
+
+                {currentTopic.items.map((item, i) => {
+                  const isOpen = openFaqIndex === i;
+                  const voteKey = `${activeTopic}-${i}`;
+                  return (
+                    <div key={`${activeTopic}-${i}`} className={`fw-qa${isOpen ? ' fw-open' : ''}`}>
+                      <button
+                        className="fw-qa-q"
+                        onClick={() => setOpenFaqIndex(isOpen ? null : i)}
+                      >
+                        <span className="fw-qnum">{String(i + 1).padStart(2, '0')}.</span>
+                        <span className="fw-qttl">{item.q}</span>
+                        <span className="fw-plus">
+                          <Svg size={14} style={{ strokeWidth: 2.2 }}>
+                            <path d="M12 5v14M5 12h14"/>
+                          </Svg>
+                        </span>
+                      </button>
+                      <div
+                        className="fw-qa-a"
+                        style={{ maxHeight: isOpen ? '600px' : '0' }}
+                      >
+                        <div className="fw-qa-a-inner">
+                          <div dangerouslySetInnerHTML={{ __html: item.a }} />
+                          <div className="fw-qa-foot">
+                            <span>Was this helpful?</span>
+                            <button
+                              className={`fw-vote-btn${votes[voteKey] === 'up' ? ' fw-active' : ''}`}
+                              onClick={() => setVotes(prev => ({ ...prev, [voteKey]: 'up' }))}
+                            >
+                              <Svg size={13}>
+                                <path d="M7 10v11M14 4l-1 6h7l-2 9c-.2.7-.8 1-1.5 1H7V10l5-7c.6 0 2 0 2 1Z"/>
+                              </Svg>
+                              Yes
+                            </button>
+                            <button
+                              className={`fw-vote-btn${votes[voteKey] === 'down' ? ' fw-active' : ''}`}
+                              onClick={() => setVotes(prev => ({ ...prev, [voteKey]: 'down' }))}
+                            >
+                              <Svg size={13}>
+                                <path d="M17 14V3M10 20l1-6H4l2-9c.2-.7.8-1 1.5-1H17v10l-5 7c-.6 0-2 0-2-1Z"/>
+                              </Svg>
+                              No
+                            </button>
+                            <span className="fw-qa-reviewed">Last reviewed · April 2026</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* ── Bottom CTA ── */}
+              <div className="fw-cta">
+                <div>
+                  <h3>Couldn't find your <em>answer?</em></h3>
+                  <p>Send us a note. A real human — not a bot — will write back, usually within two hours.</p>
+                </div>
+                <div className="fw-cta-actions">
+                  <button className="fw-cta-btn fw-primary">
+                    Contact support
+                    <Svg size={14} style={{ strokeWidth: 2.2 }}>
+                      <path d="M5 12h14M13 5l7 7-7 7"/>
+                    </Svg>
+                  </button>
+                  <button className="fw-cta-btn fw-ghost">Browse all topics</button>
+                </div>
+              </div>
+
+            </div>{/* end fw-main */}
+          </div>
         </div>
-        <div style={{
-          color: 'var(--text-secondary)',
-          fontSize: '0.78rem',
-          fontFamily: "'Inter', sans-serif",
-        }}>
-          {sub}
-        </div>
+
       </div>
-    </div>
-  );
-}
-
-function UserMessage({ text }) {
-  return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'row-reverse',
-      alignItems: 'flex-start',
-      gap: '12px',
-      animation: 'msgSlideIn 0.28s cubic-bezier(0.34,1.56,0.64,1) both',
-    }}>
-      <div style={{
-        width: '32px', height: '32px',
-        borderRadius: '50%',
-        background: 'rgba(34,197,94,0.18)',
-        flexShrink: 0,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        marginTop: '2px',
-      }}>
-        <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#2f5e42' }}>person</span>
-      </div>
-      <div style={{ textAlign: 'right' }}>
-        <div style={{
-          maxWidth: '380px',
-          background: '#1a4d33',
-          color: '#ffffff',
-          borderRadius: '20px 20px 4px 20px',
-          padding: '14px 18px',
-          fontSize: '0.875rem',
-          lineHeight: 1.6,
-          fontFamily: "'Inter', sans-serif",
-          boxShadow: '0 6px 24px rgba(26,77,51,0.25)',
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-word',
-          textAlign: 'left',
-        }}>
-          {text}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function AiAvatar() {
-  return (
-    <div style={{
-      width: '32px', height: '32px',
-      borderRadius: '50%',
-      background: 'rgba(77,124,95,0.20)',
-      border: '1px solid rgba(77,124,95,0.25)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      color: '#1a4d33',
-      flexShrink: 0,
-      marginTop: '2px',
-    }}>
-      <span className="material-symbols-outlined" style={{ fontSize: '14px', fontVariationSettings: "'FILL' 1" }}>spa</span>
-    </div>
-  );
-}
-
-function AiMessage({ text, done }) {
-  return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'flex-start',
-      gap: '12px',
-      animation: 'msgSlideIn 0.28s cubic-bezier(0.34,1.56,0.64,1) both',
-    }}>
-      <AiAvatar />
-      <div>
-        <div style={{
-          background: '#ffffff',
-          borderRadius: '4px 20px 20px 20px',
-          padding: '14px 18px',
-          fontSize: '0.875rem',
-          lineHeight: 1.7,
-          fontFamily: "'Inter', sans-serif",
-          color: 'var(--text-primary)',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-          border: '1px solid rgba(77,124,95,0.06)',
-          maxWidth: '480px',
-          wordBreak: 'break-word',
-        }}>
-          {renderText(text)}
-          {!done && (
-            <span style={{
-              display: 'inline-block',
-              width: '2px', height: '14px',
-              background: '#1a4d33',
-              marginLeft: '2px',
-              verticalAlign: 'text-bottom',
-              animation: 'cursorBlink 0.9s step-end infinite',
-            }} />
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SendButton({ onClick, disabled }) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        width: '40px', height: '40px',
-        borderRadius: '12px',
-        border: 'none',
-        background: disabled
-          ? 'rgba(77,124,95,0.15)'
-          : hovered
-          ? 'linear-gradient(135deg, #2f5e42, #1a4d33)'
-          : 'linear-gradient(135deg, #1a4d33, #2f5e42)',
-        color: disabled ? 'rgba(77,124,95,0.40)' : '#ffffff',
-        cursor: disabled ? 'not-allowed' : 'pointer',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        flexShrink: 0,
-        transition: 'all 0.18s ease',
-        transform: hovered && !disabled ? 'scale(1.06)' : 'scale(1)',
-        boxShadow: !disabled ? '0 4px 16px rgba(26,77,51,0.30)' : 'none',
-        padding: 0,
-      }}
-    >
-      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>send</span>
-    </button>
-  );
-}
-
-function KnowledgeCard({ icon, title, desc, bullets }) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        padding: '32px',
-        borderRadius: '24px',
-        background: hovered ? 'rgba(77,124,95,0.06)' : 'rgba(77,124,95,0.04)',
-        border: `1px solid ${hovered ? 'rgba(77,124,95,0.15)' : 'transparent'}`,
-        cursor: 'pointer',
-        transition: 'all 0.2s ease',
-      }}
-    >
-      <span className="material-symbols-outlined" style={{
-        fontSize: '32px',
-        color: 'rgba(47,94,66,0.60)',
-        display: 'block',
-        marginBottom: '16px',
-      }}>
-        {icon}
-      </span>
-      <h3 style={{
-        fontSize: '1.1rem',
-        fontWeight: 700,
-        color: '#1a4d33',
-        fontFamily: "'Plus Jakarta Sans', sans-serif",
-        margin: '0 0 10px',
-        letterSpacing: '-0.02em',
-      }}>
-        {title}
-      </h3>
-      <p style={{
-        fontSize: '0.85rem',
-        color: 'var(--text-secondary)',
-        lineHeight: 1.65,
-        margin: '0 0 20px',
-        fontFamily: "'Inter', sans-serif",
-      }}>
-        {desc}
-      </p>
-      <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {bullets.map((b) => (
-          <li key={b} style={{
-            display: 'flex', alignItems: 'center', gap: '8px',
-            fontSize: '0.75rem',
-            fontWeight: 600,
-            color: 'rgba(26,77,51,0.70)',
-            fontFamily: "'Inter', sans-serif",
-          }}>
-            <span style={{
-              width: '5px', height: '5px',
-              borderRadius: '50%',
-              background: '#1a4d33',
-              flexShrink: 0,
-            }} />
-            {b}
-          </li>
-        ))}
-      </ul>
-    </div>
+    </>
   );
 }

@@ -47,10 +47,13 @@ const flightService = {
   /**
    * Uçuşu kaydeder, bilet oluşturur ve Stripe ödeme linki döner — tek istekte.
    * POST /api/Flights/book-and-pay
-   * @param {{ flightNumber, departureAirportCode, destinationAirportCode, departureTime, estimatedArrivalTime, price, airlineCode, userEmail }} data
+   * @param {{ flightNumber, departureAirportCode, destinationAirportCode, departureTime, estimatedArrivalTime, price, airlineCode, userEmail, isDiscounted, discountRate, discountedPrice }} data
    * @returns {{ ticketId: number, paymentUrl: string }}
    */
   bookAndPay: (data) => apiClient.post("/api/Flights/book-and-pay", data),
+
+  getAlternativeTransport: (origin, destination) =>
+    apiClient.get("/api/FlightSearch/alternative", { params: { origin, destination } }),
 };
 
 export default flightService;

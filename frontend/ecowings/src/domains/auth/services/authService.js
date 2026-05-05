@@ -10,6 +10,9 @@ const authService = {
 
   forgotPassword: (email) =>
     apiClient.post("/api/Account/forgot-password", { email }),
+
+  resetPassword: (data) =>
+    apiClient.post("/api/Account/reset-password", data),
 };
 
 export default authService;

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { NavLink, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Plane, Tag, MapPin, Star, X, LogOut, User, HelpCircle, Globe, ChevronDown, Settings } from 'lucide-react';
 
@@ -12,20 +12,6 @@ const drawerLinks = [
     icon: <Plane size={17} />,
     authRequired: false,
   }, */
-  {
-    to: '/campaigns',
-    label: 'Campaigns',
-    desc: 'Exclusive discounts and deals',
-    icon: <Tag size={17} />,
-    authRequired: false,
-  },
-  {
-    to: '/flight-tracker',
-    label: 'Flight Tracker',
-    desc: 'Real-time flight status',
-    icon: <MapPin size={17} />,
-    authRequired: false,
-  },
   {
     to: '/travel-planner',
     label: 'Travel Planner',
@@ -46,7 +32,8 @@ const drawerLinks = [
     desc: 'Share your airline experiences',
     icon: <Star size={17} />,
     authRequired: false,
-  },
+  }
+  
 /*
   {
     to: '/gift-ticket',
@@ -130,9 +117,10 @@ function DrawerItem({ link, index, onClose }) {
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerClosing, setDrawerClosing] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -143,31 +131,16 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const closeDrawer = () => {
-    setDrawerClosing(true);
-    setTimeout(() => {
-      setDrawerOpen(false);
-      setDrawerClosing(false);
-    }, 280);
-  };
-
-  /* ESC key + body scroll lock */
+  /* ESC key */
   useEffect(() => {
-    const onKey = (e) => { if (e.key === 'Escape') closeDrawer(); };
+    const onKey = (e) => { if (e.key === 'Escape') setDrawerOpen(false); };
     if (drawerOpen) {
       document.addEventListener('keydown', onKey);
-      document.body.style.overflow = 'hidden';
     }
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
     };
   }, [drawerOpen]);
-
-  const openDrawer = () => {
-    setDrawerOpen(true);
-    setDrawerClosing(false);
-  };
 
   /* Click-outside closes dropdown */
   useEffect(() => {
@@ -183,27 +156,34 @@ export default function Navbar() {
   const handleLogout = () => {
     logout();
     navigate('/');
-    closeDrawer();
+    setDrawerOpen(false);
   };
 
   const visibleDrawerLinks = drawerLinks.filter(
     (l) => !l.authRequired || isAuthenticated
   );
 
-  const initials = user?.userName
-    ? user.userName.slice(0, 2).toUpperCase()
-    : '??';
+  const displayName = user
+    ? `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.userName || 'Profile'
+    : 'Profile';
+
+  const initials = user
+    ? `${(user.firstName?.[0] || '')}${(user.lastName?.[0] || '')}`.toUpperCase() || (user.userName?.slice(0, 2).toUpperCase() ?? '?')
+    : '?';
 
   const centerLinkStyle = (isActive) => ({
-    padding: '4px 4px 8px',
+    padding: '8px 12px',
     fontSize: '0.875rem',
-    fontFamily: "'Manrope', sans-serif",
-    fontWeight: 500,
-    letterSpacing: '0.04em',
-    color: isActive ? '#003527' : '#404944',
+    fontWeight: 600,
+    color: isAuthPage
+      ? (isActive ? '#ffffff' : 'rgba(255,255,255,0.65)')
+      : (isActive ? '#000000' : '#71717A'),
     textDecoration: 'none',
-    transition: 'color 0.3s ease, transform 0.3s ease',
-    borderBottom: isActive ? '2px solid #003527' : '2px solid transparent',
+    transition: 'color 0.2s ease, background-color 0.2s ease',
+    borderRadius: '6px',
+    backgroundColor: isActive
+      ? (isAuthPage ? 'rgba(255,255,255,0.1)' : '#f4f4f5')
+      : 'transparent',
   });
 
   return (
@@ -214,12 +194,14 @@ export default function Navbar() {
         top: 0,
         width: '100%',
         zIndex: 1000,
-        background: 'rgba(247,249,251,0.82)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(191,201,195,0.18)',
-        boxShadow: scrolled ? '0 12px 40px rgba(25,28,30,0.08)' : '0 12px 40px rgba(25,28,30,0.04)',
-        transition: 'box-shadow 0.3s ease',
+        background: isAuthPage
+          ? (scrolled ? 'rgba(0,0,0,0.55)' : 'rgba(0,0,0,0.25)')
+          : '#ffffff',
+        backdropFilter: isAuthPage ? 'blur(12px)' : 'none',
+        WebkitBackdropFilter: isAuthPage ? 'blur(12px)' : 'none',
+        borderBottom: isAuthPage ? '1px solid rgba(255,255,255,0.08)' : '1px solid #e4e4e7',
+        boxShadow: scrolled && !isAuthPage ? '0 1px 3px rgba(0,0,0,0.05)' : 'none',
+        transition: 'background 0.3s ease, box-shadow 0.2s ease',
       }}>
         <div
           style={{
@@ -228,8 +210,7 @@ export default function Navbar() {
             justifyContent: 'space-between',
             maxWidth: '1280px',
             margin: '0 auto',
-            padding: '0 48px',
-            height: '72px',
+            padding: '10px 32px',
           }}
         >
           {/* ── Left: Logo ─────────────────────────────── */}
@@ -238,85 +219,198 @@ export default function Navbar() {
             style={{
               textDecoration: 'none',
               flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
             }}
           >
+            {/* Siyah kare ikon efekti Shadcn logosuna benzesin diye */}
             <span style={{
-              fontFamily: "'Manrope', sans-serif",
-              fontWeight: 700,
-              fontSize: '1.2rem',
-              color: '#003527',
-              letterSpacing: '-0.04em',
-              textTransform: 'uppercase',
+              fontWeight: 600,
+              fontSize: '1.125rem',
+              color: isAuthPage ? '#ffffff' : '#09090b',
+              letterSpacing: '-0.025em',
             }}>
               EcoWings
             </span>
           </Link>
 
           {/* ── Center: Nav links ────────────── */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '40px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <NavLink
               to="/"
               end
-              className="nav-center-link"
               style={({ isActive }) => centerLinkStyle(isActive)}
+              onMouseEnter={(e) => {
+                if (e.currentTarget.style.backgroundColor === 'transparent') {
+                  e.currentTarget.style.backgroundColor = '#fafafa';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (e.currentTarget.style.backgroundColor === 'rgb(250, 250, 250)') {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }
+              }}
             >
               Home
             </NavLink>
             <NavLink
               to="/about"
               end
-              className="nav-center-link"
               style={({ isActive }) => centerLinkStyle(isActive)}
+              onMouseEnter={(e) => {
+                if (e.currentTarget.style.backgroundColor === 'transparent') {
+                  e.currentTarget.style.backgroundColor = '#fafafa';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (e.currentTarget.style.backgroundColor === 'rgb(250, 250, 250)') {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }
+              }}
             >
               About Us
             </NavLink>
-            <NavLink
-              to="/faq"
-              end
-              className="nav-center-link"
-              style={({ isActive }) => centerLinkStyle(isActive)}
+
+            {/* ── Menu Feature Dropdown ── */}
+            <div
+               style={{ position: 'relative' }}
+               onMouseEnter={() => setDrawerOpen(true)}
+               onMouseLeave={() => setDrawerOpen(false)}
             >
-              SSS
-            </NavLink>
-            <NavLink
-              to="/travel-planner"
-              end
-              className="nav-center-link"
-              style={({ isActive }) => centerLinkStyle(isActive)}
-            >
-              Travel Planner
-            </NavLink>
+              {/* Dropdown Trigger */}
+              <button
+                style={{
+                  ...centerLinkStyle(drawerOpen),
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  background: 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: drawerOpen ? '#09090b' : '#71717A',
+                }}
+              >
+                Features
+                <ChevronDown
+                  size={14}
+                  style={{
+                    transition: 'transform 0.2s',
+                    transform: drawerOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+                  }}
+                />
+              </button>
+
+              {/* Dropdown Content */}
+              {drawerOpen && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: '0',
+                  paddingTop: '8px',
+                  zIndex: 1050,
+                  animation: 'dropdownFadeIn 0.2s ease',
+                }}>
+                  <div style={{
+                    width: '500px',
+                    background: '#ffffff',
+                    border: '1px solid #e4e4e7',
+                    borderRadius: '6px',
+                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                    padding: '16px',
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '8px',
+                  }}>
+                  {visibleDrawerLinks.map((link) => (
+                    <NavLink
+                      key={link.to}
+                      to={link.to}
+                      onClick={() => setDrawerOpen(false)}
+                      style={({ isActive }) => ({
+                        display: 'block',
+                        padding: '12px',
+                        borderRadius: '6px',
+                        textDecoration: 'none',
+                        background: isActive ? '#f4f4f5' : 'transparent',
+                        transition: 'background 0.2s',
+                      })}
+                      onMouseEnter={(e) => {
+                        if (e.currentTarget.style.background === 'transparent') {
+                          e.currentTarget.style.background = '#fafafa';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (e.currentTarget.style.background === 'rgb(250, 250, 250)') {
+                          e.currentTarget.style.background = 'transparent';
+                        }
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '6px',
+                          background: '#f4f4f5',
+                          color: '#09090b',
+                          flexShrink: 0,
+                        }}>
+                          {link.icon || <Plane size={16} />}
+                        </div>
+                        <div>
+                          <div style={{
+                            fontSize: '0.875rem',
+                            fontWeight: 500,
+                            color: '#09090b',
+                            marginBottom: '2px',
+                          }}>
+                            {link.label}
+                          </div>
+                          <div style={{
+                            fontSize: '0.75rem',
+                            color: '#71717A',
+                            lineHeight: 1.4,
+                          }}>
+                            {link.description || 'Explore this feature'}
+                          </div>
+                        </div>
+                      </div>
+                    </NavLink>
+                  ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* ── End Menu Feature Dropdown ── */}
           </div>
 
-          {/* ── Right: badge + logout + hamburger ──────── */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-
+          {/* ── Right: Auth / User Profile ───────────── */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             {/* User dropdown (authenticated) */}
             {isAuthenticated && (
               <div ref={dropdownRef} style={{ position: 'relative' }}>
                 {/* Trigger pill */}
                 <button
+                  className="nav-profile-trigger"
                   onClick={() => setDropdownOpen((prev) => !prev)}
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    background: dropdownOpen ? 'rgba(0,53,39,0.1)' : 'rgba(0,53,39,0.06)',
-                    border: `1px solid ${dropdownOpen ? 'rgba(0,53,39,0.32)' : 'rgba(0,53,39,0.15)'}`,
-                    borderRadius: '100px',
-                    padding: '4px 10px 4px 4px',
+                    background: isAuthPage
+                      ? (dropdownOpen ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.08)')
+                      : (dropdownOpen ? '#f4f4f5' : '#ffffff'),
+                    border: isAuthPage ? '1px solid rgba(255,255,255,0.2)' : '1px solid #e4e4e7',
                     cursor: 'pointer',
-                    transition: 'border-color 0.22s ease, background 0.22s ease',
+                    transition: 'background 0.2s ease',
                     outline: 'none',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(0,53,39,0.32)';
-                    e.currentTarget.style.background = 'rgba(0,53,39,0.1)';
+                    e.currentTarget.style.background = isAuthPage ? 'rgba(255,255,255,0.15)' : '#f4f4f5';
                   }}
                   onMouseLeave={(e) => {
                     if (!dropdownOpen) {
-                      e.currentTarget.style.borderColor = 'rgba(0,53,39,0.15)';
-                      e.currentTarget.style.background = 'rgba(0,53,39,0.06)';
+                      e.currentTarget.style.background = isAuthPage ? 'rgba(255,255,255,0.08)' : '#ffffff';
                     }
                   }}
                 >
@@ -325,40 +419,36 @@ export default function Navbar() {
                     width: '28px',
                     height: '28px',
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                    background: 'linear-gradient(135deg, #1b6d24 0%, #004b0f 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '0.63rem',
+                    fontSize: '0.688rem',
                     fontWeight: 700,
-                    color: '#f0fdf4',
-                    letterSpacing: '0.05em',
-                    fontFamily: "'DM Mono', monospace",
+                    color: '#e5ffdd',
                     flexShrink: 0,
-                    boxShadow: '0 2px 8px rgba(34,197,94,0.3)',
+                    letterSpacing: '0.03em',
                   }}>
                     {initials}
                   </div>
-                  {/* Username */}
+                  {/* Display name */}
                   <span style={{
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                    color: '#003527',
-                    fontFamily: "'Manrope', sans-serif",
-                    letterSpacing: '0.01em',
-                    maxWidth: '90px',
+                    fontSize: '0.875rem',
+                    fontWeight: 500,
+                    color: isAuthPage ? '#ffffff' : '#09090b',
+                    maxWidth: '120px',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
                   }}>
-                    {user?.userName || 'Profile'}
+                    {displayName}
                   </span>
                   {/* Chevron */}
                   <ChevronDown
-                    size={12}
-                    color="#003527"
+                    size={14}
+                    color={isAuthPage ? 'rgba(255,255,255,0.6)' : '#71717a'}
                     style={{
-                      transition: 'transform 0.22s ease',
+                      transition: 'transform 0.2s ease',
                       transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
                       flexShrink: 0,
                     }}
@@ -369,64 +459,57 @@ export default function Navbar() {
                 {dropdownOpen && (
                   <div style={{
                     position: 'absolute',
-                    top: 'calc(100% + 10px)',
+                    top: '100%',
+                    marginTop: '8px',
                     right: 0,
-                    width: '232px',
-                    background: 'rgba(255,255,255,0.96)',
-                    backdropFilter: 'blur(24px)',
-                    WebkitBackdropFilter: 'blur(24px)',
-                    border: '1px solid rgba(0,53,39,0.1)',
-                    borderRadius: '16px',
-                    boxShadow: '0 12px 40px rgba(0,45,28,0.13), 0 2px 8px rgba(0,0,0,0.06)',
+                    width: '220px',
+                    background: '#ffffff',
+                    border: '1px solid #e4e4e7',
+                    borderRadius: '6px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
                     overflow: 'hidden',
                     zIndex: 1100,
-                    animation: 'dropdownFadeIn 0.18s cubic-bezier(0.16,1,0.3,1) both',
                   }}>
                     {/* User info header */}
                     <div style={{
-                      padding: '16px',
-                      background: 'linear-gradient(135deg, rgba(34,197,94,0.06), rgba(0,53,39,0.04))',
-                      borderBottom: '1px solid rgba(0,53,39,0.07)',
+                      padding: '12px 16px',
+                      borderBottom: '1px solid #e4e4e7',
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '11px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <div style={{
-                          width: '40px',
-                          height: '40px',
+                          width: '38px',
+                          height: '38px',
                           borderRadius: '50%',
-                          background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                          background: 'linear-gradient(135deg, #1b6d24 0%, #004b0f 100%)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontSize: '0.72rem',
+                          fontSize: '0.8rem',
                           fontWeight: 700,
-                          color: '#f0fdf4',
-                          letterSpacing: '0.05em',
-                          fontFamily: "'DM Mono', monospace",
+                          color: '#e5ffdd',
                           flexShrink: 0,
-                          boxShadow: '0 4px 12px rgba(34,197,94,0.35)',
+                          letterSpacing: '0.03em',
                         }}>
                           {initials}
                         </div>
                         <div style={{ minWidth: 0 }}>
                           <div style={{
                             fontSize: '0.875rem',
-                            fontWeight: 700,
-                            color: '#002d1c',
-                            fontFamily: "'Manrope', sans-serif",
+                            fontWeight: 600,
+                            color: '#09090b',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
                           }}>
-                            {user?.userName || 'User'}
+                            {displayName}
                           </div>
                           <div style={{
-                            fontSize: '0.7rem',
-                            color: '#6c8274',
-                            marginTop: '2px',
-                            fontFamily: "'Plus Jakarta Sans', sans-serif",
+                            fontSize: '0.72rem',
+                            color: '#71717a',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
+                            marginTop: '1px',
                           }}>
                             {user?.email || 'EcoWings Member'}
                           </div>
@@ -435,38 +518,30 @@ export default function Navbar() {
                     </div>
 
                     {/* Menu items */}
-                    <div style={{ padding: '6px' }}>
+                    <div style={{ padding: '4px' }}>
                       <NavLink
                         to="/profile"
                         onClick={() => setDropdownOpen(false)}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '10px',
-                          padding: '9px 12px',
-                          borderRadius: '10px',
+                          gap: '8px',
+                          padding: '6px 8px',
+                          borderRadius: '4px',
                           textDecoration: 'none',
-                          color: '#003527',
-                          fontSize: '0.845rem',
-                          fontWeight: 500,
-                          fontFamily: "'Manrope', sans-serif",
-                          transition: 'background 0.15s ease',
+                          color: '#09090b',
+                          fontSize: '0.875rem',
+                          transition: 'background 0.2s ease',
                         }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,53,39,0.06)'; }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = '#f4f4f5'; }}
                         onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                       >
-                        <div style={{
-                          width: '30px', height: '30px', borderRadius: '8px',
-                          background: 'rgba(0,53,39,0.07)', display: 'flex',
-                          alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                        }}>
-                          <User size={14} color="#003527" />
-                        </div>
+                        <User size={16} color="#09090b" />
                         View Profile
                       </NavLink>
 
                       {/* Divider */}
-                      <div style={{ height: '1px', background: 'rgba(0,53,39,0.07)', margin: '4px 2px' }} />
+                      <div style={{ height: '1px', background: '#e4e4e7', margin: '4px -4px' }} />
 
                       {/* Sign Out */}
                       <button
@@ -475,29 +550,21 @@ export default function Navbar() {
                           width: '100%',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: '10px',
-                          padding: '9px 12px',
-                          borderRadius: '10px',
+                          gap: '8px',
+                          padding: '6px 8px',
+                          borderRadius: '4px',
                           background: 'transparent',
                           border: 'none',
-                          color: '#dc2626',
-                          fontSize: '0.845rem',
-                          fontWeight: 500,
-                          fontFamily: "'Manrope', sans-serif",
+                          color: '#09090b',
+                          fontSize: '0.875rem',
                           cursor: 'pointer',
                           textAlign: 'left',
-                          transition: 'background 0.15s ease',
+                          transition: 'background 0.2s ease',
                         }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(220,38,38,0.06)'; }}
+                        onMouseEnter={(e) => { e.currentTarget.style.background = '#f4f4f5'; }}
                         onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                       >
-                        <div style={{
-                          width: '30px', height: '30px', borderRadius: '8px',
-                          background: 'rgba(220,38,38,0.07)', display: 'flex',
-                          alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                        }}>
-                          <LogOut size={14} color="#dc2626" />
-                        </div>
+                        <LogOut size={16} color="#09090b" />
                         Sign Out
                       </button>
                     </div>
@@ -508,386 +575,58 @@ export default function Navbar() {
 
             {/* Login / Signup (unauthenticated) */}
             {!isAuthenticated && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                 <Link
                   to="/login"
                   style={{
                     fontSize: '0.875rem',
-                    fontWeight: 500,
-                    color: '#404944',
-                    fontFamily: "'Manrope', sans-serif",
-                    letterSpacing: '0.04em',
+                    fontWeight: 600,
+                    color: isAuthPage ? 'rgba(255,255,255,0.85)' : '#09090b',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    border: isAuthPage ? '1px solid rgba(255,255,255,0.2)' : '1px solid #e4e4e7',
+                    background: isAuthPage ? 'rgba(255,255,255,0.08)' : '#ffffff',
                     textDecoration: 'none',
-                    transition: 'color 0.3s ease, transform 0.3s ease',
+                    transition: 'background 0.2s ease',
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.color = '#003527';
-                    e.currentTarget.style.transform = 'scale(1.05)';
+                    e.currentTarget.style.background = isAuthPage ? 'rgba(255,255,255,0.15)' : '#f4f4f5';
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.color = '#404944';
-                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.background = isAuthPage ? 'rgba(255,255,255,0.08)' : '#ffffff';
                   }}
                 >
-                  Sign In
+                  Sign in
                 </Link>
                 <Link
                   to="/signup"
                   style={{
-                    padding: '10px 24px',
-                    borderRadius: '8px',
-                    fontSize: '0.875rem',
-                    fontWeight: 500,
-                    color: '#ffffff',
-                    background: '#003527',
-                    fontFamily: "'Manrope', sans-serif",
-                    letterSpacing: '0.04em',
-                    textDecoration: 'none',
-                    boxShadow: '0 2px 8px rgba(0,53,39,0.2)',
-                    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'scale(1.05)';
-                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,53,39,0.35)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'scale(1)';
-                    e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,53,39,0.2)';
-                  }}
-                >
-                  Sign Up
-                </Link>
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  fontSize: '0.875rem',
+                  fontWeight: 600,
+                  color: '#ffffff',
+                  WebkitTextFillColor: '#ffffff',
+                  background: 'linear-gradient(135deg, #002d1c 0%, #00452e 100%)',
+                  textDecoration: 'none',
+                  transition: 'opacity 0.2s ease',
+                  border: '1px solid #002d1c',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.opacity = '0.88';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.opacity = '1';
+                }}
+              >
+                Sign Up
+              </Link>
               </div>
             )}
-
-            {/* ── Hamburger ──────────────────────────────── */}
-            <button
-              onClick={() => (drawerOpen ? closeDrawer() : openDrawer())}
-              aria-label={drawerOpen ? 'Close menu' : 'Open menu'}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '5px',
-                width: '40px',
-                height: '40px',
-                background: 'var(--bg-surface)',
-                border: `1px solid ${drawerOpen ? 'rgba(34,197,94,0.45)' : 'var(--border)'}`,
-                borderRadius: '10px',
-                cursor: 'pointer',
-                padding: '0',
-                flexShrink: 0,
-                transition: 'border-color 0.2s ease, background 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                if (!drawerOpen) e.currentTarget.style.borderColor = 'var(--border-hover)';
-              }}
-              onMouseLeave={(e) => {
-                if (!drawerOpen) e.currentTarget.style.borderColor = 'var(--border)';
-              }}
-            >
-              {/* Top line */}
-              <span style={{
-                display: 'block',
-                width: '16px',
-                height: '1.5px',
-                background: drawerOpen ? 'var(--green-primary)' : 'var(--text-secondary)',
-                borderRadius: '2px',
-                transition: 'transform 0.28s cubic-bezier(0.4,0,0.2,1), background 0.2s ease',
-                transform: drawerOpen
-                  ? 'translateY(6.5px) rotate(45deg)'
-                  : 'translateY(0) rotate(0)',
-                transformOrigin: 'center',
-              }} />
-              {/* Mid line */}
-              <span style={{
-                display: 'block',
-                width: '16px',
-                height: '1.5px',
-                background: drawerOpen ? 'var(--green-primary)' : 'var(--text-secondary)',
-                borderRadius: '2px',
-                transition: 'opacity 0.18s ease, background 0.2s ease',
-                opacity: drawerOpen ? 0 : 1,
-              }} />
-              {/* Bottom line */}
-              <span style={{
-                display: 'block',
-                width: '16px',
-                height: '1.5px',
-                background: drawerOpen ? 'var(--green-primary)' : 'var(--text-secondary)',
-                borderRadius: '2px',
-                transition: 'transform 0.28s cubic-bezier(0.4,0,0.2,1), background 0.2s ease',
-                transform: drawerOpen
-                  ? 'translateY(-6.5px) rotate(-45deg)'
-                  : 'translateY(0) rotate(0)',
-                transformOrigin: 'center',
-              }} />
-            </button>
           </div>
         </div>
       </nav>
-
-      {/* ── Overlay ───────────────────────────────────────── */}
-      {drawerOpen && (
-        <div
-          onClick={closeDrawer}
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: 'rgba(0,0,0,0.55)',
-            backdropFilter: 'blur(3px)',
-            WebkitBackdropFilter: 'blur(3px)',
-            zIndex: 998,
-            animation: drawerClosing
-              ? 'overlayFadeIn 0.28s cubic-bezier(0.4,0,0.2,1) reverse'
-              : 'overlayFadeIn 0.28s cubic-bezier(0.4,0,0.2,1) forwards',
-          }}
-        />
-      )}
-
-      {/* ── Drawer ────────────────────────────────────────── */}
-      {drawerOpen && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            right: 0,
-            height: '100vh',
-            width: '320px',
-            background: 'rgba(8,14,8,0.97)',
-            backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)',
-            borderLeft: '1px solid var(--border)',
-            zIndex: 999,
-            display: 'flex',
-            flexDirection: 'column',
-            animation: drawerClosing
-              ? 'drawerSlideIn 0.28s cubic-bezier(0.4,0,0.2,1) reverse'
-              : 'drawerSlideIn 0.28s cubic-bezier(0.4,0,0.2,1) forwards',
-            overflowY: 'auto',
-          }}
-        >
-          {/* Drawer header */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '18px 20px',
-            borderBottom: '1px solid var(--border)',
-            flexShrink: 0,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>🌿</span>
-              <span style={{
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                fontWeight: 700,
-                fontSize: '1rem',
-                color: 'var(--green-primary)',
-              }}>
-                EcoWings Menu
-              </span>
-            </div>
-            <button
-              onClick={closeDrawer}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '32px',
-                height: '32px',
-                background: 'var(--bg-elevated)',
-                border: '1px solid var(--border)',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                color: 'var(--text-muted)',
-                transition: 'color 0.18s ease, border-color 0.18s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.color = 'var(--green-primary)';
-                e.currentTarget.style.borderColor = 'var(--border-hover)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.color = 'var(--text-muted)';
-                e.currentTarget.style.borderColor = 'var(--border)';
-              }}
-            >
-              <X size={15} />
-            </button>
-          </div>
-
-          {/* Drawer nav items */}
-          <div style={{ flex: 1, padding: '10px 12px 0', overflowY: 'auto' }}>
-            <div style={{
-              fontSize: '0.68rem',
-              fontWeight: 700,
-              color: 'var(--text-muted)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              padding: '8px 8px 6px',
-            }}>
-              Pages
-            </div>
-            {visibleDrawerLinks.map((link, i) => (
-              <DrawerItem key={link.to} link={link} index={i} onClose={closeDrawer} />
-            ))}
-          </div>
-
-          {/* Drawer footer */}
-          <div style={{
-            borderTop: '1px solid var(--border)',
-            padding: '16px',
-            flexShrink: 0,
-          }}>
-            {isAuthenticated ? (
-              <>
-                {/* User card */}
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '12px',
-                  background: 'var(--bg-elevated)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '12px',
-                  padding: '12px 14px',
-                  marginBottom: '10px',
-                }}>
-                  <div style={{
-                    width: '38px',
-                    height: '38px',
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #22c55e, #16a34a)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '0.75rem',
-                    fontWeight: 700,
-                    color: '#f0fdf4',
-                    letterSpacing: '0.04em',
-                    fontFamily: "'DM Mono', monospace",
-                    flexShrink: 0,
-                  }}>
-                    {initials}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{
-                      fontSize: '0.875rem',
-                      fontWeight: 700,
-                      color: 'var(--text-primary)',
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}>
-                      {user?.userName || 'User'}
-                    </div>
-                    <div style={{
-                      fontSize: '0.72rem',
-                      color: 'var(--text-muted)',
-                      marginTop: '1px',
-                    }}>
-                      {user?.email || 'EcoWings Member'}
-                    </div>
-                  </div>
-                  <NavLink
-                    to="/profile"
-                    onClick={closeDrawer}
-                    style={{ color: 'var(--text-muted)', transition: 'color 0.18s ease' }}
-                    onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--green-primary)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-muted)'; }}
-                  >
-                    <User size={15} />
-                  </NavLink>
-                </div>
-                {/* Logout */}
-                <button
-                  onClick={handleLogout}
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    background: 'rgba(248,113,113,0.06)',
-                    border: '1px solid rgba(248,113,113,0.2)',
-                    borderRadius: '10px',
-                    padding: '11px',
-                    fontSize: '0.875rem',
-                    fontWeight: 600,
-                    color: '#f87171',
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    cursor: 'pointer',
-                    transition: 'background 0.18s ease, border-color 0.18s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(248,113,113,0.12)';
-                    e.currentTarget.style.borderColor = 'rgba(248,113,113,0.4)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(248,113,113,0.06)';
-                    e.currentTarget.style.borderColor = 'rgba(248,113,113,0.2)';
-                  }}
-                >
-                  <LogOut size={15} />
-                  Sign Out
-                </button>
-              </>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <Link
-                  to="/login"
-                  onClick={closeDrawer}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '11px',
-                    borderRadius: '10px',
-                    fontSize: '0.875rem',
-                    fontWeight: 600,
-                    color: 'var(--text-secondary)',
-                    border: '1px solid var(--border)',
-                    background: 'var(--bg-surface)',
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    textDecoration: 'none',
-                    transition: 'border-color 0.18s ease, color 0.18s ease',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--border-hover)';
-                    e.currentTarget.style.color = 'var(--green-primary)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--border)';
-                    e.currentTarget.style.color = 'var(--text-secondary)';
-                  }}
-                >
-                  Sign In
-                </Link>
-                <Link
-                  to="/signup"
-                  onClick={closeDrawer}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: '11px',
-                    borderRadius: '10px',
-                    fontSize: '0.875rem',
-                    fontWeight: 600,
-                    color: '#ffffff',
-                    background: '#003527',
-                    fontFamily: "'Manrope', sans-serif",
-                    textDecoration: 'none',
-                    boxShadow: '0 2px 16px rgba(0,53,39,0.3)',
-                  }}
-                >
-                  Sign Up
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </>
   );
 }
+

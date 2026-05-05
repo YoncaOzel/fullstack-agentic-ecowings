@@ -21,17 +21,19 @@ export default function AirportSelect({
   onChange,
   placeholder = 'Şehir veya havalimanı',
 }) {
-  const [open, setOpen]           = useState(false);
-  const [query, setQuery]         = useState('');
-  const [focused, setFocused]     = useState(false);
-  const [results, setResults]     = useState([]);
-  const [searching, setSearching] = useState(false);
-  const containerRef              = useRef(null);
-  const inputRef                  = useRef(null);
-  const debounceTimer             = useRef(null);
+  const [open, setOpen]                   = useState(false);
+  const [query, setQuery]                 = useState('');
+  const [focused, setFocused]             = useState(false);
+  const [results, setResults]             = useState([]);
+  const [searching, setSearching]         = useState(false);
+  const [selectedAirport, setSelectedAirport] = useState(null);
+  const containerRef                      = useRef(null);
+  const inputRef                          = useRef(null);
+  const debounceTimer                     = useRef(null);
 
   const selected = airports.find(a => a.code === value)
-    || results.find(a => a.code === value);
+    || results.find(a => a.code === value)
+    || (selectedAirport?.code === value ? selectedAirport : null);
 
   // Dışarı tıklayınca kapat
   useEffect(() => {
@@ -94,7 +96,8 @@ export default function AirportSelect({
   };
 
   const handleSelect = (airport) => {
-    onChange(airport.code);
+    setSelectedAirport(airport);
+    onChange(airport.code, airport);
     setOpen(false);
     setQuery('');
     setResults([]);
@@ -102,6 +105,7 @@ export default function AirportSelect({
 
   const handleClear = (e) => {
     e.stopPropagation();
+    setSelectedAirport(null);
     onChange('');
     setQuery('');
     setResults([]);

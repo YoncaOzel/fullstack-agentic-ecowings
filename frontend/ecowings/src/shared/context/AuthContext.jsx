@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import authService from '../../domains/auth/services/authService';
+import apiClient from '../services/apiClient';
 
 const AuthContext = createContext(null);
 
@@ -9,6 +10,21 @@ export function AuthProvider({ children }) {
   const [refreshToken, setRefreshToken] = useState(null);
   const [roles, setRoles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const fetchAndMergeProfile = async () => {
+    try {
+      const res = await apiClient.get('/api/User/me');
+      if (res.data?.email || res.data?.id) {
+        setUser(prev => {
+          const merged = { ...prev, ...res.data };
+          localStorage.setItem('user', JSON.stringify(merged));
+          return merged;
+        });
+      }
+    } catch {
+      // profil yüklenemedi, mevcut user ile devam et
+    }
+  };
 
   // Sayfa yenilenince localStorage'dan yükle
   useEffect(() => {
@@ -29,6 +45,11 @@ export function AuthProvider({ children }) {
     setIsLoading(false);
   }, []);
 
+  // Token gelince profil detaylarını çek (firstName/lastName için)
+  useEffect(() => {
+    if (jwToken) fetchAndMergeProfile();
+  }, [jwToken]);
+
   const login = async (credentials) => {
     const res = await authService.login(credentials);
     // Backend doğrudan AuthenticationResponse döndürür (succeeded/data sarması yok)
@@ -43,14 +64,23 @@ export function AuthProvider({ children }) {
       setJwToken(data.jwToken);
       setRefreshToken(data.refreshToken || null);
       setRoles(data.roles || []);
-      return { success: true };
+      return { success: true, roles: data.roles || [] };
     }
     return { success: false, message: res.data?.message || 'Giriş başarısız. E-posta veya şifrenizi kontrol edin.', errors: res.data?.errors };
   };
 
   const register = async (formData) => {
-    const res = await authService.register(formData);
-    return res.data;
+    try {
+      const res = await authService.register(formData);
+      return { succeeded: true, message: res.data };
+    } catch (err) {
+      const data = err.response?.data || {};
+      return {
+        succeeded: false,
+        message: data.Message || data.message || 'Registration failed. Please try again.',
+        errors: data.Errors || data.errors || [],
+      };
+    }
   };
 
   const logout = () => {
@@ -63,11 +93,19 @@ export function AuthProvider({ children }) {
     setRoles([]);
   };
 
+  const updateUser = (patch) => {
+    setUser(prev => {
+      const merged = { ...prev, ...patch };
+      localStorage.setItem('user', JSON.stringify(merged));
+      return merged;
+    });
+  };
+
   const isAuthenticated = !!jwToken;
-  const isAdmin = roles.includes('Admin');
+  const isAdmin = roles.some(r => r === 'Admin' || r === 'SuperAdmin');
 
   return (
-    <AuthContext.Provider value={{ user, jwToken, refreshToken, roles, isLoading, isAuthenticated, isAdmin, login, logout, register }}>
+    <AuthContext.Provider value={{ user, jwToken, refreshToken, roles, isLoading, isAuthenticated, isAdmin, login, logout, register, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

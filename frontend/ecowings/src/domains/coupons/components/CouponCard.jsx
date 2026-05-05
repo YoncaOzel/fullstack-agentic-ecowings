@@ -1,10 +1,8 @@
 import { useState } from 'react';
-import { Copy, Check, Tag, Calendar, Users, Percent } from 'lucide-react';
 import { formatDateShort } from '../../../shared/utils/formatDate';
 
-export default function CouponCard({ coupon }) {
+export default function CouponCard({ coupon, variant = 'active' }) {
   const [copied, setCopied] = useState(false);
-  const [hovered, setHovered] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(coupon.code || '');
@@ -13,124 +11,211 @@ export default function CouponCard({ coupon }) {
   };
 
   const isExpired = coupon.expiryDate && new Date(coupon.expiryDate) < new Date();
-  const isActive = coupon.isActive && !isExpired;
+  const isUsed = coupon.isUsed;
+  const isInactive = !coupon.isActive || isExpired || isUsed;
 
   const discountLabel = coupon.discountAmount
-    ? `${coupon.discountAmount} ₺`
+    ? `${coupon.discountAmount} TL`
     : coupon.discountPercentage
-    ? `%${coupon.discountPercentage}`
+    ? `${coupon.discountPercentage}% Off`
     : null;
 
-  return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        position: 'relative',
-        background: '#ffffff',
-        border: `1px solid ${isActive ? 'rgba(34,197,94,0.22)' : 'rgba(239,68,68,0.2)'}`,
-        borderLeft: `4px solid ${isActive ? '#22c55e' : '#ef4444'}`,
-        borderRadius: '14px',
-        padding: '20px',
-        overflow: 'hidden',
-        transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
-        boxShadow: hovered
-          ? `0 10px 28px ${isActive ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.1)'}`
-          : '0 2px 10px rgba(77,124,95,0.07)',
-        transition: 'transform 0.22s,box-shadow 0.22s,border-color 0.22s',
-      }}
-    >
-      {/* Subtle top accent */}
+  const statusLabel = isUsed ? 'USED' : isExpired ? 'EXPIRED' : 'ACTIVE';
+  const expiryFormatted = coupon.expiryDate ? formatDateShort(coupon.expiryDate) : null;
+
+  if (variant === 'used') {
+    return (
       <div style={{
-        position: 'absolute', top: '-30px', right: '-30px', width: '100px', height: '100px',
-        background: isActive ? 'radial-gradient(circle,rgba(34,197,94,0.06) 0%,transparent 70%)' : 'radial-gradient(circle,rgba(239,68,68,0.04) 0%,transparent 70%)',
-        pointerEvents: 'none',
-      }} />
-
-      {/* Discount badge */}
-      {discountLabel && (
-        <div style={{
-          position: 'absolute', top: '14px', right: '14px',
-          background: isActive ? 'linear-gradient(135deg,rgba(34,197,94,0.18),rgba(22,163,74,0.12))' : 'rgba(239,68,68,0.1)',
-          border: `1px solid ${isActive ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.25)'}`,
-          borderRadius: '20px', padding: '3px 10px',
-          fontSize: '11px', fontWeight: 700,
-          color: isActive ? '#4ade80' : '#fca5a5',
-          display: 'flex', alignItems: 'center', gap: '4px',
-        }}>
-          <Percent size={9} />
-          {discountLabel}
-        </div>
-      )}
-
-      {/* Code row */}
-      <div style={{ marginBottom: '16px', marginRight: discountLabel ? '70px' : '0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '5px' }}>
-          <Tag size={11} style={{ color: '#22c55e' }} />
-          <span style={{ fontSize: '10px', fontWeight: 700, color: '#16a34a', letterSpacing: '0.6px', textTransform: 'uppercase' }}>Kupon Kodu</span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        padding: '24px',
+        background: '#f1f4f6',
+        borderRadius: '12px',
+        opacity: 0.6,
+        filter: 'grayscale(0.5)',
+        transition: 'all 0.3s ease',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+          <TicketIcon />
           <span style={{
-            fontSize: '1.25rem', fontWeight: 800, letterSpacing: '3px',
-            color: isActive ? '#166534' : '#9ca3af',
-            fontFamily: "'DM Mono',monospace",
+            fontSize: '10px',
+            fontWeight: 700,
+            color: '#586064',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            fontFamily: "'DM Sans', sans-serif",
           }}>
-            {coupon.code}
+            {statusLabel}
           </span>
+        </div>
+        <h4 style={{
+          fontSize: '15px',
+          fontWeight: 500,
+          color: '#2b3437',
+          margin: '0 0 6px',
+          fontFamily: "'DM Sans', sans-serif",
+        }}>
+          {coupon.name || coupon.code}
+        </h4>
+        {expiryFormatted && (
+          <p style={{
+            fontSize: '10px',
+            color: '#737c7f',
+            margin: 0,
+            fontFamily: "'DM Sans', sans-serif",
+          }}>
+            Expires: {expiryFormatted}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="coupon-card-active" style={{
+      background: '#f1f4f6',
+      borderRadius: '12px',
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column',
+      boxShadow: '0 10px 40px rgba(43,52,55,0.04)',
+      transition: 'box-shadow 0.5s ease',
+    }}
+      onMouseEnter={e => e.currentTarget.style.boxShadow = '0 20px 60px rgba(43,52,55,0.08)'}
+      onMouseLeave={e => e.currentTarget.style.boxShadow = '0 10px 40px rgba(43,52,55,0.04)'}
+    >
+      <style>{`
+        .coupon-card-active:hover .coupon-thumb { transform: scale(1.05); }
+      `}</style>
+
+      {/* Thumbnail strip */}
+      <div style={{ height: '140px', overflow: 'hidden', background: '#dbe4e7', position: 'relative', flexShrink: 0 }}>
+        <div
+          className="coupon-thumb"
+          style={{
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(135deg, #1b6d24 0%, #076019 60%, #004b0f 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'transform 0.7s ease',
+          }}
+        >
+          <LargeTicketIcon />
+        </div>
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(27,109,36,0.08)',
+          mixBlendMode: 'multiply',
+        }} />
+      </div>
+
+      {/* Body */}
+      <div style={{
+        flexGrow: 1,
+        padding: '28px',
+        background: '#ffffff',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+      }}>
+        <div style={{ marginBottom: '24px' }}>
+          {discountLabel && (
+            <span style={{
+              display: 'block',
+              fontWeight: 700,
+              fontSize: '26px',
+              letterSpacing: '-0.04em',
+              color: '#1b6d24',
+              fontFamily: "'DM Sans', sans-serif",
+              marginBottom: '6px',
+            }}>
+              {discountLabel}
+            </span>
+          )}
+          <h3 style={{
+            fontSize: '17px',
+            fontWeight: 500,
+            color: '#2b3437',
+            margin: '0 0 8px',
+            lineHeight: 1.35,
+            fontFamily: "'DM Sans', sans-serif",
+          }}>
+            {coupon.name || 'Special Coupon'}
+          </h3>
+          {coupon.description && (
+            <p style={{
+              fontSize: '12px',
+              color: '#586064',
+              lineHeight: 1.6,
+              margin: 0,
+              fontFamily: "'DM Sans', sans-serif",
+              opacity: 0.8,
+            }}>
+              {coupon.description}
+            </p>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+          <div style={{
+            background: '#f1f4f6',
+            padding: '8px 16px',
+            borderRadius: '8px',
+          }}>
+            <span style={{
+              fontFamily: 'monospace',
+              fontSize: '12px',
+              letterSpacing: '0.12em',
+              fontWeight: 700,
+              color: '#2b3437',
+            }}>
+              {coupon.code}
+            </span>
+          </div>
           <button
             onClick={handleCopy}
-            title="Kopyala"
             style={{
-              display: 'inline-flex', alignItems: 'center', gap: '5px',
-              padding: '5px 11px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-              background: copied ? 'rgba(34,197,94,0.12)' : '#f3f4f6',
-              color: copied ? '#166534' : '#374151',
-              fontSize: '11px', fontWeight: 700,
-              transition: 'all 0.2s',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              color: '#1b6d24',
+              fontFamily: "'DM Sans', sans-serif",
+              padding: '4px 0',
+              textDecoration: copied ? 'underline' : 'none',
+              textUnderlineOffset: '4px',
+              transition: 'text-decoration 0.2s',
+              whiteSpace: 'nowrap',
             }}
+            onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
+            onMouseLeave={e => { if (!copied) e.currentTarget.style.textDecoration = 'none'; }}
           >
-            {copied ? <><Check size={11} /> Kopyalandı</> : <><Copy size={11} /> Kopyala</>}
+            {copied ? 'COPIED' : 'COPY'}
           </button>
         </div>
       </div>
-
-      {/* Info grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '14px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Users size={12} style={{ color: 'rgba(34,197,94,0.5)', flexShrink: 0 }} />
-          <div>
-            <div style={{ fontSize: '9px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Limit</div>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: '#1c2b22' }}>{coupon.usageLimit ?? 'Sınırsız'}</div>
-          </div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <Calendar size={12} style={{ color: 'rgba(34,197,94,0.5)', flexShrink: 0 }} />
-          <div>
-            <div style={{ fontSize: '9px', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Son Kullanım</div>
-            <div style={{ fontSize: '13px', fontWeight: 600, color: isExpired ? '#dc2626' : '#1c2b22' }}>
-              {coupon.expiryDate ? formatDateShort(coupon.expiryDate) : 'Süresiz'}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Status chip */}
-      <div style={{
-        display: 'inline-flex', alignItems: 'center', gap: '5px',
-        padding: '4px 10px', borderRadius: '20px',
-        background: isActive ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.08)',
-        border: `1px solid ${isActive ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)'}`,
-      }}>
-        <span style={{
-          width: '6px', height: '6px', borderRadius: '50%',
-          background: isActive ? '#22c55e' : '#ef4444',
-          display: 'inline-block',
-          boxShadow: isActive ? '0 0 5px rgba(34,197,94,0.6)' : 'none',
-        }} />
-        <span style={{ fontSize: '11px', fontWeight: 700, color: isActive ? '#166534' : '#dc2626' }}>
-          {isActive ? 'Aktif' : 'Süresi Dolmuş'}
-        </span>
-      </div>
     </div>
+  );
+}
+
+function TicketIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#737c7f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/>
+      <line x1="9" y1="9" x2="9" y2="15"/>
+    </svg>
+  );
+}
+
+function LargeTicketIcon() {
+  return (
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2z"/>
+      <line x1="9" y1="9" x2="9" y2="15"/>
+    </svg>
   );
 }

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Tag, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, CheckCircle2, ShieldCheck, TicketPercent, Sparkles } from 'lucide-react';
 import { useAuth } from '../../../shared/context/AuthContext';
 import couponService from '../services/couponService';
 import CouponCard from '../components/CouponCard';
+import CampaignsHero from '../components/CampaignsHero';
 import LoadingSpinner from '../../../shared/components/LoadingSpinner';
 import ErrorMessage from '../../../shared/components/ErrorMessage';
 
@@ -33,141 +34,106 @@ export default function CampaignsPage() {
   }, [isAuthenticated]);
 
   return (
-    <main style={{ minHeight: 'calc(100vh - 64px)', background: 'var(--bg-base)' }}>
+    <main className="min-h-[calc(100vh-64px)] bg-(--bg-base)">
+      <CampaignsHero isAuthenticated={isAuthenticated} />
 
-      {/* ══ Hero ══ */}
-      <section style={{
-        background: 'linear-gradient(135deg,#080e08 0%,#0d1f0d 40%,#0a1a12 100%)',
-        padding: '72px 0 64px',
-        position: 'relative', overflow: 'hidden',
-      }}>
-        <div style={{ position: 'absolute', top: '-60px', left: '50%', transform: 'translateX(-50%)', width: '800px', height: '420px', background: 'radial-gradient(ellipse,rgba(34,197,94,0.16) 0%,transparent 70%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: '-60px', right: '5%', width: '350px', height: '280px', background: 'radial-gradient(ellipse,rgba(34,197,94,0.07) 0%,transparent 70%)', pointerEvents: 'none' }} />
-
-        <div className="container" style={{ position: 'relative' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: '20px', padding: '5px 16px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '20px' }}>
-            <Tag size={11} /> Özel Fırsatlar
-          </div>
-
-          <h1 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", lineHeight: 1.15, margin: '0 0 16px', color: '#1a4d33' }}>
-            Kampanyalar & Kuponlar
-          </h1>
-          <p style={{ color: 'rgba(187,247,208,0.75)', fontSize: '1.05rem', maxWidth: '500px' }}>
-            {isAuthenticated ? 'Mevcut kuponlarınız ve size özel kampanyalar' : 'EcoWings üyeleri için özel indirimler ve fırsatlar'}
-          </p>
-        </div>
-      </section>
-
-      {/* ══ Content ══ */}
-      <div style={{ padding: '60px 0 80px', background: 'var(--bg-base)' }}>
+      <section id="campaigns-content" className="py-16 lg:py-24 bg-[radial-gradient(circle_at_top,rgba(77,124,95,0.08)_0%,transparent_45%)]">
         <div className="container">
-
-          {/* Not authenticated — teaser view */}
           {!isAuthenticated && (
             <>
-              {/* Section header */}
-              <div style={{ marginBottom: '40px', textAlign: 'center' }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: '14px' }}>
-                  🏷️ Üyelere Özel
+              <header className="mx-auto max-w-2xl text-center mb-10 lg:mb-14">
+                <div className="inline-flex items-center gap-2 rounded-full border border-green-300/45 bg-green-100/60 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-green-800">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Members-only perks
                 </div>
-                <h2 style={{ fontSize: '2rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", margin: '0 0 10px', color: '#1a4d33' }}>
-                  Özel Kampanyalar Sizi Bekliyor
+                <h2 className="mt-4 text-3xl md:text-5xl font-extrabold tracking-tight text-(--text-primary)">
+                  Campaign Drops Built for Frequent Flyers
                 </h2>
-                <p style={{ color: '#6b7280', fontSize: '0.95rem', maxWidth: '480px', margin: '0 auto 12px', lineHeight: 1.6 }}>
-                  EcoWings üyesi olun, kişisel kuponlarınıza ve sürdürülebilir seyahat fırsatlarına göz atın.
+                <p className="mt-4 text-base md:text-lg leading-relaxed text-(--text-muted)">
+                  Join EcoWings to unlock personalized coupon access and exclusive discounts designed for conscious travelers.
                 </p>
-                <div style={{ height: '1px', background: 'linear-gradient(90deg,transparent 0%,rgba(34,197,94,0.3) 50%,transparent 100%)', marginTop: '24px' }} />
-              </div>
+              </header>
 
-              {/* Promo cards */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: '20px', marginBottom: '48px' }}>
-                {PROMOS.map((p, i) => (
-                  <div
-                    key={p.title}
-                    style={{
-                      background: 'var(--bg-card)',
-                      border: '1px solid rgba(34,197,94,0.13)',
-                      borderRadius: '18px',
-                      padding: '28px 22px 24px',
-                      position: 'relative', overflow: 'hidden',
-                      transition: 'transform 0.2s,box-shadow 0.2s,border-color 0.2s',
-                      boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-                      animationDelay: `${i * 80}ms`,
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 16px 44px rgba(34,197,94,0.12),0 4px 12px rgba(0,0,0,0.08)'; e.currentTarget.style.borderColor = 'rgba(34,197,94,0.3)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.06)'; e.currentTarget.style.borderColor = 'rgba(34,197,94,0.13)'; }}
+              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4 mb-12">
+                {PROMOS.map((promo) => (
+                  <article
+                    key={promo.title}
+                    className="group relative overflow-hidden rounded-3xl border border-green-700/10 bg-white p-6 shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all duration-300 hover:-translate-y-1.5 hover:border-green-500/30 hover:shadow-[0_20px_45px_rgba(34,197,94,0.16)]"
                   >
-                    {/* Glow blob */}
-                    <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '120px', height: '120px', background: 'radial-gradient(ellipse,rgba(34,197,94,0.08) 0%,transparent 70%)', pointerEvents: 'none' }} />
-
-                    {/* Discount badge */}
-                    <div style={{ position: 'absolute', top: '14px', right: '14px', background: 'linear-gradient(135deg,#22c55e,#16a34a)', borderRadius: '20px', padding: '3px 10px', fontSize: '0.62rem', fontWeight: 800, color: '#080e08', letterSpacing: '0.04em' }}>
-                      {p.badge}
+                    <div className="pointer-events-none absolute -top-10 -right-10 h-24 w-24 rounded-full bg-[radial-gradient(circle,rgba(34,197,94,0.16)_0%,transparent_72%)]" />
+                    <span className="absolute right-4 top-4 rounded-full bg-linear-to-r from-green-500 to-green-600 px-3 py-1 text-[0.68rem] font-bold tracking-wide text-[#06210f]">
+                      {promo.badge}
+                    </span>
+                    <div className="text-4xl mb-4">{promo.icon}</div>
+                    <h3 className="text-lg font-bold text-(--text-primary)">{promo.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-(--text-muted)">{promo.desc}</p>
+                    <div className="mt-5 inline-flex items-center gap-1.5 rounded-full border border-green-500/20 bg-green-50 px-3 py-1 text-xs font-semibold text-green-700">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      Members benefit
                     </div>
-
-                    <div style={{ fontSize: '2.4rem', marginBottom: '14px' }}>{p.icon}</div>
-                    <h3 style={{ fontSize: '0.98rem', fontWeight: 700, color: '#1a4d33', marginBottom: '8px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>{p.title}</h3>
-                    <p style={{ fontSize: '0.83rem', color: '#6b7280', lineHeight: 1.6, margin: 0 }}>{p.desc}</p>
-
-                    {/* Bottom tag */}
-                    <div style={{ marginTop: '16px', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.72rem', color: '#22c55e', fontWeight: 600 }}>
-                      <CheckCircle2 size={11} /> Üyelere özel
-                    </div>
-                  </div>
+                  </article>
                 ))}
               </div>
 
-              {/* CTA */}
-              <div style={{
-                background: 'linear-gradient(160deg,rgba(34,197,94,0.07) 0%,rgba(34,197,94,0.02) 100%)',
-                border: '1px solid rgba(34,197,94,0.18)',
-                borderRadius: '20px', padding: '40px 32px', textAlign: 'center',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-              }}>
-                <div style={{ fontSize: '2.8rem', marginBottom: '12px' }}>🎫</div>
-                <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1a4d33', marginBottom: '10px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
-                  Kişisel Kuponlarınıza Erişin
-                </h3>
-                <p style={{ color: '#6b7280', fontSize: '0.9rem', lineHeight: 1.6, marginBottom: '28px', maxWidth: '420px', margin: '0 auto 28px' }}>
-                  Giriş yaparak mevcut indirim kuponlarınızı görebilir ve uçuş rezervasyonlarınızda kullanabilirsiniz.
-                </p>
-                <Link
-                  to="/login"
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 36px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg,#22c55e 0%,#16a34a 100%)', color: '#080e08', fontWeight: 700, fontSize: '15px', textDecoration: 'none', boxShadow: '0 4px 20px rgba(34,197,94,0.3)', transition: 'all 0.2s' }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 30px rgba(34,197,94,0.45)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(34,197,94,0.3)'; }}
-                >
-                  Giriş Yap ve Kuponlarını Gör <ArrowRight size={15} />
-                </Link>
+              <div className="relative overflow-hidden rounded-3xl border border-green-500/20 bg-[linear-gradient(160deg,rgba(34,197,94,0.10)_0%,rgba(255,255,255,0.7)_60%,rgba(34,197,94,0.05)_100%)] p-8 md:p-10 shadow-[0_18px_50px_rgba(0,0,0,0.15)]">
+                <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full bg-[radial-gradient(circle,rgba(34,197,94,0.20)_0%,transparent_68%)]" />
+                <div className="grid gap-8 md:grid-cols-[1.2fr_0.8fr] items-center">
+                  <div>
+                    <div className="inline-flex items-center gap-2 rounded-full border border-green-500/25 bg-white/75 px-4 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-green-700">
+                      <TicketPercent className="h-3.5 w-3.5" />
+                      Unlock your codes
+                    </div>
+                    <h3 className="mt-4 text-2xl md:text-3xl font-extrabold text-(--text-primary)">
+                      Access Personal Coupon Wallet
+                    </h3>
+                    <p className="mt-3 text-(--text-secondary) leading-relaxed max-w-xl">
+                      Sign in to view your active discount codes and apply them directly during flight checkout.
+                    </p>
+                  </div>
+                  <div className="justify-self-start md:justify-self-end">
+                    <Link
+                      to="/login"
+                      className="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-green-500 to-green-600 px-6 py-3.5 text-sm font-bold tracking-wide text-[#07210f] shadow-[0_10px_26px_rgba(34,197,94,0.36)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(34,197,94,0.42)]"
+                    >
+                      Sign in and view coupons <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </div>
+                </div>
               </div>
             </>
           )}
 
-          {/* Authenticated — coupon list */}
           {isAuthenticated && (
             <>
               {loading ? <LoadingSpinner /> : error ? <ErrorMessage message={error} /> : (
                 <>
                   {coupons.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '80px 20px', background: 'rgba(34,197,94,0.03)', border: '1px solid rgba(34,197,94,0.1)', borderRadius: '20px' }}>
-                      <div style={{ fontSize: '3.5rem', marginBottom: '16px' }}>🎫</div>
-                      <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1a4d33', marginBottom: '8px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Kuponunuz Bulunmuyor</h3>
-                      <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>Şu an aktif kuponunuz yok. Uçuşlarınız için kampanyaları takip edin.</p>
+                    <div className="mx-auto max-w-3xl rounded-3xl border border-green-500/20 bg-white/85 p-10 text-center shadow-[0_12px_36px_rgba(0,0,0,0.08)]">
+                      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-green-100 text-green-700">
+                        <TicketPercent className="h-7 w-7" />
+                      </div>
+                      <h3 className="text-2xl font-extrabold text-(--text-primary)">No Active Coupons Yet</h3>
+                      <p className="mt-2 text-(--text-muted) leading-relaxed">
+                        You currently have no active coupons. Keep an eye on this page for upcoming campaign drops.
+                      </p>
                     </div>
                   ) : (
                     <>
-                      {/* Section header */}
-                      <div style={{ marginBottom: '32px' }}>
-                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: '14px' }}>
-                          ✦ Mevcut Kuponlar
+                      <header className="mb-8 md:mb-10">
+                        <div className="inline-flex items-center gap-2 rounded-full border border-green-300/40 bg-green-100/50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.13em] text-green-800">
+                          <ShieldCheck className="h-3.5 w-3.5" />
+                          Your active deals
                         </div>
-                        <h2 style={{ fontSize: '1.8rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", margin: 0, color: '#1a4d33' }}>
-                          {coupons.length} Kupon Mevcut
+                        <h2 className="mt-4 text-3xl md:text-4xl font-extrabold text-(--text-primary)">
+                          {coupons.length} Coupons Available
                         </h2>
-                        <div style={{ marginTop: '16px', height: '1px', background: 'linear-gradient(90deg,rgba(34,197,94,0.4) 0%,rgba(34,197,94,0.1) 60%,transparent 100%)' }} />
-                      </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '22px' }}>
-                        {coupons.map((c) => <CouponCard key={c.id} coupon={c} />)}
+                        <p className="mt-2 text-(--text-muted) max-w-2xl">
+                          Copy and use your coupon code during checkout to reduce your trip cost instantly.
+                        </p>
+                      </header>
+
+                      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+                        {coupons.map((coupon) => <CouponCard key={coupon.id} coupon={coupon} />)}
                       </div>
                     </>
                   )}
@@ -176,7 +142,7 @@ export default function CampaignsPage() {
             </>
           )}
         </div>
-      </div>
+      </section>
     </main>
   );
 }

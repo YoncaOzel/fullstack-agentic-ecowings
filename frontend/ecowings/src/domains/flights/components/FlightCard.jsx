@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
 import { useState } from 'react';
-import { Plane, Clock, ShoppingCart } from 'lucide-react';
+import { Plane, Clock, ShoppingCart, Leaf } from 'lucide-react';
+import EcoCheckButton from './EcoCheckButton';
 
 /** Saat farkından süre hesaplar → "1s 25d" */
 function calcDuration(dep, arr) {
@@ -136,7 +137,7 @@ export default function FlightCard({ flight }) {
             border: '1px solid rgba(74,222,128,0.2)',
             borderRadius: '20px', padding: '2px 9px', fontSize: '0.66rem', fontWeight: 700,
           }}>
-            <Plane size={9} />Direkt
+            <Plane size={9} />Direct
           </div>
         </div>
 
@@ -153,6 +154,33 @@ export default function FlightCard({ flight }) {
 
       </div>
 
+      {/* ── Emission + Eco comparison ── */}
+      {flight.carbonEmission != null && (
+        <div style={{
+          alignSelf: 'center', padding: '0 18px', flexShrink: 0,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px',
+          borderLeft: '1px dashed rgba(34,197,94,0.18)',
+          borderRight: '1px dashed rgba(34,197,94,0.18)',
+        }}>
+          <div style={{
+            display: 'inline-flex', alignItems: 'center', gap: '4px',
+            background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.22)',
+            borderRadius: '999px', padding: '5px 11px',
+            fontSize: '0.67rem', fontWeight: 700, color: '#4ade80',
+            textTransform: 'uppercase', letterSpacing: '0.07em', whiteSpace: 'nowrap',
+          }}>
+            <Leaf size={9} />
+            {flight.carbonEmission.toFixed(1)} kg CO₂
+          </div>
+          <EcoCheckButton
+            origin={dep.code}
+            destination={arr.code}
+            carbonEmissionKg={flight.carbonEmission}
+            theme="dark"
+          />
+        </div>
+      )}
+
       {/* ── Price + Buy ── */}
       <div style={{
         padding: '20px 26px', flexShrink: 0,
@@ -163,7 +191,7 @@ export default function FlightCard({ flight }) {
       }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '0.62rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#6b7280', fontWeight: 600, marginBottom: '4px' }}>
-            Fiyat
+            Price
           </div>
           <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#22c55e', lineHeight: 1, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             {price != null
@@ -189,7 +217,7 @@ export default function FlightCard({ flight }) {
             onMouseLeave={e => { e.currentTarget.style.filter = 'brightness(1)'; }}
           >
             <ShoppingCart size={13} />
-            SATIN AL
+            BUY
           </button>
       </div>
     </div>

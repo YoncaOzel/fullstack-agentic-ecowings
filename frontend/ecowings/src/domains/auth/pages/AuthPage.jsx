@@ -1,231 +1,56 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
 import LoginForm from '../components/LoginForm';
 import SignupForm from '../components/SignupForm';
-import { Leaf, Shield, Zap, Plane, CheckCircle2 } from 'lucide-react';
+import ForgotPasswordForm from '../components/ForgotPasswordForm';
+import ResetPasswordForm from '../components/ResetPasswordForm';
 
-// ── Static data ─────────────────────────────────────────────
-const loginFeatures = [
-  { icon: <Plane size={15} />, text: '300+ havalimanına erişim' },
-  { icon: <Leaf size={15} />, text: 'Karbon offset ve yeşil rotalar' },
-  { icon: <Zap size={15} />, text: 'Gerçek zamanlı uçuş takibi' },
-  { icon: <Shield size={15} />, text: 'Şeffaf fiyatlandırma' },
-];
-
-const signupBenefits = [
-  'Karbon ayak izinizi anlık takip edin',
-  'Yeşil sertifikalı havayollarıyla uçun',
-  'Her rezervasyonda ağaç dikme desteği',
-  'Kişiselleştirilmiş eko seyahat önerileri',
-];
-
-const EASING = 'cubic-bezier(0.65, 0, 0.35, 1)';
-const DURATION = '0.65s';
-const BRAND_W = 42; // percent
-
-// ── Shared ambient glow blobs ──────────────────────────────
-function GlowBlobs() {
-  return (
-    <>
-      <div style={{
-        position: 'absolute', bottom: '-120px', right: '-80px',
-        width: '400px', height: '400px', pointerEvents: 'none',
-        background: 'radial-gradient(circle, rgba(77,124,95,0.18) 0%, transparent 70%)',
-      }} />
-      <div style={{
-        position: 'absolute', top: '-60px', left: '-60px',
-        width: '280px', height: '280px', pointerEvents: 'none',
-        background: 'radial-gradient(circle, rgba(77,124,95,0.12) 0%, transparent 70%)',
-      }} />
-    </>
-  );
-}
-
-// ── Brand panel content: login ─────────────────────────────
-function LoginBrand() {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', position: 'relative', zIndex: 1 }}>
-      <GlowBlobs />
-
-      <div style={{ position: 'relative' }}>
-        <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', textDecoration: 'none', marginBottom: '44px' }}>
-          <span style={{ fontSize: '1.8rem' }}>🌿</span>
-          <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--green-primary)',
-            fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '-0.02em' }}>EcoWings</span>
-        </Link>
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: '6px',
-          background: 'var(--green-glow)', border: '1px solid rgba(34,197,94,0.2)',
-          borderRadius: '100px', padding: '4px 12px',
-          fontSize: '0.72rem', color: 'var(--green-primary)', fontWeight: 700,
-          letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '20px',
-        }}>
-          <Leaf size={11} /> Hoş geldiniz
-        </div>
-        <h2 style={{
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
-          fontSize: 'clamp(1.5rem, 2.2vw, 2.1rem)', fontWeight: 800,
-          letterSpacing: '-0.04em', color: 'var(--text-primary)', lineHeight: 1.15, marginBottom: '14px',
-        }}>
-          Yeşil seyahatin<br />
-          <span style={{ color: 'var(--green-primary)' }}>akıllı platformu</span>
-        </h2>
-        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: 1.7, maxWidth: '300px' }}>
-          EcoWings hesabınıza giriş yapın ve sürdürülebilir seyahat dünyasını keşfedin.
-        </p>
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '13px', position: 'relative' }}>
-        {loginFeatures.map((f) => (
-          <div key={f.text} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{
-              width: '32px', height: '32px', borderRadius: '8px', flexShrink: 0,
-              background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--green-primary)',
-            }}>{f.icon}</div>
-            <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', fontFamily: "'Inter', sans-serif" }}>{f.text}</span>
-          </div>
-        ))}
-      </div>
-
-      <div style={{ display: 'flex', gap: '32px', position: 'relative' }}>
-        {[['2M+', 'Yolcu'], ['50+', 'Havayolu'], ['120K t', 'CO₂ tasarrufu']].map(([v, l]) => (
-          <div key={l}>
-            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: 'var(--green-primary)',
-              fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '-0.03em' }}>{v}</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>{l}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ── Brand panel content: signup ────────────────────────────
-function SignupBrand() {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%', position: 'relative', zIndex: 1 }}>
-      <GlowBlobs />
-
-      <div style={{ position: 'relative' }}>
-        <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', textDecoration: 'none', marginBottom: '44px' }}>
-          <span style={{ fontSize: '1.8rem' }}>🌿</span>
-          <span style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--green-primary)',
-            fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '-0.02em' }}>EcoWings</span>
-        </Link>
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: '6px',
-          background: 'var(--green-glow)', border: '1px solid rgba(34,197,94,0.2)',
-          borderRadius: '100px', padding: '4px 12px',
-          fontSize: '0.72rem', color: 'var(--green-primary)', fontWeight: 700,
-          letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '20px',
-        }}>
-          <Leaf size={11} /> Ücretsiz katıl
-        </div>
-        <h2 style={{
-          fontFamily: "'Plus Jakarta Sans', sans-serif",
-          fontSize: 'clamp(1.5rem, 2.2vw, 2.1rem)', fontWeight: 800,
-          letterSpacing: '-0.04em', color: 'var(--text-primary)', lineHeight: 1.15, marginBottom: '14px',
-        }}>
-          Daha bilinçli bir<br />
-          <span style={{ color: 'var(--green-primary)' }}>seyahat deneyimi</span>
-        </h2>
-        <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: 1.7, maxWidth: '300px' }}>
-          EcoWings'e katılın — sürdürülebilir uçuşları takip edin, karbon dengenizi gözetin.
-        </p>
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '13px', position: 'relative' }}>
-        {signupBenefits.map((b) => (
-          <div key={b} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-            <CheckCircle2 size={17} style={{ color: 'var(--green-primary)', flexShrink: 0, marginTop: '1px' }} />
-            <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)',
-              fontFamily: "'Inter', sans-serif", lineHeight: 1.5 }}>{b}</span>
-          </div>
-        ))}
-      </div>
-
-      <div style={{
-        background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.15)',
-        borderRadius: '14px', padding: '18px 20px', position: 'relative',
-      }}>
-        <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', fontStyle: 'italic',
-          lineHeight: 1.6, marginBottom: '12px' }}>
-          "EcoWings sayesinde seyahat ederken daha iyi hissediyorum — gezilerim hem daha ucuz hem de daha yeşil oldu."
-        </p>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            width: '32px', height: '32px', borderRadius: '50%',
-            background: 'linear-gradient(135deg, var(--green-primary), var(--green-secondary))',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '0.9rem', fontWeight: 700, color: '#fff',
-          }}>A</div>
-          <div>
-            <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)' }}>Ayşe K.</div>
-            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>EcoWings kullanıcısı</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Main AuthPage ──────────────────────────────────────────
 export default function AuthPage() {
   const { login, register } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const isLogin = location.pathname === '/login';
+
+  const view =
+    location.pathname === '/login' ? 'login'
+    : location.pathname === '/signup' ? 'signup'
+    : location.pathname === '/forgot-password' ? 'forgot'
+    : 'reset';
+
+  const isLogin = view === 'login';
 
   const [loginLoading, setLoginLoading] = useState(false);
   const [signupLoading, setSignupLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [countdown, setCountdown] = useState(3);
 
-  // Desktop detection for conditional positioning
-  const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 768);
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 768px)');
-    const handler = (e) => setIsDesktop(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
-  }, []);
-
-  // ── Login handler ──────────────────────────────────────
   const handleLogin = async (credentials) => {
     setLoginLoading(true);
     try {
       const result = await login(credentials);
-      if (result.success) { navigate('/'); return { success: true }; }
+      if (result.success) {
+        navigate('/');
+        return { success: true };
+      }
       return result;
     } catch {
-      return { success: false, message: 'Bir hata oluştu. Lütfen tekrar deneyin.' };
+      return { success: false, message: 'Something went wrong. Please try again.' };
     } finally {
       setLoginLoading(false);
     }
-  };
-
-  // ── Signup handler ─────────────────────────────────────
-  const startCountdown = () => {
-    let c = 3;
-    const id = setInterval(() => {
-      c -= 1;
-      setCountdown(c);
-      if (c === 0) { clearInterval(id); navigate('/login'); }
-    }, 1000);
   };
 
   const handleSignup = async (formData) => {
     setSignupLoading(true);
     try {
       const result = await register(formData);
-      if (result?.succeeded) { setSuccess(true); startCountdown(); return { succeeded: true }; }
+      if (result?.succeeded) {
+        navigate('/login');
+        return { succeeded: true };
+      }
       return result;
     } catch (err) {
       return {
         succeeded: false,
-        message: err.response?.data?.message || 'Bir hata oluştu. Lütfen tekrar deneyin.',
+        message: err.response?.data?.message || 'Something went wrong. Please try again.',
         errors: err.response?.data?.errors || [],
       };
     } finally {
@@ -233,137 +58,207 @@ export default function AuthPage() {
     }
   };
 
-  // ── Sliding positions ──────────────────────────────────
-  // Login:  brand LEFT (0%),           form RIGHT (42%)
-  // Signup: form  LEFT (0%),           brand RIGHT (58%)
-  const brandLeft = isDesktop ? (isLogin ? '0%' : `${100 - BRAND_W}%`) : '-100%';
-  const formLeft  = isDesktop ? (isLogin ? `${BRAND_W}%` : '0%')        : '0%';
-  const formWidth = isDesktop ? `${100 - BRAND_W}%` : '100%';
-
-  const panelTransition = `left ${DURATION} ${EASING}`;
-
-  // ── Success state ──────────────────────────────────────
-  const successContent = (
-    <div style={{ textAlign: 'center', padding: '20px 0', animation: 'navItemSlideIn 0.4s ease both' }}>
-      <div style={{
-        width: '64px', height: '64px', borderRadius: '50%',
-        background: 'rgba(34,197,94,0.12)', border: '2px solid rgba(34,197,94,0.3)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px',
-      }}>
-        <CheckCircle2 size={32} color="var(--green-primary)" />
-      </div>
-      <h2 style={{
-        fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.4rem', fontWeight: 800,
-        letterSpacing: '-0.03em', color: 'var(--text-primary)', marginBottom: '8px',
-      }}>Kayıt Başarılı! 🎉</h2>
-      <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: 1.6, marginBottom: '24px' }}>
-        E-postanızı doğrulayın.{' '}
-        <strong style={{ color: 'var(--text-secondary)' }}>{countdown} saniye</strong>{' '}
-        içinde giriş sayfasına yönlendiriliyorsunuz.
-      </p>
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '24px' }}>
-        {[0, 1, 2].map((i) => (
-          <div key={i} style={{
-            width: '8px', height: '8px', borderRadius: '50%',
-            background: i < (3 - countdown) ? 'var(--green-primary)' : 'rgba(34,197,94,0.2)',
-            transition: 'background 0.3s ease',
-          }} />
-        ))}
-      </div>
-      <Link to="/login" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px',
-        color: 'var(--green-primary)', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 600 }}>
-        Hemen Giriş Yap →
-      </Link>
-    </div>
-  );
-
-  return (
-    <main style={{
-      height: 'calc(100vh - 64px)',
-      position: 'relative',
-      overflow: 'hidden',
-      background: 'var(--bg-base)',
-    }}>
-
-      {/* ── Brand / decorative panel ───────────────────── */}
-      <div style={{
-        position: 'absolute', top: 0, bottom: 0,
-        width: `${BRAND_W}%`,
-        left: brandLeft,
-        transition: panelTransition,
-        background: 'linear-gradient(160deg, var(--bg-elevated) 0%, var(--bg-surface) 100%)',
-        borderRight: isLogin ? '1px solid var(--border)' : 'none',
-        borderLeft: isLogin ? 'none' : '1px solid var(--border)',
-        padding: '56px 48px',
-        overflow: 'hidden',
-        zIndex: 1,
-      }}>
-        {isLogin ? <LoginBrand /> : <SignupBrand />}
-      </div>
-
-      {/* ── Form panel ────────────────────────────────── */}
-      <div style={{
-        position: 'absolute', top: 0, bottom: 0,
-        width: formWidth,
-        left: formLeft,
-        transition: panelTransition,
-        display: 'flex', alignItems: 'flex-start', justifyContent: 'center',
-        padding: '56px 24px 48px',
-        overflowY: 'auto',
-        zIndex: 1,
-      }}>
-        <div style={{ width: '100%', maxWidth: isLogin ? '420px' : '460px' }}>
-
-          {/* Mobile logo (brand panel hidden on mobile) */}
-          <div className="auth-mobile-header" style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none', marginBottom: '20px' }}>
-              <span style={{ fontSize: '2rem' }}>🌿</span>
-            </Link>
-            <h1 style={{
-              fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.75rem', fontWeight: 800,
-              letterSpacing: '-0.04em', color: 'var(--text-primary)', marginBottom: '6px',
-            }}>{isLogin ? 'Hoş Geldiniz' : 'Hesap Oluştur'}</h1>
-            <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', fontFamily: "'Inter', sans-serif" }}>
-              {isLogin ? 'EcoWings hesabınıza giriş yapın' : 'EcoWings\'in yeşil seyahat topluluğuna katılın'}
-            </p>
+  const leftContent = () => {
+    if (view === 'forgot' || view === 'reset') {
+      return (
+        <>
+          <span className="auth-eyebrow"><span className="auth-eyebrow-dot" /> Account Security</span>
+          <h1 className="auth-left-h1">
+            {view === 'forgot' ? <>Reset your <em>password.</em></> : <>Choose a new <em>password.</em></>}
+          </h1>
+          <p className="auth-left-lede">
+            {view === 'forgot'
+              ? "We'll send a secure link to your email address. Follow the instructions to reset your password and get back to your green journey."
+              : "Create a strong, unique password to keep your EcoWings account safe. You'll be signed in automatically after resetting."}
+          </p>
+          <div className="auth-perks">
+            <div className="auth-perk">
+              <div className="auth-perk-ico">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+              </div>
+              <div>
+                <div className="auth-perk-title">Secure token</div>
+                <div className="auth-perk-sub">Reset links expire in 60 minutes and can only be used once.</div>
+              </div>
+            </div>
+            <div className="auth-perk">
+              <div className="auth-perk-ico">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="5" width="18" height="14" rx="3" />
+                  <path d="m3 7 9 6 9-6" />
+                </svg>
+              </div>
+              <div>
+                <div className="auth-perk-title">Email verification</div>
+                <div className="auth-perk-sub">Only the registered email address receives the reset link.</div>
+              </div>
+            </div>
           </div>
+        </>
+      );
+    }
 
-          {/* Card */}
-          <div style={{
-            background: 'var(--bg-card)', border: '1px solid var(--border)',
-            borderRadius: '20px', padding: '36px 32px',
-            boxShadow: '0 4px 24px rgba(77,124,95,0.10)',
-          }}>
-            {isLogin ? (
-              <>
-                <div className="auth-desktop-header" style={{ marginBottom: '28px' }}>
-                  <h1 style={{
-                    fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.5rem', fontWeight: 800,
-                    letterSpacing: '-0.04em', color: 'var(--text-primary)', marginBottom: '6px',
-                  }}>Giriş Yap</h1>
-                  <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', fontFamily: "'Inter', sans-serif" }}>
-                    Hesabınıza erişmek için bilgilerinizi girin
-                  </p>
-                </div>
-                <LoginForm onSubmit={handleLogin} loading={loginLoading} />
-              </>
-            ) : success ? successContent : (
-              <>
-                <div className="auth-desktop-header" style={{ marginBottom: '28px' }}>
-                  <h1 style={{
-                    fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '1.5rem', fontWeight: 800,
-                    letterSpacing: '-0.04em', color: 'var(--text-primary)', marginBottom: '6px',
-                  }}>Hesap Oluştur</h1>
-                  <p style={{ fontSize: '0.84rem', color: 'var(--text-muted)', fontFamily: "'Inter', sans-serif" }}>
-                    Birkaç adımda EcoWings'e katılın
-                  </p>
-                </div>
-                <SignupForm onSubmit={handleSignup} loading={signupLoading} />
-              </>
-            )}
+    if (isLogin) {
+      return (
+        <>
+          <span className="auth-eyebrow"><span className="auth-eyebrow-dot" /> Sustainable Aviation</span>
+          <h1 className="auth-left-h1">Welcome <em>back.</em><br />Your green journey continues.</h1>
+          <p className="auth-left-lede">
+            Sign in to pick up where you left off — saved searches, eco-routed itineraries,
+            and your travel impact in one calm place.
+          </p>
+          <div className="auth-testimonial">
+            <p className="auth-testimonial-quote">
+              "Honest carbon math, no upsell labyrinth, and a booking flow that actually feels
+              considered. EcoWings is how I fly now."
+            </p>
+            <div className="auth-testimonial-who">
+              <div className="auth-avatar">EM</div>
+              <div>
+                <div className="auth-who-name">Elif Mertoğlu</div>
+                <div className="auth-who-role">Frequent flyer · Member since 2024</div>
+              </div>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <span className="auth-eyebrow"><span className="auth-eyebrow-dot" /> Join EcoWings</span>
+        <h1 className="auth-left-h1">Start your <em>greener</em> way to fly.</h1>
+        <p className="auth-left-lede">
+          Create a free account and unlock smarter routing, an honest impact dashboard,
+          and a calmer booking flow that respects your time — and the planet.
+        </p>
+        <div className="auth-perks">
+          <div className="auth-perk">
+            <div className="auth-perk-ico">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 20C5 20 3 15 3 12c0-3 2-7 8-9 0 6 3 8 6 9-1 5-3 8-6 8Z" />
+              </svg>
+            </div>
+            <div>
+              <div className="auth-perk-title">Eco-routed by default</div>
+              <div className="auth-perk-sub">Lower-impact flights surface first — no toggling required.</div>
+            </div>
+          </div>
+          <div className="auth-perk">
+            <div className="auth-perk-ico">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 12h6l3-7 3 14 3-7h3" />
+              </svg>
+            </div>
+            <div>
+              <div className="auth-perk-title">Personal impact dashboard</div>
+              <div className="auth-perk-sub">Track CO₂, distance, and trips saved across every booking.</div>
+            </div>
+          </div>
+          <div className="auth-perk">
+            <div className="auth-perk-ico">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 3 4 6v6c0 5 3 8 8 9 5-1 8-4 8-9V6l-8-3Z" />
+                <path d="m9 12 2 2 4-4" />
+              </svg>
+            </div>
+            <div>
+              <div className="auth-perk-title">No greenwashing, ever</div>
+              <div className="auth-perk-sub">Sourced figures, dated estimates, audited methodology.</div>
+            </div>
           </div>
         </div>
-      </div>
-    </main>
+      </>
+    );
+  };
+
+  const rightTopContent = () => {
+    if (view === 'forgot' || view === 'reset') {
+      return (
+        <>
+          <span>Remember your password?</span>
+          <Link to="/login" className="auth-pill-btn">Sign in</Link>
+        </>
+      );
+    }
+    return (
+      <>
+        <span>{isLogin ? 'New to EcoWings?' : 'Already have an account?'}</span>
+        <Link to={isLogin ? '/signup' : '/login'} className="auth-pill-btn">
+          {isLogin ? 'Create account' : 'Sign in'}
+        </Link>
+      </>
+    );
+  };
+
+  const footContent = () => {
+    if (view === 'forgot' || view === 'reset') return <div>© 2026 EcoWings</div>;
+    if (isLogin) {
+      return (
+        <div className="auth-left-foot-stats">
+          <div><b>120<em>+</em></b><span>Eco routes</span></div>
+          <div><b>48<em>k</em></b><span>Travelers</span></div>
+          <div><b>9</b><span>Partners</span></div>
+        </div>
+      );
+    }
+    return <div>Free forever · No card required</div>;
+  };
+
+  return (
+    <div className="ecowings-auth-v2">
+      {/* ── LEFT PANEL ── */}
+      <aside className="auth-left">
+        <div className="auth-grid-lines" />
+        <div className="auth-cloud auth-cloud-1" />
+        <div className="auth-cloud auth-cloud-2" />
+
+        <Link to="/" className="auth-brand">
+          <span className="auth-brand-mark">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 22c5-3 8-7 8-13a8 8 0 1 0-16 0c0 6 3 10 8 13Z" />
+              <path d="M12 22V8" />
+            </svg>
+          </span>
+          EcoWings
+        </Link>
+
+        <div className="auth-left-body">
+          {leftContent()}
+        </div>
+
+        <div className="auth-left-foot">
+          {footContent()}
+          <div>© 2026 EcoWings</div>
+        </div>
+      </aside>
+
+      {/* ── RIGHT PANEL ── */}
+      <section className="auth-right">
+        <div className="auth-right-top">
+          {rightTopContent()}
+        </div>
+
+        <div className="auth-form-wrap">
+          {view === 'login' && <LoginForm onSubmit={handleLogin} loading={loginLoading} />}
+          {view === 'signup' && <SignupForm onSubmit={handleSignup} loading={signupLoading} />}
+          {view === 'forgot' && <ForgotPasswordForm />}
+          {view === 'reset' && <ResetPasswordForm />}
+        </div>
+
+        <div className="auth-right-foot">
+          <div>
+            <a href="#">Privacy</a>
+            {' · '}
+            <a href="#">Terms</a>
+            {' · '}
+            <a href="#">Help</a>
+          </div>
+          <div>© 2026 EcoWings</div>
+        </div>
+      </section>
+    </div>
   );
 }

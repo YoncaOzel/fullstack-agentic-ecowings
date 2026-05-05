@@ -1,13 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, Filter, MessageSquarePlus } from 'lucide-react';
+import { ChevronDown, PenLine, X } from 'lucide-react';
 import { useAuth } from '../../../shared/context/AuthContext';
 import reviewService from '../services/reviewService';
-import ReviewCard from '../components/ReviewCard';
 import ReviewForm from '../components/ReviewForm';
 import LoadingSpinner from '../../../shared/components/LoadingSpinner';
 import ErrorMessage from '../../../shared/components/ErrorMessage';
 import apiClient from '../../../shared/services/apiClient';
+import { ScrollFlyIn } from '../../../components/ui/hero-section-3';
+import WallOfLoveSection from '../../../components/ui/testimonials';
 
 export default function CommentsPage() {
   const { isAuthenticated } = useAuth();
@@ -17,7 +18,8 @@ export default function CommentsPage() {
   const [error, setError] = useState('');
   const [filterAirline, setFilterAirline] = useState('');
   const [showForm, setShowForm] = useState(false);
-  const [filterFocus, setFilterFocus] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     Promise.all([
@@ -26,20 +28,29 @@ export default function CommentsPage() {
     ])
       .then(([revRes, airRes]) => {
         if (Array.isArray(revRes.data)) setReviews(revRes.data);
-        else setError(revRes.data?.message || 'Yorumlar yüklenemedi.');
+        else setError(revRes.data?.message || 'Could not load reviews.');
         if (Array.isArray(airRes.data)) setAirlines(airRes.data);
       })
-      .catch(() => setError('Veriler yüklenirken hata oluştu.'))
+      .catch(() => setError('Failed to load data. Please try again.'))
       .finally(() => setLoading(false));
+  }, []);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
   const displayed = filterAirline
     ? reviews.filter((r) => String(r.airlineId) === filterAirline)
     : reviews;
 
-  const avgRating = reviews.length
-    ? (reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviews.length).toFixed(1)
-    : null;
+  const selectedAirline = airlines.find(a => String(a.id) === filterAirline);
 
   const handleNewReview = (newReview) => {
     if (newReview && newReview.id) setReviews((prev) => [newReview, ...prev]);
@@ -58,92 +69,198 @@ export default function CommentsPage() {
   };
 
   return (
-    <main style={{ minHeight: 'calc(100vh - 64px)', background: 'var(--bg-base)' }}>
+    <main style={{ minHeight: 'calc(100vh - 64px)', background: '#ffffff' }}>
 
       {/* ══ Hero ══ */}
-      <section style={{
-        background: 'linear-gradient(135deg,#080e08 0%,#0d1f0d 40%,#0a1a12 100%)',
-        padding: '72px 0 64px', position: 'relative', overflow: 'hidden',
-      }}>
-        <div style={{ position: 'absolute', top: '-60px', left: '50%', transform: 'translateX(-50%)', width: '800px', height: '420px', background: 'radial-gradient(ellipse,rgba(34,197,94,0.16) 0%,transparent 70%)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', bottom: '-60px', left: '5%', width: '350px', height: '280px', background: 'radial-gradient(ellipse,rgba(34,197,94,0.06) 0%,transparent 70%)', pointerEvents: 'none' }} />
-
-        <div className="container" style={{ position: 'relative' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: '20px', padding: '5px 16px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '20px' }}>
-            <Star size={11} /> Yolcu Deneyimleri
-          </div>
-
-          <h1 style={{ fontSize: 'clamp(2rem,5vw,3rem)', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", lineHeight: 1.15, margin: '0 0 16px', color: '#1a4d33' }}>
-            Yorumlar
-          </h1>
-          <p style={{ color: 'rgba(187,247,208,0.75)', fontSize: '1.05rem', marginBottom: '28px', maxWidth: '480px' }}>
-            Havayollarına ait gerçek değerlendirmeleri okuyun ve deneyimlerinizi paylaşın
+      <ScrollFlyIn
+        imageUrl="https://cdn.prod.website-files.com/661fdce3e735db03332bf817/66223004372c7c1124c1b0d1_Top-view2x-p-2000.webp"
+        imageAlt="Aerial view of a plane"
+        stats={!loading && reviews.length > 0 ? [
+          { value: reviews.length, label: 'Reviews' },
+          { value: airlines.length, label: 'Airlines' },
+          { value: reviews.length > 0 ? (reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviews.length).toFixed(1) : '—', label: 'Avg Rating' },
+        ] : undefined}
+      >
+        <div style={{ maxWidth: '768px', margin: '0 auto', padding: '0 16px', textAlign: 'center' }}>
+          <p style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#7aaa8a', marginBottom: '12px' }}>
+            Passenger Experiences
           </p>
-
-          {/* Stats chips */}
-          {!loading && !error && (
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '30px', padding: '7px 16px', fontSize: '0.8rem', fontWeight: 600, color: '#bbf7d0' }}>
-                💬 {reviews.length} Yorum
-              </div>
-              {avgRating && (
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '30px', padding: '7px 16px', fontSize: '0.8rem', fontWeight: 600, color: '#bbf7d0' }}>
-                  <Star size={12} style={{ fill: '#22c55e', color: '#22c55e' }} /> {avgRating} Ortalama
-                </div>
-              )}
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '30px', padding: '7px 16px', fontSize: '0.8rem', fontWeight: 600, color: '#bbf7d0' }}>
-                ✈️ {airlines.length} Havayolu
-              </div>
-            </div>
-          )}
+          <h2 style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontWeight: 800, lineHeight: 1.1, color: '#4d7c5f', fontFamily: "'Plus Jakarta Sans', sans-serif", margin: '0 0 24px' }}>
+            Real reviews,<br />real journeys
+          </h2>
+          <p style={{ fontSize: '1.1rem', color: '#6c8274', maxWidth: '520px', margin: '0 auto' }}>
+            Read genuine airline reviews and share your own travel experience
+          </p>
         </div>
-      </section>
+      </ScrollFlyIn>
 
       {/* ══ Filter Bar ══ */}
-      <div style={{ background: 'var(--bg-surface)', borderBottom: '1px solid rgba(34,197,94,0.1)', padding: '20px 0', position: 'sticky', top: '64px', zIndex: 40 }}>
+      <div style={{
+        background: '#fff',
+        borderBottom: '1px solid #f0f0f0',
+        padding: '14px 0',
+        position: 'sticky',
+        top: '64px',
+        zIndex: 40,
+      }}>
         <div className="container">
-          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
-            {/* Airline filter */}
-            <div style={{ position: 'relative', flex: '0 1 280px' }}>
-              <Filter size={13} style={{ position: 'absolute', left: '13px', top: '50%', transform: 'translateY(-50%)', color: filterFocus ? '#22c55e' : 'rgba(107,114,128,0.7)', pointerEvents: 'none', transition: 'color 0.2s' }} />
-              <select
-                value={filterAirline}
-                onChange={(e) => setFilterAirline(e.target.value)}
-                onFocus={() => setFilterFocus(true)}
-                onBlur={() => setFilterFocus(false)}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+
+            {/* Custom airline dropdown */}
+            <div ref={dropdownRef} style={{ position: 'relative' }}>
+              <button
+                onClick={() => setDropdownOpen(v => !v)}
                 style={{
-                  width: '100%', appearance: 'none', WebkitAppearance: 'none',
-                  background: 'rgba(255,255,255,0.04)', border: `1px solid ${filterFocus ? '#22c55e' : 'rgba(34,197,94,0.18)'}`,
-                  borderRadius: '10px', padding: '10px 38px 10px 38px', color: '#f0fdf4',
-                  fontSize: '14px', fontFamily: 'Inter,sans-serif', outline: 'none', cursor: 'pointer',
-                  boxShadow: filterFocus ? '0 0 0 3px rgba(34,197,94,0.12)' : 'none',
-                  transition: 'border-color 0.2s,box-shadow 0.2s',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '7px 14px',
+                  borderRadius: '8px',
+                  border: `1px solid ${dropdownOpen || filterAirline ? '#4d7c5f' : '#e2e8f0'}`,
+                  background: filterAirline ? '#f0f7f3' : '#fff',
+                  color: filterAirline ? '#4d7c5f' : '#64748b',
+                  fontSize: '13.5px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  outline: 'none',
+                  transition: 'all 0.15s',
+                  fontFamily: 'Inter, sans-serif',
+                  whiteSpace: 'nowrap',
                 }}
               >
-                <option value="" style={{ background: '#0a1a0a' }}>Tüm Havayolları</option>
-                {airlines.map((a) => <option key={a.id} value={String(a.id)} style={{ background: '#0a1a0a' }}>{a.name}</option>)}
-              </select>
+                <span style={{ fontSize: '13px', color: filterAirline ? '#4d7c5f' : '#94a3b8' }}>✈</span>
+                {selectedAirline ? selectedAirline.name : 'All Airlines'}
+                <ChevronDown
+                  size={13}
+                  style={{
+                    marginLeft: '2px',
+                    transform: dropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s',
+                    color: filterAirline ? '#4d7c5f' : '#94a3b8',
+                  }}
+                />
+              </button>
+
+              {/* Dropdown menu */}
+              {dropdownOpen && (
+                <div style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 6px)',
+                  left: 0,
+                  minWidth: '200px',
+                  background: '#fff',
+                  border: '1px solid #e8edf2',
+                  borderRadius: '10px',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04)',
+                  overflow: 'hidden',
+                  zIndex: 100,
+                }}>
+                  {/* All Airlines option */}
+                  <button
+                    onClick={() => { setFilterAirline(''); setDropdownOpen(false); }}
+                    style={{
+                      display: 'block',
+                      width: '100%',
+                      textAlign: 'left',
+                      padding: '9px 14px',
+                      background: !filterAirline ? '#f8faf9' : 'transparent',
+                      border: 'none',
+                      fontSize: '13.5px',
+                      color: !filterAirline ? '#4d7c5f' : '#374151',
+                      fontWeight: !filterAirline ? 600 : 400,
+                      cursor: 'pointer',
+                      fontFamily: 'Inter, sans-serif',
+                      borderBottom: '1px solid #f3f4f6',
+                    }}
+                    onMouseEnter={e => { if (filterAirline) e.currentTarget.style.background = '#f8faf9'; }}
+                    onMouseLeave={e => { if (filterAirline) e.currentTarget.style.background = 'transparent'; }}
+                  >
+                    All Airlines
+                  </button>
+                  {airlines.map((a) => {
+                    const isActive = String(a.id) === filterAirline;
+                    return (
+                      <button
+                        key={a.id}
+                        onClick={() => { setFilterAirline(String(a.id)); setDropdownOpen(false); }}
+                        style={{
+                          display: 'block',
+                          width: '100%',
+                          textAlign: 'left',
+                          padding: '9px 14px',
+                          background: isActive ? '#f0f7f3' : 'transparent',
+                          border: 'none',
+                          fontSize: '13.5px',
+                          color: isActive ? '#4d7c5f' : '#374151',
+                          fontWeight: isActive ? 600 : 400,
+                          cursor: 'pointer',
+                          fontFamily: 'Inter, sans-serif',
+                        }}
+                        onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = '#f8faf9'; }}
+                        onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
+                      >
+                        {a.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
-            {/* Clear filter */}
-            {filterAirline && (
+            {/* Active filter chip */}
+            {filterAirline && selectedAirline && (
               <button
                 onClick={() => setFilterAirline('')}
-                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '9px 16px', borderRadius: '10px', border: '1px solid rgba(34,197,94,0.2)', background: 'rgba(34,197,94,0.05)', color: '#22c55e', fontSize: '13px', fontWeight: 600, cursor: 'pointer', transition: 'all 0.2s' }}
-                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(34,197,94,0.1)'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(34,197,94,0.05)'; }}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '5px 10px 5px 12px',
+                  borderRadius: '999px',
+                  border: '1px solid #c7ddd0',
+                  background: '#eef6f1',
+                  color: '#4d7c5f',
+                  fontSize: '12.5px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  fontFamily: 'Inter, sans-serif',
+                }}
               >
-                ✕ Filtreyi Kaldır
+                {selectedAirline.name}
+                <X size={11} strokeWidth={2.5} />
               </button>
             )}
 
-            {/* Add review CTA */}
+            {/* Review count */}
+            {!loading && !error && (
+              <span style={{ color: '#b0b8c1', fontSize: '13px', fontWeight: 400 }}>
+                {displayed.length} {displayed.length === 1 ? 'review' : 'reviews'}
+              </span>
+            )}
+
+            {/* Write review button */}
             {isAuthenticated && (
               <button
-                onClick={() => setShowForm((v) => !v)}
-                style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '9px 20px', borderRadius: '10px', border: 'none', background: showForm ? 'rgba(34,197,94,0.2)' : 'linear-gradient(135deg,#22c55e 0%,#16a34a 100%)', color: showForm ? '#22c55e' : '#080e08', fontSize: '13px', fontWeight: 700, cursor: 'pointer', boxShadow: showForm ? 'none' : '0 3px 14px rgba(34,197,94,0.25)', transition: 'all 0.2s' }}
+                onClick={() => setShowForm(v => !v)}
+                style={{
+                  marginLeft: 'auto',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '7px 16px',
+                  borderRadius: '8px',
+                  border: showForm ? '1px solid #c7ddd0' : '1px solid transparent',
+                  background: showForm ? '#fff' : '#4d7c5f',
+                  color: showForm ? '#4d7c5f' : '#fff',
+                  fontSize: '13.5px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  fontFamily: 'Inter, sans-serif',
+                  transition: 'all 0.15s',
+                }}
               >
-                <MessageSquarePlus size={14} /> {showForm ? 'Formu Gizle' : 'Yorum Yaz'}
+                <PenLine size={13} />
+                {showForm ? 'Cancel' : 'Write a Review'}
               </button>
             )}
           </div>
@@ -151,54 +268,116 @@ export default function CommentsPage() {
       </div>
 
       {/* ══ Content ══ */}
-      <div style={{ padding: '52px 0 80px', background: 'var(--bg-base)' }}>
+      <div style={{ background: '#ffffff', paddingBottom: '80px' }}>
         <div className="container">
 
-          {/* Review form (collapsible) */}
           {isAuthenticated && showForm && !loading && (
-            <div style={{ marginBottom: '40px', background: 'linear-gradient(160deg,rgba(11,21,11,0.9) 0%,rgba(8,14,8,0.95) 100%)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: '20px', padding: '32px', boxShadow: '0 12px 40px rgba(0,0,0,0.4)', backdropFilter: 'blur(20px)' }}>
+            <div style={{
+              margin: '32px 0',
+              background: 'linear-gradient(180deg, #ffffff 0%, #fbfdff 100%)',
+              border: '1px solid #e2e8f0',
+              borderRadius: '16px',
+              padding: '28px',
+              boxShadow: '0 14px 34px rgba(15,23,42,0.06)',
+            }}>
               <ReviewForm airlines={airlines} onSuccess={handleNewReview} />
             </div>
           )}
 
-          {loading ? <LoadingSpinner /> : error ? <ErrorMessage message={error} /> : (
-            <>
-              {/* Header */}
-              <div style={{ marginBottom: '32px' }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.72rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: '14px' }}>
-                  <Star size={10} /> {displayed.length} Yorum
-                </div>
-                <h2 style={{ fontSize: '1.8rem', fontWeight: 800, fontFamily: "'Plus Jakarta Sans',sans-serif", margin: 0, color: '#1a4d33' }}>
-                  {filterAirline ? `${airlines.find(a => String(a.id) === filterAirline)?.name || ''} Yorumları` : 'Tüm Yorumlar'}
-                </h2>
-                <div style={{ marginTop: '16px', height: '1px', background: 'linear-gradient(90deg,rgba(34,197,94,0.4) 0%,rgba(34,197,94,0.1) 60%,transparent 100%)' }} />
-              </div>
-
-              {displayed.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '80px 20px', background: 'rgba(34,197,94,0.03)', border: '1px solid rgba(34,197,94,0.1)', borderRadius: '20px' }}>
-                  <div style={{ fontSize: '3.5rem', marginBottom: '16px' }}>💭</div>
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#1a4d33', marginBottom: '8px', fontFamily: "'Plus Jakarta Sans',sans-serif" }}>Henüz Yorum Yok</h3>
-                  <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>İlk yorumu siz yapın ve seyahat topluluğuna katkıda bulunun!</p>
-                </div>
-              ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '22px', marginBottom: '40px' }}>
-                  {displayed.map((r) => (
-                    <ReviewCard key={r.id} review={r} onUpdate={handleUpdate} onDelete={handleDelete} />
-                  ))}
-                </div>
-              )}
-            </>
+          {loading ? (
+            <div style={{ padding: '80px 0' }}>
+              <LoadingSpinner />
+            </div>
+          ) : error ? (
+            <div style={{ padding: '40px 0' }}>
+              <ErrorMessage message={error} />
+            </div>
+          ) : (
+            <WallOfLoveSection
+              reviews={displayed}
+              airlines={airlines}
+              loading={loading}
+            />
           )}
 
-          {/* Not logged in — CTA */}
           {!isAuthenticated && !loading && (
-            <div style={{ textAlign: 'center', paddingTop: '40px', borderTop: '1px solid rgba(34,197,94,0.1)' }}>
-              <p style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: '16px' }}>
-                Yorum eklemek için{' '}
-                <Link to="/login" style={{ color: '#22c55e', fontWeight: 600 }}>giriş yapın</Link>.
+            <div style={{ textAlign: 'center', paddingTop: '24px', borderTop: '1px solid #f3f4f6' }}>
+              <p style={{ color: '#94a3b8', fontSize: '0.875rem' }}>
+                <Link to="/login" style={{ color: '#4d7c5f', fontWeight: 600 }}>Sign in</Link> to write a review.
               </p>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* ══ Bottom Info Section ══ */}
+      <div style={{ background: '#f7fbf8' }}>
+        {/* Divider wave */}
+        <div style={{ lineHeight: 0, overflow: 'hidden' }}>
+          <svg viewBox="0 0 1440 48" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block', width: '100%' }}>
+            <path d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z" fill="#ffffff" />
+          </svg>
+        </div>
+
+        <div style={{ maxWidth: '1152px', margin: '0 auto', padding: '56px 24px 72px' }}>
+          {/* Headline */}
+          <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+            <p style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#7aaa8a', marginBottom: '10px' }}>
+              Why it matters
+            </p>
+            <h3 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', fontWeight: 700, color: '#1c2b22', lineHeight: 1.2, fontFamily: "'Plus Jakarta Sans', sans-serif", margin: '0 auto', maxWidth: '560px' }}>
+              Every review helps someone fly smarter
+            </h3>
+          </div>
+
+          {/* Three columns */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '24px' }}>
+            {[
+              {
+                icon: '✦',
+                title: 'Honest & Verified',
+                body: 'Reviews come from real passengers who have booked through EcoWings. No incentivised posts, no sponsored content — just genuine experiences.',
+              },
+              {
+                icon: '⬡',
+                title: 'Helps Others Decide',
+                body: 'Choosing an airline is more than price. Comfort, punctuality, and sustainability all matter. Your words make that decision easier for the next traveller.',
+              },
+              {
+                icon: '◈',
+                title: 'Shapes Better Flying',
+                body: 'Airlines listen to feedback. When passengers consistently highlight what works — and what doesn\'t — it creates pressure for meaningful improvement.',
+              },
+            ].map((item, i) => (
+              <div key={i} style={{
+                background: '#ffffff',
+                border: '1px solid #e6efe9',
+                borderRadius: '14px',
+                padding: '28px 26px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+              }}>
+                <span style={{ fontSize: '1.1rem', color: '#4d7c5f', lineHeight: 1 }}>{item.icon}</span>
+                <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1c2b22', margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  {item.title}
+                </h4>
+                <p style={{ fontSize: '0.875rem', color: '#6c8274', lineHeight: 1.7, margin: 0 }}>
+                  {item.body}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom quote */}
+          <div style={{ marginTop: '56px', borderTop: '1px solid #ddeae2', paddingTop: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', textAlign: 'center' }}>
+            <p style={{ fontSize: 'clamp(1rem, 2vw, 1.2rem)', fontStyle: 'italic', color: '#4d7c5f', maxWidth: '560px', lineHeight: 1.7, margin: 0, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              "Sustainable travel isn't just about carbon — it's about accountability, transparency, and the voices of the people who fly."
+            </p>
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#8aab96', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+              — EcoWings Community
+            </span>
+          </div>
         </div>
       </div>
     </main>
