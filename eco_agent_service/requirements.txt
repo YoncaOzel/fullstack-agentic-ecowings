@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+crewai
+crewai-tools
+langchain-groq
+requests
+python-dotenv
+pydantic
+litellm

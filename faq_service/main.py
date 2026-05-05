@@ -1,4 +1,5 @@
 import os
+os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 import uuid
 from contextlib import asynccontextmanager
 
@@ -8,8 +9,6 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from openai import OpenAI
 from dotenv import load_dotenv
-from crew.travel_crew import run_travel_crew
-
 from rag.pdf_loader import get_vector_store
 from rag.retriever import retrieve_faq_context
 
@@ -17,7 +16,8 @@ from rag.retriever import retrieve_faq_context
 load_dotenv()
 
 # OpenAI istemcisini global olarak oluştur; tüm endpoint'ler bunu kullanır
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+_openai_key = os.getenv("OPENAI_API_KEY") or "placeholder"
+client = OpenAI(api_key=_openai_key)
 
 
 # ---------------------------------------------------------------------------
@@ -40,9 +40,13 @@ async def lifespan(app: FastAPI):
     lifespan= parametresiyle alır ve uygulama döngüsüne bağlar.
     """
     print("EcoWings FAQ Service starting...")
-    get_vector_store()   # FAQ dökümanlarını belleğe al ve indexle
-    print("FAQ indexed, ready.")
-    yield                # Sunucu burada çalışmaya başlar; bu noktada istekler alınır
+    try:
+        get_vector_store()
+        print("FAQ indexed, ready.")
+    except Exception as e:
+        print(f"WARNING: Vector store could not be loaded: {e}")
+        print("Service will run without RAG context.")
+    yield
 
 
 app = FastAPI(
@@ -84,13 +88,13 @@ class ChatResponse(BaseModel):
 # ---------------------------------------------------------------------------
 
 # OpenAI'ya her sohbette gönderilen sabit rol ve kural tanımı
-SYSTEM_PROMPT = """You are a virtual assistant for EcoWings airline.
-Your job is to answer customer questions based on the EcoWings FAQ and policy documents provided to you.
+SYSTEM_PROMPT = """You are EcoWings' virtual assistant. You are here to help customers with questions about EcoWings airline services, policies, and flights.
 
 Rules:
-- Use ONLY the information from the provided documents.
-- If the answer is not in the documents, say: "I don't have information on this topic, please contact our support line."
-- ALWAYS reply in the same language as the customer's question. If Turkish, reply in Turkish. If English, reply in English.
+- ALWAYS reply in English, regardless of the language the customer uses.
+- For questions about who you are or your identity, always introduce yourself as: "I am EcoWings' virtual assistant. I'm here to help you!"
+- For other questions, use the information from the provided EcoWings documents.
+- If the answer is not in the documents and the question is not about your identity, say: "I don't have information on this topic, please contact our support line."
 - Be concise, clear, and friendly.
 - Never make up information.
 """
@@ -116,9 +120,12 @@ async def chat(req: ChatRequest):
          Bu bilgi frontend'de "Kaynağa dayalı cevap" rozeti için kullanılabilir.
     """
     # 1. RAG: ilgili belge bölümlerini getir
-    context = retrieve_faq_context(req.message, top_k=3)
-    # retrieve_faq_context hiçbir şey bulamazsa bu sabit metni döndürür
-    found = context != "İlgili bir bilgi bulunamadı."
+    try:
+        context = retrieve_faq_context(req.message, top_k=3)
+        found = context != "İlgili bir bilgi bulunamadı."
+    except Exception:
+        context = "İlgili bir bilgi bulunamadı."
+        found = False
 
     # 2. Model için kullanıcı promptunu hazırla
     user_prompt = f"""Customer question: {req.message}
@@ -127,17 +134,17 @@ Relevant EcoWings document sections:
 {context}
 
 Answer the customer's question based on the information above.
-IMPORTANT: Detect the language of the customer's question and reply in THAT EXACT language. If the question is in English, reply in English. If Turkish, reply in Turkish. Do not translate."""
+IMPORTANT: Always reply in English only, regardless of the language used in the question."""
 
     # 3. OpenAI API çağrısı
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},   # Sabit rol tanımı
-            {"role": "user",   "content": user_prompt},     # Dinamik soru + bağlam
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user",   "content": user_prompt},
         ],
-        temperature=0.3,    # Düşük değer = daha tutarlı, az yaratıcı çıktı
-        max_tokens=500,     # Maksimum yanıt uzunluğu
+        temperature=0.3,
+        max_tokens=500,
     )
 
     # 4. Yanıtı çıkar ve döndür

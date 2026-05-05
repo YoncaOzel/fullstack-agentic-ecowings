@@ -10,24 +10,13 @@ from graph.state import TravelPlanState
 # ---------------------------------------------------------------------------
 
 def validate_input(state: TravelPlanState) -> TravelPlanState:
-    """
-    Kullanıcıdan gelen form verilerini graph'a sokmadan önce doğrular.
-
-    Ne yapar:
-      1. origin, destination, start_date, end_date alanlarının boş olmadığını kontrol eder.
-      2. start_date ve end_date değerlerinin YYYY-MM-DD formatına uyduğunu regex ile doğrular.
-      3. Herhangi bir hata varsa state'e 'error' anahtarı ekleyip döner;
-         bir sonraki node bu hatayı görerek işlemi durdurabilir.
-      4. Her şey geçerliyse state'i değiştirmeden döndürür (graph devam eder).
-    """
-    # Zorunlu alanları sırayla kontrol et; boş veya sadece boşluk içeriyorsa hata üret
     required = ["origin", "destination", "start_date", "end_date"]
     for field in required:
         if not state.get(field, "").strip():
             # state'i spread edip üstüne error anahtarını ekle (immutable pattern)
             return {**state, "error": f"Missing required field: {field}"}
 
-    # YYYY-MM-DD formatı için regex deseni
+    # YYYY-MM-DD 
     date_pattern = re.compile(r"^\d{4}-\d{2}-\d{2}$")
     for date_field in ("start_date", "end_date"):
         if not date_pattern.match(state[date_field]):
@@ -47,14 +36,6 @@ def validate_input(state: TravelPlanState) -> TravelPlanState:
 def search_flights(state: TravelPlanState) -> TravelPlanState:
     """
     EcoWings Flight Search API'sini çağırarak uygun uçuşları arar.
-
-    Ne yapar:
-      1. FlightSearchTool'u import edip state içindeki seyahat bilgileriyle çalıştırır.
-      2. API yanıtı "EcoWings returned" ile başlıyorsa başarılı kabul eder;
-         flight_results listesine ham sonucu ekler.
-      3. Başarısız olursa (API hatası, sonuç yok vb.) flight_results boş bırakılır
-         ve retry_count bir artırılır — bu sayı check_flight_results tarafından
-         kaç deneme yapıldığını takip etmek için kullanılır.
     """
     # Lazy import: her çağrıda yüklenmemesi için node içinde import edilir
     from tools.flight_search import FlightSearchTool
@@ -90,15 +71,6 @@ def search_flights(state: TravelPlanState) -> TravelPlanState:
 def check_flight_results(state: TravelPlanState) -> str:
     """
     search_flights çıktısına bakarak graph'ın hangi yola sapacağını belirler.
-    Bu fonksiyon bir 'node' değil, 'conditional edge' dir — yani state'i
-    değiştirmez, sadece string bir etiket döndürür.
-
-    Dönüş değerleri ve anlamları:
-      "proceed"  → Uçuşlar bulundu, CrewAI agent'larına geç (run_crew_agents)
-      "retry"    → Uçuş bulunamadı ama deneme hakkı kaldı, tekrar dene (search_flights)
-      "fallback" → Maksimum deneme (2) aşıldı, tahmini sonuçla devam et (fallback_estimate)
-
-    Bu üç etiket orchestrator.py'deki add_conditional_edges sözlüğüyle eşleşir.
     """
     if state["flight_results"]:
         # Liste doluysa uçuş bulunmuş demektir
@@ -119,7 +91,6 @@ def fallback_estimate(state: TravelPlanState) -> TravelPlanState:
     Uçuş araması defalarca başarısız olduğunda devreye giren güvenlik ağı.
 
     Ne yapar:
-      1. used_fallback bayrağını True yapar (LangSmith trace'inde görünür).
       2. flight_results'a sahte bir "tahmini uçuş" mesajı koyar.
          Bu sayede run_crew_agents node'u boş listeyle karşılaşmaz;
          AI agent'ları tahmini bir plan üretmeye devam edebilir.
@@ -141,14 +112,6 @@ def run_crew_agents(state: TravelPlanState) -> TravelPlanState:
     """
     CrewAI agent ekibini (travel_crew) başlatarak tam seyahat planı üretir
     ve planı PDF dosyasına yazar.
-
-    Ne yapar:
-      1. Her plan için benzersiz bir UUID oluşturur (plan_id).
-      2. PDF'in yazılacağı klasörü (data/travel_plans/) gerekirse oluşturur.
-      3. run_travel_crew() fonksiyonunu çağırır; bu fonksiyon içeride
-         CrewAI agent'larını sırayla çalıştırır ve PDF'i pdf_path'e yazar.
-      4. Üretilen plan metnini crew_output'a, UUID'yi pdf_id'ye yazar;
-         /pdf/{pdf_id} endpoint'i bu id ile dosyayı sunacaktır.
     """
     from crew.travel_crew import run_travel_crew
 
@@ -186,13 +149,6 @@ def run_crew_agents(state: TravelPlanState) -> TravelPlanState:
 def generate_pdf(state: TravelPlanState) -> TravelPlanState:
     """
     PDF üretim adımını temsil eden geçiş node'u.
-
-    Neden var:
-      run_crew_agents içindeki run_travel_crew() zaten PDF'i diske yazmaktadır.
-      Bu node ayrı bir iş yapmaz; ancak LangGraph / LangSmith trace'inde
-      "PDF oluşturuldu" adımının görünür bir span olarak yer alması için
-      graph mimarisinde ayrı bir node olarak bırakılmıştır.
-      State'i değiştirmeden olduğu gibi döndürür.
     """
     # PDF zaten run_crew_agents'ta yazıldı; burada ek işlem yok
     return state

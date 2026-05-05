@@ -34,7 +34,7 @@ def run_travel_crew(
         ),
         tools=[flight_search_tool] + ([search_tool] if search_tool else []),
         llm="gpt-4o-mini",
-        verbose=True,
+        verbose=False,
     )
 
     flight_task = Task(
@@ -72,7 +72,7 @@ STEP 2 — Present the results:
         ),
         tools=[search_tool] if search_tool else [],
         llm="gpt-4o-mini",
-        verbose=True,
+        verbose=False,
     )
 
     hotel_task = Task(
@@ -104,7 +104,7 @@ If you cannot access real-time data, provide realistic recommendations based on 
         ),
         tools=[],
         llm="gpt-4o-mini",
-        verbose=True,
+        verbose=False,
     )
 
     itinerary_task = Task(
@@ -138,7 +138,7 @@ Format clearly using day headers (## Day 1 - Title) and bullet points.""",
         agents=[flight_researcher, hotel_researcher, itinerary_planner],
         tasks=[flight_task, hotel_task, itinerary_task],
         process=Process.sequential,
-        verbose=True,
+        verbose=False,
     )
 
     result = crew.kickoff()
