@@ -18,6 +18,11 @@ namespace CleanArchitecture.Infrastructure.Services
         public StripePaymentService(IOptions<StripeSettings> options)
         {
             _settings = options.Value;
+            if (string.IsNullOrWhiteSpace(_settings.SecretKey))
+            {
+                throw new InvalidOperationException("StripeSettings:SecretKey is not configured.");
+            }
+
             StripeConfiguration.ApiKey = _settings.SecretKey;
         }
 
@@ -36,7 +41,7 @@ namespace CleanArchitecture.Infrastructure.Services
                     PriceData = new SessionLineItemPriceDataOptions
                     {
                         Currency = "try",
-                        UnitAmount = (long)(price * 100), // kuruş
+                        UnitAmount = (long)Math.Round(price * 100, MidpointRounding.AwayFromZero), // kuruş
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
                             Name = "Flight Ticket"

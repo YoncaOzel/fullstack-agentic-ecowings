@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Configuration;
 
 
 namespace CleanArchitecture.WebApi.Controllers
@@ -25,15 +26,18 @@ namespace CleanArchitecture.WebApi.Controllers
         private readonly StripeSettings _settings;
         private readonly IPaymentService _paymentService;
         private readonly ApplicationDbContext _db;
+        private readonly IConfiguration _configuration;
 
         public PaymentController(
             IOptions<StripeSettings> settings,
             IPaymentService paymentService,
-            ApplicationDbContext db)
+            ApplicationDbContext db,
+            IConfiguration configuration)
         {
             _settings = settings.Value;
             _paymentService = paymentService;
             _db = db;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -42,8 +46,9 @@ namespace CleanArchitecture.WebApi.Controllers
         [HttpPost("pay")]
         public IActionResult Pay([FromQuery] int ticketId, [FromQuery] decimal amount)
         {
-            var successUrl = "http://localhost:3000/payment-success";
-            var cancelUrl = "http://localhost:3000/payment-fail";
+            var frontendUrl = _configuration["FrontendURL"]?.TrimEnd('/') ?? "http://localhost:5173";
+            var successUrl = $"{frontendUrl}/payment-success";
+            var cancelUrl = $"{frontendUrl}/payment-fail";
 
             var ticket = _db.Tickets.FirstOrDefault(t => t.Id == ticketId);
             

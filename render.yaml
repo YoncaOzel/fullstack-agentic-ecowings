@@ -1,0 +1,83 @@
+services:
+  - type: web
+    runtime: python
+    name: ecowings-eco-agent
+    rootDir: eco_agent_service
+    region: frankfurt
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+
+  - type: web
+    runtime: docker
+    name: fullstack-agentic-ecowings
+    rootDir: Backend
+    region: frankfurt
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: PythonEcoAgentService__BaseUrl
+        fromService:
+          name: ecowings-eco-agent
+          type: web
+          property: hostport
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: JWTSettings__Key
+        sync: false
+      - key: JWTSettings__Issuer
+        sync: false
+      - key: JWTSettings__Audience
+        sync: false
+      - key: JWTSettings__DurationInMinutes
+        value: 3600
+      - key: DuffelSettings__AccessToken
+        sync: false
+      - key: StripeSettings__SecretKey
+        sync: false
+      - key: StripeSettings__PublishableKey
+        sync: false
+      - key: StripeSettings__WebhookSecret
+        sync: false
+      - key: MailSettings__EmailFrom
+        sync: false
+      - key: MailSettings__DisplayName
+        value: EcoWings
+      - key: MailSettings__SmtpHost
+        sync: false
+      - key: MailSettings__SmtpPort
+        value: 587
+      - key: MailSettings__SmtpUser
+        sync: false
+      - key: MailSettings__SmtpPass
+        sync: false
+      - key: MailSettings__EnableSSL
+        value: true
+      - key: MailSettings__UseDefaultCredentials
+        value: false
+      - key: FrontendURL
+        sync: false
+
+  - type: web
+    runtime: static
+    name: ecowings-frontend
+    rootDir: frontend/ecowings
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        sync: false
+      - key: VITE_AI_SERVICE_URL
+        sync: false
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

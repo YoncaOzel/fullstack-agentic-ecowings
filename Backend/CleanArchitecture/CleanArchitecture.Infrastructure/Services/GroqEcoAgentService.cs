@@ -18,7 +18,21 @@ namespace CleanArchitecture.Infrastructure.Services
         {
             _httpClient = httpClient;
             _airportRepository = airportRepository;
-            _pythonApiUrl = configuration["PythonEcoAgentService:BaseUrl"] ?? "http://localhost:8000";
+            _pythonApiUrl = NormalizeBaseUrl(configuration["PythonEcoAgentService:BaseUrl"] ?? "http://localhost:8002");
+        }
+
+        private static string NormalizeBaseUrl(string baseUrl)
+        {
+            if (string.IsNullOrWhiteSpace(baseUrl))
+            {
+                return "http://localhost:8002";
+            }
+
+            baseUrl = baseUrl.Trim().TrimEnd('/');
+            return baseUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+                   baseUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+                ? baseUrl
+                : $"http://{baseUrl}";
         }
 
         public async Task<EcoAgentResponseDto> GetAlternativeEmissionAsync(string departureCity, string destinationCity)

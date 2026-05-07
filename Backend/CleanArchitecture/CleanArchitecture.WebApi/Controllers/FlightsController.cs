@@ -12,6 +12,7 @@ using CleanArchitecture.Core.Entities;
 using System;
 using CleanArchitecture.Core.Features.Flights.Commands.BookFlight;
 using CleanArchitecture.Core.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace CleanArchitecture.WebAPI.Controllers
 {
@@ -21,11 +22,13 @@ namespace CleanArchitecture.WebAPI.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IPaymentService _paymentService;
+        private readonly IConfiguration _configuration;
 
-        public FlightsController(IMediator mediator, IPaymentService paymentService)
+        public FlightsController(IMediator mediator, IPaymentService paymentService, IConfiguration configuration)
         {
             _mediator = mediator;
             _paymentService = paymentService;
+            _configuration = configuration;
         }
 
  
@@ -99,8 +102,9 @@ namespace CleanArchitecture.WebAPI.Controllers
             var ticketId = await _mediator.Send(command);
 
             // 2. Ödeme bağlantısı oluştur
-            var successUrl = "http://localhost:3000/payment-success";
-            var cancelUrl = "http://localhost:3000/payment-fail";
+            var frontendUrl = _configuration["FrontendURL"]?.TrimEnd('/') ?? "http://localhost:5173";
+            var successUrl = $"{frontendUrl}/payment-success";
+            var cancelUrl = $"{frontendUrl}/payment-fail";
 
             decimal amountToPay = command.IsDiscounted && command.DiscountedPrice.HasValue 
                 ? command.DiscountedPrice.Value 
