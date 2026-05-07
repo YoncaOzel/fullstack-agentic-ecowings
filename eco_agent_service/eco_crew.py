@@ -8,7 +8,7 @@ from crewai.tools import tool
 
 load_dotenv()
 
-llm_model = "groq/llama-3.3-70b-versatile"
+llm_model = "gpt-4o-mini"
 
 @tool("Route and Distance Calculator")
 def calculate_route(origin_city: str, destination_city: str) -> str:
