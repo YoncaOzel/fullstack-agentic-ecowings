@@ -57,13 +57,31 @@ app = FastAPI(
 )
 
 # CORS ayarları: frontend geliştirme portlarından gelen isteklere izin ver
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
+def get_allowed_origins():
+    origins = [
         "http://localhost:3000",   # Create React App
         "http://localhost:3001",   # Alternatif React portu
         "http://localhost:5173",   # Vite / SvelteKit
-    ],
+    ]
+
+    frontend_url = os.getenv("FRONTEND_URL")
+    if frontend_url:
+        origins.append(frontend_url.rstrip("/"))
+
+    extra_origins = os.getenv("CORS_ORIGINS")
+    if extra_origins:
+        origins.extend(
+            origin.strip().rstrip("/")
+            for origin in extra_origins.split(",")
+            if origin.strip()
+        )
+
+    return list(dict.fromkeys(origins))
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=get_allowed_origins(),
     allow_methods=["POST", "GET"],
     allow_headers=["*"],
 )
