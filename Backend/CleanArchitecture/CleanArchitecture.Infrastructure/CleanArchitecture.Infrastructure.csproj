@@ -4,6 +4,7 @@
     <Version>1.1.0</Version>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="BCrypt" Version="1.0.0" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="BertTokenizer" Version="1.0.0" />
     <PackageReference Include="BERTTokenizers" Version="1.2.0" />
@@ -18,7 +19,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.101" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     <PackageReference Include="Microsoft.ML" Version="5.0.0" />
     <PackageReference Include="Microsoft.ML.FastTree" Version="5.0.0" />

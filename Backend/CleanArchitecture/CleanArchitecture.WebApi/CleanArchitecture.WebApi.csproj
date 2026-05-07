@@ -13,11 +13,17 @@
     <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Content Remove="C:\Users\TUSAŞ\.nuget\packages\berttokenizers\1.2.0\contentFiles\any\net6.0\Vocabularies\base_cased.txt" />
+    <Content Remove="C:\Users\TUSAŞ\.nuget\packages\berttokenizers\1.2.0\contentFiles\any\net6.0\Vocabularies\base_cased_german.txt" />
+    <Content Remove="C:\Users\TUSAŞ\.nuget\packages\berttokenizers\1.2.0\contentFiles\any\net6.0\Vocabularies\base_cased_large.txt" />
+    <Content Remove="C:\Users\TUSAŞ\.nuget\packages\berttokenizers\1.2.0\contentFiles\any\net6.0\Vocabularies\base_cased_multilingual.txt" />
+    <Content Remove="C:\Users\TUSAŞ\.nuget\packages\berttokenizers\1.2.0\contentFiles\any\net6.0\Vocabularies\base_uncased.txt" />
+    <Content Remove="C:\Users\TUSAŞ\.nuget\packages\berttokenizers\1.2.0\contentFiles\any\net6.0\Vocabularies\base_uncased_large.txt" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="BertTokenizer" Version="1.0.0" />
-    <PackageReference Include="BERTTokenizers" Version="1.2.0">
-      <ExcludeAssets>contentFiles</ExcludeAssets>
-    </PackageReference>
+    <PackageReference Include="BERTTokenizers" Version="1.2.0" />
     <PackageReference Include="MediatR" Version="12.5.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.14">
       <PrivateAssets>all</PrivateAssets>

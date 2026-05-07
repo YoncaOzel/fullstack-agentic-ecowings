@@ -49,7 +49,14 @@ namespace CleanArchitecture.Core.Features.Flights.Commands.BookFlight
                 var selectedAirline = airline.FirstOrDefault(a => a.AirlineCode == request.AirlineCode);
                 if (selectedAirline == null)
                 {
-                    throw new Exception($"Airline with code {request.AirlineCode} not found");
+                    selectedAirline = new Airline
+                    {
+                        AirlineCode = request.AirlineCode ?? "UNKNOWN",
+                        Name = request.AirlineCode ?? "Unknown Airline",
+                        Country = "Unknown"
+                    };
+
+                    await _airlineRepository.AddAsync(selectedAirline);
                 }
 
                 // 2. User'ı email'e göre bul

@@ -27,9 +27,8 @@ using Microsoft.AspNetCore.RateLimiting;
 var builder = WebApplication.CreateBuilder(args);
 
 //Add configurations
-builder.Configuration.AddJsonFile("appsettings.json", optional: true);
+builder.Configuration.AddJsonFile("appsettings.json");
 builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true);
-builder.Configuration.AddEnvironmentVariables();
 
 
 
@@ -90,12 +89,7 @@ else
 app.UseHttpsRedirection();
 app.UseRateLimiter();
 app.UseRouting();
-var frontendUrl = builder.Configuration["FrontendURL"] ?? "http://localhost:5173";
-app.UseCors(options => options
-    .WithOrigins(frontendUrl, "http://localhost:5173", "http://localhost:3000")
-    .AllowAnyHeader()
-    .AllowAnyMethod()
-    .AllowCredentials());
+app.UseCors(options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSwaggerExtension();
