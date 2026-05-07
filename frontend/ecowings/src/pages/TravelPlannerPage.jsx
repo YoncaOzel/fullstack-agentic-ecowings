@@ -7,7 +7,9 @@ import {
 /* ─────────────────────────────────────────────────────────────────
    FROZEN — do not touch anything in this block
    ───────────────────────────────────────────────────────────────── */
-const AI_SERVICE_URL = import.meta.env.VITE_AI_SERVICE_URL || 'http://localhost:8001';
+const AI_SERVICE_URL = import.meta.env.VITE_FAQ_SERVICE_URL
+  || import.meta.env.VITE_AI_SERVICE_URL
+  || 'http://localhost:8001';
 
 /* ── Inline bold parser: "**text**" → <strong> ─────────────────── */
 function parseInline(text, baseStyle = {}) {
