@@ -13,6 +13,13 @@ namespace CleanArchitecture.Infrastructure.Services
         private readonly HttpClient _httpClient;
         private readonly string _pythonApiUrl;
         private readonly IAirportRepositoryAsync _airportRepository; // ✅ Veritabanından havalimanı bulmak için eklendi
+        private static readonly System.Collections.Generic.IReadOnlyDictionary<string, string> AirportCityFallbacks =
+            new System.Collections.Generic.Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["IST"] = "Istanbul, Turkey",
+                ["SAW"] = "Istanbul, Turkey",
+                ["AYT"] = "Antalya, Turkey"
+            };
 
         public GroqEcoAgentService(HttpClient httpClient, IConfiguration configuration, IAirportRepositoryAsync airportRepository)
         {
@@ -62,7 +69,7 @@ namespace CleanArchitecture.Infrastructure.Services
                 var responseString = await response.Content.ReadAsStringAsync();
                 var result = JsonSerializer.Deserialize<EcoAgentResponseDto>(responseString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                if (result == null || result.Mode == "None" || result.EmissionKg <= 0)
+                if (result == null || result.Mode == "None")
                 {
                     return null;
                 }
@@ -90,6 +97,11 @@ namespace CleanArchitecture.Infrastructure.Services
                     var exactMatch = System.Linq.Enumerable.FirstOrDefault(airports, a => a.Code.Equals(codeOrName, StringComparison.OrdinalIgnoreCase));
                     var targetAirport = exactMatch ?? airports[0];
                     return $"{targetAirport.City}, {targetAirport.Country}";
+                }
+
+                if (AirportCityFallbacks.TryGetValue(codeOrName, out var cityName))
+                {
+                    return cityName;
                 }
 
                 return $"{codeOrName} International Airport";

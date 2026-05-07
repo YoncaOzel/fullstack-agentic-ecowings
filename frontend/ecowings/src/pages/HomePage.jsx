@@ -279,6 +279,7 @@ export default function HomePage() {
 
   // Search form state
   const [searchForm, setSearchForm] = useState({ from: '', to: '', departure: null, travelClass: 'Economy' });
+  const [selectedAirports, setSelectedAirports] = useState({ from: null, to: null });
   const [searchResults, setSearchResults] = useState(null);
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
@@ -287,13 +288,23 @@ export default function HomePage() {
   const [ecoStatus, setEcoStatus] = useState('idle'); // idle | loading | done | no-alt | error
   const [ecoResult, setEcoResult] = useState(null);   // { mode, emissionKg }
 
+  const resolveEcoLocation = (code, selectedAirport) => {
+    const airport = selectedAirport?.code === code
+      ? selectedAirport
+      : airports.find(a => a.code?.toUpperCase() === code?.toUpperCase());
+
+    if (airport?.city && airport?.country && airport.city !== 'Unknown') {
+      return `${airport.city}, ${airport.country}`;
+    }
+
+    return code;
+  };
+
   const handleEcoCheck = async () => {
     setEcoStatus('loading');
     try {
-      const fromAirport = airports.find(a => a.code === searchForm.from);
-      const toAirport   = airports.find(a => a.code === searchForm.to);
-      const originCity  = fromAirport ? `${fromAirport.city}, ${fromAirport.country}` : searchForm.from;
-      const destCity    = toAirport   ? `${toAirport.city}, ${toAirport.country}`     : searchForm.to;
+      const originCity = resolveEcoLocation(searchForm.from, selectedAirports.from);
+      const destCity = resolveEcoLocation(searchForm.to, selectedAirports.to);
       const res = await flightService.getAlternativeTransport(originCity, destCity);
       const alt = res.data?.data;
       if (!alt || alt.mode === 'There is no reasonable alternative way') {
@@ -525,7 +536,12 @@ export default function HomePage() {
                     icon="takeoff"
                     airports={airports}
                     value={searchForm.from}
-                    onChange={(code) => setSearchForm((p) => ({ ...p, from: code }))}
+                    onChange={(code, airport = null) => {
+                      setSearchForm((p) => ({ ...p, from: code }));
+                      setSelectedAirports((p) => ({ ...p, from: airport }));
+                      setEcoStatus('idle');
+                      setEcoResult(null);
+                    }}
                     placeholder="Departure airport"
                   />
                 </div>
@@ -543,7 +559,12 @@ export default function HomePage() {
                     icon="landing"
                     airports={airports}
                     value={searchForm.to}
-                    onChange={(code) => setSearchForm((p) => ({ ...p, to: code }))}
+                    onChange={(code, airport = null) => {
+                      setSearchForm((p) => ({ ...p, to: code }));
+                      setSelectedAirports((p) => ({ ...p, to: airport }));
+                      setEcoStatus('idle');
+                      setEcoResult(null);
+                    }}
                     placeholder="Arrival airport"
                   />
                 </div>
