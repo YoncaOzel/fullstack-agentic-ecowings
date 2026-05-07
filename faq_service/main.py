@@ -3,7 +3,7 @@ os.environ.setdefault("KMP_DUPLICATE_LIB_OK", "TRUE")
 import uuid
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
@@ -232,7 +232,13 @@ async def plan_travel(req: TravelRequest):
       orchestrator modülü LangSmith ve CrewAI'yı init eder; uygulama
       başlarken değil ilk /plan isteğinde yüklenmesi tercih edilir.
     """
-    from graph.orchestrator import run_travel_graph
+    try:
+        from graph.orchestrator import run_travel_graph
+    except ImportError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="Travel Planner is temporarily unavailable in this deployment. FAQ chat is available.",
+        ) from exc
 
     # LangGraph iş akışını çalıştır, plan metnini ve PDF id'sini al
     plan_text, pdf_id = await run_travel_graph(req)
