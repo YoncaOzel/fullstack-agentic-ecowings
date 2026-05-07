@@ -1,7 +1,24 @@
 import { Plane, Clock, Leaf, ShoppingCart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
-import EcoCheckButton from './EcoCheckButton';
+
+const AIRLINE_NAMES = {
+  IB: 'Iberia', TK: 'Turkish Airlines', LH: 'Lufthansa', BA: 'British Airways',
+  FR: 'Ryanair', U2: 'easyJet', AF: 'Air France', KL: 'KLM', AY: 'Finnair',
+  SK: 'SAS', OS: 'Austrian', SN: 'Brussels Airlines', TP: 'TAP Portugal',
+  VY: 'Vueling', EK: 'Emirates', QR: 'Qatar Airways', EY: 'Etihad',
+  PC: 'Pegasus', XQ: 'SunExpress', HV: 'Transavia', W6: 'Wizz Air',
+  BT: 'Air Baltic', LO: 'LOT Polish', OK: 'Czech Airlines', A3: 'Aegean',
+  RO: 'TAROM', AA: 'American', DL: 'Delta', UA: 'United', WN: 'Southwest',
+  AC: 'Air Canada', QF: 'Qantas', SQ: 'Singapore', CX: 'Cathay Pacific',
+  NH: 'ANA', JL: 'Japan Airlines', LX: 'Swiss', AZ: 'ITA Airways',
+  D8: 'Norwegian', DY: 'Norwegian', G3: 'Gol', LA: 'LATAM', AM: 'Aeromexico',
+};
+
+function getAirlineName(code) {
+  if (!code) return null;
+  return AIRLINE_NAMES[code.toUpperCase()] || null;
+}
 
 function getEmissionClass(kg) {
   if (kg == null) return null;
@@ -94,7 +111,7 @@ export default function AmadeusFlightCard({ flight }) {
           {(flight.carrier || 'XX').slice(0, 2).toUpperCase()}
         </div>
         <div style={{ fontSize: '0.68rem', color: '#475569', fontWeight: 600, textAlign: 'center', lineHeight: 1.35, wordBreak: 'break-word' }}>
-          {flight.carrier || '—'}
+          {getAirlineName(flight.carrier) || flight.carrier || '—'}
         </div>
         <div style={{
           fontSize: '0.68rem', fontWeight: 700, color: '#0f766e',
@@ -206,12 +223,6 @@ export default function AmadeusFlightCard({ flight }) {
           <div style={{ fontSize: '0.68rem', color: '#64748b', whiteSpace: 'nowrap', fontWeight: 600 }}>
             {flight.carbonEmission.toFixed(1)} kg CO₂
           </div>
-          <EcoCheckButton
-            origin={flight.departure}
-            destination={flight.arrival}
-            carbonEmissionKg={flight.carbonEmission}
-            theme="light"
-          />
         </div>
       )}
 

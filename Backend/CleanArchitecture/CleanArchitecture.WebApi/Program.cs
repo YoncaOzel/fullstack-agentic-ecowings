@@ -29,6 +29,7 @@ var builder = WebApplication.CreateBuilder(args);
 //Add configurations
 builder.Configuration.AddJsonFile("appsettings.json", optional: true);
 builder.Configuration.AddJsonFile("appsettings.Development.json", optional: true);
+builder.Configuration.AddEnvironmentVariables();
 
 
 
@@ -89,7 +90,12 @@ else
 app.UseHttpsRedirection();
 app.UseRateLimiter();
 app.UseRouting();
-app.UseCors(options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+var frontendUrl = builder.Configuration["FrontendURL"] ?? "http://localhost:5173";
+app.UseCors(options => options
+    .WithOrigins(frontendUrl, "http://localhost:5173", "http://localhost:3000")
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials());
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSwaggerExtension();

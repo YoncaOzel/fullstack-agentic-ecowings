@@ -391,7 +391,7 @@ export default function Navbar() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             {/* User dropdown (authenticated) */}
             {isAuthenticated && (
-              <div ref={dropdownRef} style={{ position: 'relative' }}>
+              <div ref={dropdownRef} style={{ position: 'relative', display: 'inline-block' }}>
                 {/* Trigger pill */}
                 <button
                   className="nav-profile-trigger"
@@ -462,7 +462,8 @@ export default function Navbar() {
                     top: '100%',
                     marginTop: '8px',
                     right: 0,
-                    width: '220px',
+                    left: 0,
+                    width: '100%',
                     background: '#ffffff',
                     border: '1px solid #e4e4e7',
                     borderRadius: '6px',
@@ -472,19 +473,19 @@ export default function Navbar() {
                   }}>
                     {/* User info header */}
                     <div style={{
-                      padding: '12px 16px',
+                      padding: '10px 12px',
                       borderBottom: '1px solid #e4e4e7',
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{
-                          width: '38px',
-                          height: '38px',
+                          width: '28px',
+                          height: '28px',
                           borderRadius: '50%',
                           background: 'linear-gradient(135deg, #1b6d24 0%, #004b0f 100%)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          fontSize: '0.8rem',
+                          fontSize: '0.688rem',
                           fontWeight: 700,
                           color: '#e5ffdd',
                           flexShrink: 0,
@@ -492,14 +493,14 @@ export default function Navbar() {
                         }}>
                           {initials}
                         </div>
-                        <div style={{ minWidth: 0 }}>
+                        <div style={{ minWidth: 0, flex: 1 }}>
                           <div style={{
                             fontSize: '0.875rem',
                             fontWeight: 600,
                             color: '#09090b',
+                            whiteSpace: 'nowrap',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap',
                           }}>
                             {displayName}
                           </div>
@@ -550,6 +551,7 @@ export default function Navbar() {
                           width: '100%',
                           display: 'flex',
                           alignItems: 'center',
+                          justifyContent: 'flex-start',
                           gap: '8px',
                           padding: '6px 8px',
                           borderRadius: '4px',

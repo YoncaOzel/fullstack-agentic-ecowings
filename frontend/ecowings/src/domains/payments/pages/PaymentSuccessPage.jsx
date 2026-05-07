@@ -69,94 +69,94 @@ export default function PaymentSuccessPage() {
 
   /* ── Render ── */
   return (
-    <main style={{ minHeight: 'calc(100vh - 64px)', background: 'var(--bg-base)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 16px' }}>
+    <main style={{ minHeight: 'calc(100vh - 64px)', background: 'linear-gradient(160deg,#f6faf7 0%,#eaf3ed 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 16px' }}>
       <div style={{ maxWidth: '520px', width: '100%', textAlign: 'center' }}>
 
         {/* Icon */}
         <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '32px' }}>
           <div style={{
             width: '100px', height: '100px', borderRadius: '50%',
-            background: status === 'polling' ? 'rgba(34,197,94,0.06)' : 'rgba(34,197,94,0.1)',
-            border: `2px solid ${status === 'polling' ? 'rgba(34,197,94,0.15)' : 'rgba(34,197,94,0.25)'}`,
+            background: status === 'polling' ? 'rgba(22,74,56,0.06)' : 'rgba(22,74,56,0.1)',
+            border: `2px solid ${status === 'polling' ? 'rgba(22,74,56,0.14)' : 'rgba(22,74,56,0.22)'}`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             animation: status !== 'polling' ? 'popIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both' : 'none',
           }}>
             {status === 'polling'
-              ? <Loader2 size={48} style={{ color: '#22c55e', animation: 'spin 1s linear infinite' }} />
-              : <CheckCircle size={48} style={{ color: '#22c55e' }} strokeWidth={1.8} />
+              ? <Loader2 size={48} style={{ color: '#1F6B4A', animation: 'spin 1s linear infinite' }} />
+              : <CheckCircle size={48} style={{ color: '#1F6B4A' }} strokeWidth={1.8} />
             }
           </div>
           {status !== 'polling' && (
-            <div style={{ position: 'absolute', width: '80px', height: '80px', borderRadius: '50%', background: 'radial-gradient(circle,rgba(34,197,94,0.25) 0%,transparent 70%)', animation: 'pulse 2s ease-in-out infinite' }} />
+            <div style={{ position: 'absolute', width: '80px', height: '80px', borderRadius: '50%', background: 'radial-gradient(circle,rgba(22,74,56,0.18) 0%,transparent 70%)', animation: 'pulse 2s ease-in-out infinite' }} />
           )}
         </div>
 
         {/* Card */}
-        <div style={{ background: 'linear-gradient(160deg,#111c11 0%,#0e1a0e 100%)', border: '1px solid rgba(34,197,94,0.18)', borderRadius: '24px', padding: '40px 36px', boxShadow: '0 16px 60px rgba(0,0,0,0.4), 0 0 40px rgba(34,197,94,0.08)' }}>
+        <div style={{ background: '#fff', border: '1px solid #e2efe6', borderRadius: '24px', padding: '40px 36px', boxShadow: '0 4px 24px rgba(15,61,46,0.08), 0 1px 4px rgba(15,61,46,0.04)' }}>
 
           {status === 'polling' && (
             <>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.7rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '16px' }}>
-                Ödeme Doğrulanıyor
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(22,74,56,0.07)', border: '1.5px solid rgba(22,74,56,0.16)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.7rem', fontWeight: 700, color: '#164A38', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '16px' }}>
+                Verifying Payment
               </div>
-              <h1 style={{ fontSize: 'clamp(1.4rem,4vw,1.9rem)', fontWeight: 900, fontFamily: "'Plus Jakarta Sans',sans-serif", color: '#f0fdf4', margin: '0 0 12px', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
-                Ödemeniz İşleniyor…
+              <h1 style={{ fontSize: 'clamp(1.4rem,4vw,1.9rem)', fontWeight: 900, fontFamily: "'Plus Jakarta Sans',sans-serif", color: '#0B2E22', margin: '0 0 12px', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                Processing Your Payment…
               </h1>
-              <p style={{ color: '#9ca3af', fontSize: '0.95rem', lineHeight: 1.7, margin: 0 }}>
-                Ödemeniz Stripe tarafından onaylanıyor. Bu işlem birkaç saniye sürebilir, lütfen sayfayı kapatmayın.
+              <p style={{ color: '#5A5F5C', fontSize: '0.95rem', lineHeight: 1.7, margin: 0 }}>
+                Your payment is being confirmed by Stripe. This may take a few seconds — please do not close this page.
               </p>
             </>
           )}
 
           {(status === 'confirmed' || status === 'timeout') && (
             <>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.7rem', fontWeight: 700, color: '#22c55e', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '16px' }}>
-                Ödeme Başarılı
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(22,74,56,0.08)', border: '1.5px solid rgba(22,74,56,0.18)', borderRadius: '20px', padding: '4px 14px', fontSize: '0.7rem', fontWeight: 700, color: '#164A38', letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '16px' }}>
+                Payment Successful
               </div>
 
-              <h1 style={{ fontSize: 'clamp(1.5rem,4vw,2rem)', fontWeight: 900, fontFamily: "'Plus Jakarta Sans',sans-serif", color: '#f0fdf4', margin: '0 0 12px', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
-                Biletiniz Onaylandı!
+              <h1 style={{ fontSize: 'clamp(1.5rem,4vw,2rem)', fontWeight: 900, fontFamily: "'Plus Jakarta Sans',sans-serif", color: '#0B2E22', margin: '0 0 12px', letterSpacing: '-0.02em', lineHeight: 1.2 }}>
+                Your Ticket is Confirmed!
               </h1>
 
               {status === 'confirmed' && pnrCode ? (
                 <div style={{ margin: '0 0 20px' }}>
-                  <p style={{ color: '#9ca3af', fontSize: '0.9rem', marginBottom: '14px' }}>
-                    PNR kodunuz oluşturuldu:
+                  <p style={{ color: '#5A5F5C', fontSize: '0.9rem', marginBottom: '14px' }}>
+                    Your PNR code has been generated:
                   </p>
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.22)', borderRadius: '12px', padding: '12px 24px' }}>
-                    <span style={{ fontSize: '0.65rem', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 600 }}>PNR</span>
-                    <span style={{ fontFamily: "'DM Mono',monospace", fontWeight: 800, fontSize: '1.4rem', color: '#f0fdf4', letterSpacing: '0.18em' }}>{pnrCode}</span>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', background: '#F1F6F2', border: '1.5px solid #d6eadd', borderRadius: '12px', padding: '12px 24px' }}>
+                    <span style={{ fontSize: '0.65rem', color: '#8A8E8B', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700 }}>PNR</span>
+                    <span style={{ fontFamily: "'DM Mono',monospace", fontWeight: 800, fontSize: '1.4rem', color: '#0F3D2E', letterSpacing: '0.18em' }}>{pnrCode}</span>
                   </div>
                 </div>
               ) : (
-                <p style={{ color: '#9ca3af', fontSize: '0.95rem', lineHeight: 1.7, margin: '0 0 28px' }}>
-                  Ödemeniz başarıyla alındı. Biletiniz kısa süre içinde sisteme yansıyacak ve PNR kodunuz profilinizde görünecektir.
+                <p style={{ color: '#5A5F5C', fontSize: '0.95rem', lineHeight: 1.7, margin: '0 0 28px' }}>
+                  Your payment was received successfully. Your ticket will appear in the system shortly and your PNR code will be visible in your profile.
                 </p>
               )}
 
-              <div style={{ height: '1px', background: 'linear-gradient(90deg,transparent,rgba(34,197,94,0.2),transparent)', marginBottom: '28px' }} />
+              <div style={{ height: '1px', background: 'linear-gradient(90deg,transparent,#d6eadd,transparent)', marginBottom: '28px' }} />
 
               <div style={{ display: 'flex', gap: '12px', flexDirection: 'column' }}>
                 <button
                   onClick={() => navigate('/profile?tab=tickets')}
-                  style={{ width: '100%', padding: '14px', borderRadius: '12px', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg,#22c55e 0%,#16a34a 100%)', color: '#051005', fontWeight: 800, fontSize: '0.9rem', fontFamily: "'Plus Jakarta Sans',sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 4px 20px rgba(34,197,94,0.3)', transition: 'filter 0.2s' }}
-                  onMouseEnter={e => { e.currentTarget.style.filter = 'brightness(1.08)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.filter = 'brightness(1)'; }}
+                  style={{ width: '100%', padding: '14px', borderRadius: '12px', border: 'none', cursor: 'pointer', background: 'linear-gradient(135deg,#2E8B5F 0%,#164A38 100%)', color: '#fff', fontWeight: 800, fontSize: '0.9rem', fontFamily: "'Plus Jakarta Sans',sans-serif", display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 4px 20px rgba(15,61,46,0.25)', transition: 'filter 0.2s, transform 0.2s' }}
+                  onMouseEnter={e => { e.currentTarget.style.filter = 'brightness(1.08)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.filter = 'brightness(1)'; e.currentTarget.style.transform = 'translateY(0)'; }}
                 >
-                  <Ticket size={16} /> Biletlerimi Gör
+                  <Ticket size={16} /> View My Tickets
                 </button>
                 <button
                   onClick={() => navigate('/')}
-                  style={{ width: '100%', padding: '13px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer', background: 'transparent', color: '#9ca3af', fontWeight: 600, fontSize: '0.88rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
-                  onMouseEnter={e => { e.currentTarget.style.color = '#f0fdf4'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.color = '#9ca3af'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
+                  style={{ width: '100%', padding: '13px', borderRadius: '12px', border: '1.5px solid #e2efe6', cursor: 'pointer', background: '#F1F6F2', color: '#5A5F5C', fontWeight: 600, fontSize: '0.88rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
+                  onMouseEnter={e => { e.currentTarget.style.color = '#0B2E22'; e.currentTarget.style.borderColor = '#b8d9c4'; e.currentTarget.style.background = '#e8f3ec'; }}
+                  onMouseLeave={e => { e.currentTarget.style.color = '#5A5F5C'; e.currentTarget.style.borderColor = '#e2efe6'; e.currentTarget.style.background = '#F1F6F2'; }}
                 >
-                  <Home size={15} /> Ana Sayfaya Dön
+                  <Home size={15} /> Back to Home
                 </button>
               </div>
 
-              <p style={{ marginTop: '20px', fontSize: '0.78rem', color: '#4b5563' }}>
-                {countdown} saniye içinde biletlerinize yönlendiriliyorsunuz…
+              <p style={{ marginTop: '20px', fontSize: '0.78rem', color: '#8A8E8B' }}>
+                You will be redirected to your tickets in {countdown} seconds…
               </p>
             </>
           )}

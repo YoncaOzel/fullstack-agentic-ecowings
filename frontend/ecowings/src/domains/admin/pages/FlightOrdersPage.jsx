@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import OrdersTable from '../components/OrdersTable';
-import { IcoOrders, IcoDollar, IcoTicket, IcoPlane, IcoFilter, IcoExport, IcoPlus, IcoSearch, IcoUp, IcoDown } from '../components/Icons';
+import { IcoOrders, IcoDollar, IcoTicket, IcoPlane, IcoSearch } from '../components/Icons';
 import { getAllTickets, mapTicketToOrder } from '../services/adminApi';
 
-function MiniKpi({ label, IconC, value, delta, up, cmp }) {
+function MiniKpi({ label, IconC, value, cmp }) {
   return (
     <div className="admin-card admin-kpi">
       <div className="lab">
@@ -12,10 +12,6 @@ function MiniKpi({ label, IconC, value, delta, up, cmp }) {
       </div>
       <div className="val">{value}</div>
       <div className="foot">
-        <span className={"admin-delta " + (up ? "up" : "down")}>
-          {up ? <IcoUp size={10} /> : <IcoDown size={10} />}
-          {delta}
-        </span>
         <span className="cmp">{cmp}</span>
       </div>
     </div>
@@ -67,8 +63,6 @@ export default function FlightOrdersPage() {
 
   const totalRev = filtered.filter(o => o.status !== "Cancelled").reduce((s, o) => s + o.amount, 0);
 
-  const today = new Date().toDateString();
-  const ordersToday = orders.filter(o => new Date(o.date).toDateString() === today || o.date === "").length;
   const paidOrders  = orders.filter(o => o.status === "Confirmed");
   const grossTotal  = paidOrders.reduce((s, o) => s + o.amount, 0);
   const avgPerBooking = paidOrders.length > 0 ? Math.round(grossTotal / paidOrders.length) : 0;
@@ -92,19 +86,14 @@ export default function FlightOrdersPage() {
             Every booking flowing through the EcoWings network. {orders.length} total · {pendingCount} pending.
           </p>
         </div>
-        <div className="admin-page-actions">
-          <button className="admin-btn admin-btn-ghost"><IcoFilter size={14} /> Advanced</button>
-          <button className="admin-btn admin-btn-ghost"><IcoExport size={14} /> Export CSV</button>
-          <button className="admin-btn admin-btn-primary"><IcoPlus size={14} /> New order</button>
-        </div>
+        <div className="admin-page-actions" />
       </div>
 
-      <div className="admin-kpis" style={{ marginBottom: 16 }}>
-        <MiniKpi label="Total orders"      IconC={IcoOrders} value={orders.length.toLocaleString()} delta="" up cmp={`${pendingCount} pending`} />
-        <MiniKpi label="Gross value"       IconC={IcoDollar} value={fmtMoney(grossTotal)} delta="" up cmp={`Avg ${fmtMoney(avgPerBooking)} / booking`} />
-        <MiniKpi label="Pending review"    IconC={IcoTicket} value={pendingCount.toString()} delta="" up={false} cmp="Awaiting payment" />
-        {/* TODO: Cancellation rate requires a cancelled status field on Ticket — currently not available */}
-        <MiniKpi label="Confirmed orders"  IconC={IcoPlane}  value={paidOrders.length.toLocaleString()} delta="" up cmp={`of ${orders.length} total`} />
+      <div className="admin-kpis">
+        <MiniKpi label="Total orders"     IconC={IcoOrders} value={orders.length.toLocaleString()} cmp={`${pendingCount} pending`} />
+        <MiniKpi label="Gross value"      IconC={IcoDollar} value={fmtMoney(grossTotal)} cmp={`Avg ${fmtMoney(avgPerBooking)} / booking`} />
+        <MiniKpi label="Pending review"   IconC={IcoTicket} value={pendingCount.toString()} cmp="Awaiting payment" />
+        <MiniKpi label="Confirmed orders" IconC={IcoPlane}  value={paidOrders.length.toLocaleString()} cmp={`of ${orders.length} total`} />
       </div>
 
       <div className="admin-card" style={{ overflow: "hidden" }}>
@@ -124,16 +113,12 @@ export default function FlightOrdersPage() {
                 onChange={e => setQ(e.target.value)}
               />
             </div>
-            <div className="admin-pillseg">
-              {["All", "Economy", "Premium", "Business", "First"].map(c => (
-                <button key={c} className={cabin === c ? "on" : ""} onClick={() => setCabin(c)}>{c}</button>
-              ))}
-            </div>
+            
           </div>
         </div>
 
         <div className="admin-filters">
-          {["All", "Confirmed", "Pending", "Cancelled"].map(f => (
+          {["All", "Confirmed", "Pending"].map(f => (
             <button key={f} className={"admin-chip " + (filter === f ? "on" : "")} onClick={() => setFilter(f)}>
               {f}<span className="c">{counts[f]}</span>
             </button>
@@ -143,11 +128,7 @@ export default function FlightOrdersPage() {
         <OrdersTable rows={filtered} />
 
         <div className="admin-card-foot">
-          <span>Page 1 of {Math.ceil(orders.length / 15) || 1} · {orders.length} orders total</span>
-          <div style={{ display: "flex", gap: 6 }}>
-            <button className="admin-btn admin-btn-ghost" style={{ padding: "6px 10px" }}>Prev</button>
-            <button className="admin-btn admin-btn-ghost" style={{ padding: "6px 10px" }}>Next</button>
-          </div>
+          <span>{orders.length} orders total</span>
         </div>
       </div>
     </>

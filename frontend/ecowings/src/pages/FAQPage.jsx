@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 
 /* ── backend (preserved) ── */
-const FAQ_SERVICE_URL = 'http://localhost:8001';
+const FAQ_SERVICE_URL = import.meta.env.VITE_AI_SERVICE_URL || 'http://localhost:8001';
 const FALLBACK = `I can't respond right now, sorry!\n\nPlease try again later:\n• support@ecowings.com`;
 
 async function fetchResponse(text) {

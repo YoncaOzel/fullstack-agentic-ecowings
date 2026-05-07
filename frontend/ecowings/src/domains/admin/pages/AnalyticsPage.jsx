@@ -1,21 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { BookingsCancelChart, HBars, Funnel, CarbonChart, Donut, RevenueChart, SentimentDistChart } from '../components/Charts';
-import {
-  IcoDollar, IcoOrders, IcoLeaf, IcoGlobe,
-  IcoExport, IcoPlus, IcoUp
-} from '../components/Icons';
-import {
-  // TODO: replace with GET api/Analytics/cancellations-weekly when available — Ticket has no cancelled status field
-  CANCEL_BY_WEEK,
-  // TODO: replace with GET api/Analytics/cabin-mix when available — Ticket has no cabin/fare-class field
-  CABIN_MIX,
-  // TODO: replace with GET api/Analytics/geo-distribution when available — requires IATA→region mapping table
-  GEO,
-  // TODO: replace with GET api/Analytics/carbon-monthly when available
-  CARBON_MONTHLY,
-  // TODO: replace with GET api/Analytics/conversion-funnel when available
-  DEVICE_FUNNEL
-} from '../data/mockData';
+import { BookingsCancelChart, RevenueChart, SentimentDistChart } from '../components/Charts';
+import { IcoDollar, IcoOrders, IcoUp } from '../components/Icons';
 import {
   getAllTickets,
   deriveRevenueMonthly,
@@ -29,11 +14,19 @@ function scoreColor(score) {
   return map[score] ?? "#92827A";
 }
 
+function fmtMoney(n) {
+  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
+  if (n >= 1_000)     return `$${(n / 1_000).toFixed(1)}K`;
+  return `$${n}`;
+}
+
 export default function AnalyticsPage() {
   const [range, setRange] = useState("12W");
   const [revenueMonthly, setRevenueMonthly] = useState([]);
   const [bookingsByWeek, setBookingsByWeek] = useState([]);
   const [analyticsLoading, setAnalyticsLoading] = useState(true);
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [totalBookings, setTotalBookings] = useState(0);
 
   const [sentimentData, setSentimentData] = useState([]);
   const [sentimentLoading, setSentimentLoading] = useState(true);
@@ -46,8 +39,10 @@ export default function AnalyticsPage() {
         const tickets = Array.isArray(data) ? data : [];
         setRevenueMonthly(deriveRevenueMonthly(tickets));
         setBookingsByWeek(deriveBookingsByWeek(tickets));
+        setTotalRevenue(tickets.filter(t => t.isPaid).reduce((s, t) => s + Number(t.price ?? 0), 0));
+        setTotalBookings(tickets.length);
       })
-      .catch(() => { /* silently keep empty state; charts will render with zeros */ })
+      .catch(() => {})
       .finally(() => setAnalyticsLoading(false));
   }, []);
 
@@ -87,16 +82,18 @@ export default function AnalyticsPage() {
     }));
   }, [sentimentData]);
 
+  const zeros = bookingsByWeek.map(() => 0);
+
   return (
     <>
       <div className="admin-page-head">
         <div>
           <div style={{ marginBottom: 6 }}>
-            <span className="admin-eyebrow">Insights · Apr 19, 2026</span>
+            <span className="admin-eyebrow">Insights</span>
           </div>
           <h1 className="admin-page-title">Analytics &amp; Reports</h1>
           <p className="admin-page-sub">
-            The full shape of EcoWings — bookings, revenue, network mix and sustainability impact.
+            Bookings, revenue and sentiment analysis from live data.
           </p>
         </div>
         <div className="admin-page-actions">
@@ -105,90 +102,51 @@ export default function AnalyticsPage() {
               <button key={r} className={range === r ? "on" : ""} onClick={() => setRange(r)}>{r}</button>
             ))}
           </div>
-          <button className="admin-btn admin-btn-ghost"><IcoExport size={14} /> Report PDF</button>
-          <button className="admin-btn admin-btn-primary"><IcoPlus size={14} /> New report</button>
         </div>
       </div>
 
-      <div className="admin-kpis" style={{ marginBottom: 16 }}>
+      <div className="admin-kpis">
         {[
-          { label: "Revenue",       IconC: IcoDollar, value: "$4.82M", delta: "+12.4%", cmp: "vs. prior period", accent: true },
-          { label: "Bookings",      IconC: IcoOrders, value: "4,812",  delta: "+9.2%",  cmp: "Avg 412 / week" },
-          { label: "Carbon saved",  IconC: IcoLeaf,   value: "2.14M",  unit: " kg",     delta: "+18.9%", cmp: "≈ 94K trees / year" },
-          { label: "Network reach", IconC: IcoGlobe,  value: "68",     delta: "+4",     cmp: "routes · 42 countries" },
+          { label: "Revenue",  IconC: IcoDollar, value: fmtMoney(totalRevenue), cmp: "from paid bookings", accent: true },
+          { label: "Bookings", IconC: IcoOrders, value: totalBookings.toLocaleString(), cmp: "total tickets" },
         ].map(k => (
           <div key={k.label} className={"admin-card admin-kpi" + (k.accent ? " accent" : "")}>
             <div className="lab">
               <span className="ico"><k.IconC size={14} sw={1.8} /></span>
               {k.label}
             </div>
-            <div className="val">{k.value}{k.unit && <span className="unit">{k.unit}</span>}</div>
+            <div className="val">{k.value}</div>
             <div className="foot">
-              <span className="admin-delta up"><IcoUp size={10} />{k.delta}</span>
+              <span className="admin-delta up"><IcoUp size={10} /></span>
               <span className="cmp">{k.cmp}</span>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Bookings vs Cancellations */}
-      <div className="admin-grid2" style={{ marginBottom: 16 }}>
-        <div className="admin-card">
-          <div className="admin-card-h">
-            <div>
-              <h3>Bookings vs cancellations · last 12 weeks</h3>
-              <div className="sub">Weekly trend — confirmed bookings and refund volume</div>
-            </div>
-            <div className="admin-chart-legend">
-              <span className="k"><span className="sw" style={{ background: "#1B3D2F" }} />Confirmed</span>
-              <span className="k"><span className="sw" style={{ background: "#B23535", opacity: 0.7 }} />Cancelled</span>
-            </div>
+      {/* Bookings by week */}
+      <div className="admin-card" style={{ marginBottom: 16 }}>
+        <div className="admin-card-h">
+          <div>
+            <h3>Bookings · last 12 weeks</h3>
+            <div className="sub">Weekly confirmed booking count</div>
           </div>
-          <div className="admin-chart-wrap">
-            {!analyticsLoading && bookingsByWeek.length > 0 && (
-              <BookingsCancelChart bookings={bookingsByWeek} cancels={CANCEL_BY_WEEK} />
-            )}
-          </div>
-          <div className="admin-card-foot">
-            <span>Peak week: <b style={{ color: "var(--ink)", fontFamily: "'Plus Jakarta Sans'", fontWeight: 700 }}>548 bookings</b> · W12</span>
-            <a href="#">Full breakdown →</a>
+          <div className="admin-chart-legend">
+            <span className="k"><span className="sw" style={{ background: "#1B3D2F" }} />Bookings</span>
           </div>
         </div>
-
-        <div className="admin-card">
-          <div className="admin-card-h">
-            <div>
-              <h3>Cabin mix</h3>
-              <div className="sub">Booking distribution by fare class</div>
-            </div>
-          </div>
-          <div className="admin-users-panel">
-            <div className="admin-donut-wrap">
-              <div className="admin-donut">
-                <Donut data={CABIN_MIX} />
-                <div className="centerv">
-                  <div className="n">4.8K</div>
-                  <div className="l">Bookings</div>
-                </div>
-              </div>
-              <div className="admin-chan-list">
-                {CABIN_MIX.map(c => (
-                  <div className="admin-chan" key={c.name}>
-                    <span className="sw2" style={{ background: c.color }} />
-                    <span className="name">{c.name}</span>
-                    <span className="n">{c.pct}%</span>
-                    <div className="chan-bar">
-                      <span style={{ width: c.pct + "%", background: c.color }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <div className="admin-card-foot">
-            <span>Economy steady · Business +2.1 pp MoM</span>
-            <a href="#">Revenue breakdown →</a>
-          </div>
+        <div className="admin-chart-wrap">
+          {!analyticsLoading && bookingsByWeek.length > 0 && (
+            <BookingsCancelChart bookings={bookingsByWeek} cancels={zeros} />
+          )}
+        </div>
+        <div className="admin-card-foot">
+          <span>
+            Peak week:{" "}
+            <b style={{ color: "var(--ink)", fontFamily: "'Plus Jakarta Sans'", fontWeight: 700 }}>
+              {bookingsByWeek.length > 0 ? Math.max(...bookingsByWeek) : "—"} bookings
+            </b>
+          </span>
         </div>
       </div>
 
@@ -211,63 +169,9 @@ export default function AnalyticsPage() {
         </div>
         <div className="admin-card-foot">
           <span>
-            <b style={{ color: "var(--ink)", fontFamily: "'Plus Jakarta Sans'", fontWeight: 700 }}>$6.92M</b>{" "}
-            YTD — up 22.7% YoY
+            Total:{" "}
+            <b style={{ color: "var(--ink)", fontFamily: "'Plus Jakarta Sans'", fontWeight: 700 }}>{fmtMoney(totalRevenue)}</b>
           </span>
-          <a href="#">View forecast →</a>
-        </div>
-      </div>
-
-      <div className="admin-grid2" style={{ marginBottom: 16 }}>
-        {/* Geographic distribution */}
-        <div className="admin-card">
-          <div className="admin-card-h">
-            <div>
-              <h3>Geographic distribution</h3>
-              <div className="sub">Bookings by region · last 30 days</div>
-            </div>
-          </div>
-          <HBars rows={GEO} />
-          <div className="admin-card-foot">
-            <span>Europe leads · APAC growing fastest (+14% MoM)</span>
-            <a href="#">Region detail →</a>
-          </div>
-        </div>
-
-        {/* Conversion funnel */}
-        <div className="admin-card">
-          <div className="admin-card-h">
-            <div>
-              <h3>Conversion funnel</h3>
-              <div className="sub">Search to flight · last 30 days</div>
-            </div>
-          </div>
-          <Funnel rows={DEVICE_FUNNEL} />
-          <div className="admin-card-foot">
-            <span>Overall conversion: <b style={{ color: "var(--ink)", fontFamily: "'Plus Jakarta Sans'", fontWeight: 700 }}>5.8%</b></span>
-            <a href="#">Funnel detail →</a>
-          </div>
-        </div>
-      </div>
-
-      {/* Carbon trend */}
-      <div className="admin-card" style={{ marginBottom: 16 }}>
-        <div className="admin-card-h">
-          <div>
-            <h3>Carbon savings · rolling 12 months</h3>
-            <div className="sub">Thousand kg CO₂ saved vs. conventional aviation</div>
-          </div>
-          <span className="admin-eyebrow">Sustainability</span>
-        </div>
-        <div className="admin-chart-wrap">
-          <CarbonChart data={CARBON_MONTHLY} />
-        </div>
-        <div className="admin-card-foot">
-          <span>
-            <b style={{ color: "var(--ink)", fontFamily: "'Plus Jakarta Sans'", fontWeight: 700 }}>1.63M kg</b>{" "}
-            saved YTD · +18.9% YoY
-          </span>
-          <a href="#">Carbon report →</a>
         </div>
       </div>
 

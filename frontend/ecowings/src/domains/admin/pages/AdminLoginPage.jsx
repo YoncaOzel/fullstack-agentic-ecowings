@@ -5,12 +5,12 @@ import LoginForm from '../../auth/components/LoginForm';
 import LoadingSpinner from '../../../shared/components/LoadingSpinner';
 
 export default function AdminLoginPage() {
-  const { login, logout, isAdmin, isAuthenticated, isLoading } = useAuth();
+  const { login, logout, adminSessionActive, activateAdminSession, isLoading } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
   if (isLoading) return <LoadingSpinner />;
-  if (isAuthenticated && isAdmin) return <Navigate to="/admin" replace />;
+  if (adminSessionActive) return <Navigate to="/admin" replace />;
 
   const handleAdminLogin = async (credentials) => {
     setLoading(true);
@@ -23,6 +23,7 @@ export default function AdminLoginPage() {
           logout();
           return { success: false, message: 'Access denied. Admin privileges required.' };
         }
+        activateAdminSession();
         navigate('/admin');
         return { success: true };
       }

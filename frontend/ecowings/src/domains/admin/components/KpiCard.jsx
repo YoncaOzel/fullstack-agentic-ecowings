@@ -2,6 +2,7 @@ import { IcoUp, IcoDown } from './Icons';
 import { Sparkline } from './Charts';
 
 export default function KpiCard({ label, value, unit, delta, cmp, spark, sparkColor, IconC, accent }) {
+  const hasDelta = delta != null;
   const up = delta >= 0;
   return (
     <div className={"admin-card admin-kpi" + (accent ? " accent" : "")}>
@@ -23,10 +24,12 @@ export default function KpiCard({ label, value, unit, delta, cmp, spark, sparkCo
         {unit && <span className="unit">{unit}</span>}
       </div>
       <div className="foot">
-        <span className={"admin-delta " + (up ? "up" : "down")}>
-          {up ? <IcoUp size={10} /> : <IcoDown size={10} />}
-          {up ? "+" : ""}{delta}%
-        </span>
+        {hasDelta && (
+          <span className={"admin-delta " + (up ? "up" : "down")}>
+            {up ? <IcoUp size={10} /> : <IcoDown size={10} />}
+            {up ? "+" : ""}{delta}%
+          </span>
+        )}
         <span className="cmp">{cmp}</span>
       </div>
     </div>

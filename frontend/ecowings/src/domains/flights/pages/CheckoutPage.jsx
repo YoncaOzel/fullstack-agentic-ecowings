@@ -10,11 +10,11 @@ import './CheckoutPage.css';
 /* ─── helpers ─────────────────────────────────────── */
 function fmt(d) {
   if (!d) return '--:--';
-  return new Date(d).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+  return new Date(d).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 }
 function fmtDate(d) {
   if (!d) return '';
-  return new Date(d).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+  return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 function calcDuration(dep, arr) {
   if (!dep || !arr) return null;
@@ -95,14 +95,14 @@ export default function CheckoutPage() {
   const rawPrice = isDiscounted ? discountedPrice : originalPrice;
 
   const priceDisplay = isAmadeus
-    ? `${rawPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ${currency}`
-    : `${rawPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺`;
+    ? `${rawPrice.toLocaleString('en-GB', { minimumFractionDigits: 2 })} ${currency}`
+    : `${rawPrice.toLocaleString('en-GB', { minimumFractionDigits: 2 })} ₺`;
   const originalPriceDisplay = isAmadeus
-    ? `${originalPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ${currency}`
-    : `${originalPrice.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺`;
+    ? `${originalPrice.toLocaleString('en-GB', { minimumFractionDigits: 2 })} ${currency}`
+    : `${originalPrice.toLocaleString('en-GB', { minimumFractionDigits: 2 })} ₺`;
 
   const stopCount = isAmadeus ? ((flight.segments?.length ?? 1) - 1) : 0;
-  const stopLabel = stopCount === 0 ? 'Direkt' : `${stopCount} Aktarma`;
+  const stopLabel = stopCount === 0 ? 'Direct' : `${stopCount} Stop${stopCount > 1 ? 's' : ''}`;
 
   /* ── Pay handler ── */
   const handlePay = async () => {
@@ -138,7 +138,7 @@ export default function CheckoutPage() {
         const ticketId = ticketRes.data?.id;
 
         if (!ticketId) {
-          setError('Bilet oluşturulamadı. Lütfen tekrar deneyin.');
+          setError('Could not create ticket. Please try again.');
           setLoading(false);
           return;
         }
@@ -152,14 +152,14 @@ export default function CheckoutPage() {
       }
 
       if (!paymentUrl) {
-        setError('Ödeme sayfası açılamadı. Lütfen tekrar deneyin.');
+        setError('Could not open payment page. Please try again.');
         setLoading(false);
         return;
       }
 
       window.location.href = paymentUrl;
     } catch (err) {
-      setError(err.response?.data?.message || 'Bir hata oluştu. Lütfen tekrar deneyin.');
+      setError(err.response?.data?.message || 'An error occurred. Please try again.');
       setLoading(false);
     }
   };
@@ -171,7 +171,7 @@ export default function CheckoutPage() {
     if (!els.length) return;
     const obs = new IntersectionObserver(
       (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }),
-      { threshold: 0.12 }
+      { threshold: 0.05 }
     );
     els.forEach(el => obs.observe(el));
     return () => obs.disconnect();
@@ -188,19 +188,19 @@ export default function CheckoutPage() {
         <div className="co-hero-glow" />
         <div className="co-hero-inner">
           <button className="co-back-btn reveal" ref={r(0)} onClick={() => navigate(-1)}>
-            <ArrowLeft size={13} /> Geri Dön
+            <ArrowLeft size={13} /> Go Back
           </button>
 
           <div className="co-eyebrow reveal d1" ref={r(1)}>
             <span className="co-dot" />
-            Ödeme Özeti
+            Order Summary
           </div>
 
           <h1 className="reveal d2" ref={r(2)}>
-            Biletinizi <em>Satın Alın</em>
+            Purchase Your <em>Ticket</em>
           </h1>
           <p className="co-hero-sub reveal d3" ref={r(3)}>
-            Uçuş bilgilerini kontrol edin ve ödemeye geçin.
+            Review your flight details and proceed to payment.
           </p>
         </div>
       </section>
@@ -223,8 +223,8 @@ export default function CheckoutPage() {
                     <Plane size={16} />
                   </div>
                   <div>
-                    <div className="co-card-title">Uçuş Bilgileri</div>
-                    <div className="co-card-subtitle">Aldığınız biletin detayları</div>
+                    <div className="co-card-title">Flight Details</div>
+                    <div className="co-card-subtitle">Details of your selected flight</div>
                   </div>
                 </div>
 
@@ -269,10 +269,10 @@ export default function CheckoutPage() {
                   {/* Details grid */}
                   <div className="co-details-grid">
                     {[
-                      { label: 'Havayolu', value: carrier },
-                      { label: 'Uçuş No', value: flightNumber, mono: true },
+                      { label: 'Airline', value: carrier },
+                      { label: 'Flight No', value: flightNumber, mono: true },
                       ...(isAmadeus && flight.emissionClass ? [{
-                        label: 'Karbon Emisyonu',
+                        label: 'Carbon Emission',
                         value: `${flight.emissionClass} · ${flight.carbonEmission?.toFixed(1)} kg CO₂`,
                         color: emissionColor(flight.emissionClass),
                       }] : []),
@@ -292,7 +292,7 @@ export default function CheckoutPage() {
                   {/* Segments */}
                   {stopCount > 0 && flight.segments && (
                     <div className="co-segments">
-                      <div className="co-segments-title">Aktarma Detayları</div>
+                      <div className="co-segments-title">Stopover Details</div>
                       {flight.segments.map((seg, i) => (
                         <div key={i} className="co-segment-row">
                           <span className="co-segment-route">{seg.departure} → {seg.arrival}</span>
@@ -314,12 +314,12 @@ export default function CheckoutPage() {
                     <div className="co-card-icon">
                       <CreditCard size={15} />
                     </div>
-                    <div className="co-card-title">Fiyat Özeti</div>
+                    <div className="co-card-title">Price Summary</div>
                   </div>
 
                   <div className="co-card-body">
                     <div className="co-price-row">
-                      <span className="co-price-label">Bilet fiyatı</span>
+                      <span className="co-price-label">Ticket price</span>
                       {isDiscounted
                         ? <span className="co-price-original">{originalPriceDisplay}</span>
                         : <span className="co-price-value">{priceDisplay}</span>
@@ -330,10 +330,10 @@ export default function CheckoutPage() {
                       <div className="co-price-row">
                         <span className="co-discount-label">
                           <span className="co-discount-pill">%{discountRate}</span>
-                          Eko indirim
+                          Eco discount
                         </span>
                         <span className="co-discount-value">
-                          -{(originalPrice - rawPrice).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} ₺
+                          -{(originalPrice - rawPrice).toLocaleString('en-GB', { minimumFractionDigits: 2 })} ₺
                         </span>
                       </div>
                     )}
@@ -341,7 +341,7 @@ export default function CheckoutPage() {
                     <div className="co-price-divider" />
 
                     <div className="co-total-row">
-                      <span className="co-total-label">Toplam</span>
+                      <span className="co-total-label">Total</span>
                       <span className="co-total-value">{priceDisplay}</span>
                     </div>
                   </div>
@@ -365,12 +365,12 @@ export default function CheckoutPage() {
                   {loading ? (
                     <>
                       <span className="co-spinner" />
-                      İşleniyor...
+                      Processing...
                     </>
                   ) : (
                     <>
                       <CreditCard size={17} />
-                      Ödemeye Geç
+                      Proceed to Payment
                     </>
                   )}
                 </button>
@@ -378,14 +378,14 @@ export default function CheckoutPage() {
                 {/* Trust note */}
                 <div className="co-trust reveal d3" ref={r(8)}>
                   <Shield size={12} />
-                  Ödemeniz Stripe ile güvenli şekilde işlenir
+                  Your payment is securely processed by Stripe
                 </div>
 
                 {/* Leaf note */}
                 {isAmadeus && flight.emissionClass === 'Low' && (
                   <div className="co-eco-note reveal d4" ref={r(9)}>
                     <Leaf size={15} />
-                    <span>Bu uçuş düşük karbon emisyonluğu ile çevre dostudur.</span>
+                    <span>This flight is eco-friendly with low carbon emissions.</span>
                   </div>
                 )}
 

@@ -88,6 +88,9 @@ export default function App() {
         {/* Admin login — korumasız */}
         <Route path="/admin/login" element={<AdminLoginPage />} />
         {/* Admin dashboard — kendi layout'u var, Navbar/Footer yok */}
+        <Route path="/admin" element={
+          <AdminProtectedRoute><AdminDashboardPage /></AdminProtectedRoute>
+        } />
         <Route path="/admin/*" element={
           <AdminProtectedRoute><AdminDashboardPage /></AdminProtectedRoute>
         } />

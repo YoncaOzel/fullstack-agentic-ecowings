@@ -85,9 +85,9 @@ export default function WallOfLoveSection({ reviews = [], airlines = [], loading
             <div key={chunkIndex} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {chunk.map((review, index) => {
                 const airlineName = getAirlineName(review.airlineId);
-                const displayName = review.userName || review.username || 'Anonymous';
-                const initials = getInitials(review.userName || review.username || review.userId);
-                const avatarIndex = getAvatarIndex(review.userName || review.username);
+                const displayName = review.user?.name || review.User?.Name || review.userName || review.username || 'Anonymous';
+                const initials = getInitials(displayName !== 'Anonymous' ? displayName : review.userId);
+                const avatarIndex = getAvatarIndex(displayName);
                 const avatarSrc = `https://randomuser.me/api/portraits/men/${avatarIndex}.jpg`;
 
                 return (

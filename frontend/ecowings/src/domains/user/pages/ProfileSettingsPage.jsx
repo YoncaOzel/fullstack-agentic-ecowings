@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import userService from '../services/userService';
 import ProfileForm from '../components/ProfileForm';
 import ChangePasswordForm from '../components/ChangePasswordForm';
-import CouponCard from '../../coupons/components/CouponCard';
 import MyTicketsTab from '../../tickets/components/MyTicketsTab';
 import LoadingSpinner from '../../../shared/components/LoadingSpinner';
 import ErrorMessage from '../../../shared/components/ErrorMessage';
@@ -11,22 +10,18 @@ import ErrorMessage from '../../../shared/components/ErrorMessage';
 const TABS = [
   { label: 'Profile', value: 'profile' },
   { label: 'Change Password', value: 'password' },
-  { label: 'My Coupons', value: 'coupons' },
   { label: 'My Tickets', value: 'tickets' },
 ];
 
-const TAB_PARAM_MAP = { profile: 0, password: 1, coupons: 2, tickets: 3 };
+const TAB_PARAM_MAP = { profile: 0, password: 1, tickets: 2 };
 
 export default function ProfileSettingsPage() {
   const [searchParams] = useSearchParams();
   const initialTab = TAB_PARAM_MAP[searchParams.get('tab')] ?? 0;
   const [activeTab, setActiveTab] = useState(initialTab);
   const [profile, setProfile] = useState(null);
-  const [coupons, setCoupons] = useState([]);
   const [loadingProfile, setLoadingProfile] = useState(true);
-  const [loadingCoupons, setLoadingCoupons] = useState(false);
   const [profileError, setProfileError] = useState('');
-  const [couponError, setCouponError] = useState('');
 
   useEffect(() => {
     userService.getProfile()
@@ -37,18 +32,6 @@ export default function ProfileSettingsPage() {
       .catch(() => setProfileError('An error occurred while loading your profile.'))
       .finally(() => setLoadingProfile(false));
   }, []);
-
-  useEffect(() => {
-    if (activeTab !== 2) return;
-    setLoadingCoupons(true);
-    userService.getMyCoupons()
-      .then((res) => {
-        if (Array.isArray(res.data)) setCoupons(res.data);
-        else setCouponError(res.data?.message || 'Failed to load coupons.');
-      })
-      .catch(() => setCouponError('An error occurred while loading coupons.'))
-      .finally(() => setLoadingCoupons(false));
-  }, [activeTab]);
 
   const fullName = profile
     ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim()
@@ -287,14 +270,6 @@ export default function ProfileSettingsPage() {
           line-height: 1.5;
         }
 
-        /* ── Coupon grid ── */
-        .psp-coupon-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-          gap: 16px;
-          margin-top: 8px;
-        }
-
         /* ── Responsive ── */
         @media (max-width: 900px) {
           .psp-body {
@@ -398,15 +373,7 @@ export default function ProfileSettingsPage() {
 
               {activeTab === 1 && <ChangePasswordForm />}
 
-              {activeTab === 2 && (
-                loadingCoupons
-                  ? <LoadingSpinner />
-                  : couponError
-                  ? <ErrorMessage message={couponError} />
-                  : <CouponsPanel coupons={coupons} />
-              )}
-
-              {activeTab === 3 && <MyTicketsTab />}
+              {activeTab === 2 && <MyTicketsTab />}
             </div>
 
             {/* Secondary actions – only show on profile tab */}
@@ -429,94 +396,6 @@ export default function ProfileSettingsPage() {
   );
 }
 
-function CouponsPanel({ coupons }) {
-  const activeCoupons = coupons.filter(
-    (c) => c.isActive && !c.isUsed && !(c.expiryDate && new Date(c.expiryDate) < new Date())
-  );
-  const inactiveCoupons = coupons.filter(
-    (c) => !c.isActive || c.isUsed || (c.expiryDate && new Date(c.expiryDate) < new Date())
-  );
-
-  if (coupons.length === 0) {
-    return (
-      <div style={{ textAlign: 'center', padding: '72px 24px', color: '#737c7f', fontFamily: "'DM Sans', sans-serif" }}>
-        <div style={{ fontSize: '3rem', marginBottom: '20px', opacity: 0.35 }}>🎫</div>
-        <h3 style={{ fontSize: '1rem', fontWeight: 500, color: '#2b3437', margin: '0 0 10px' }}>No Coupons Found</h3>
-        <p style={{ fontSize: '0.875rem', lineHeight: 1.6, margin: 0 }}>
-          You have no active coupons. Keep an eye on our campaigns.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ fontFamily: "'DM Sans', sans-serif" }}>
-      <style>{`
-        .cp-active-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 24px;
-          margin-top: 20px;
-        }
-        .cp-used-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 16px;
-          margin-top: 20px;
-        }
-        @media (max-width: 700px) {
-          .cp-active-grid { grid-template-columns: 1fr; }
-          .cp-used-grid { grid-template-columns: 1fr 1fr; }
-        }
-        @media (max-width: 480px) {
-          .cp-used-grid { grid-template-columns: 1fr; }
-        }
-      `}</style>
-
-      {/* Aktif Kuponlar */}
-      {activeCoupons.length > 0 && (
-        <section>
-          <span style={{
-            fontSize: '11px',
-            fontWeight: 700,
-            letterSpacing: '0.05em',
-            textTransform: 'uppercase',
-            color: '#586064',
-            display: 'block',
-          }}>
-            Active Coupons
-          </span>
-          <div className="cp-active-grid">
-            {activeCoupons.map((c) => (
-              <CouponCard key={c.id} coupon={c} variant="active" />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Kullanılan / Geçersiz Kuponlar */}
-      {inactiveCoupons.length > 0 && (
-        <section style={{ marginTop: activeCoupons.length > 0 ? '48px' : '0' }}>
-          <span style={{
-            fontSize: '11px',
-            fontWeight: 700,
-            letterSpacing: '0.05em',
-            textTransform: 'uppercase',
-            color: '#586064',
-            display: 'block',
-          }}>
-            Used / Expired Coupons
-          </span>
-          <div className="cp-used-grid">
-            {inactiveCoupons.map((c) => (
-              <CouponCard key={c.id} coupon={c} variant="used" />
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
-  );
-}
 
 function DownloadIcon() {
   return (

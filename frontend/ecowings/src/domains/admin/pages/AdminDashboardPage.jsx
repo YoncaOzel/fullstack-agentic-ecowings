@@ -5,7 +5,6 @@ import DashboardPage from './DashboardPage';
 import FlightOrdersPage from './FlightOrdersPage';
 import UserManagementPage from './UserManagementPage';
 import AnalyticsPage from './AnalyticsPage';
-import SettingsPage from './SettingsPage';
 import NetworkPage from './NetworkPage';
 import '../styles/admin.css';
 
@@ -15,7 +14,6 @@ const PAGES = {
   users:     <UserManagementPage />,
   network:   <NetworkPage />,
   analytics: <AnalyticsPage />,
-  settings:  <SettingsPage />,
 };
 
 export default function AdminDashboardPage() {

@@ -142,9 +142,23 @@ namespace CleanArchitecture.Infrastructure.Services
 
             string ipAddress = IpHelper.GetIpAddress();
 
-            // Core.Entities.User (integer PK) için ID'yi bul
+            // Core.Entities.User (integer PK) için ID'yi bul; yoksa otomatik oluştur
             var customUser = await _userRepository.GetByEmailAsync(user.Email);
-            var customUserId = customUser?.Id.ToString() ?? "0";
+            if (customUser == null)
+            {
+                customUser = new CleanArchitecture.Core.Entities.User
+                {
+                    Name = $"{user.FirstName} {user.LastName}".Trim(),
+                    Email = user.Email,
+                    PasswordHash = "ManagedByIdentity",
+                    Role = CleanArchitecture.Core.Enums.UserRoles.Customer,
+                    DateOfBirth = DateTime.UtcNow,
+                    Gender = "not mentioned",
+                    PhoneNumber = "not mentioned"
+                };
+                await _userRepository.AddAsync(customUser);
+            }
+            var customUserId = customUser.Id.ToString();
 
             var claims = new[]
             {

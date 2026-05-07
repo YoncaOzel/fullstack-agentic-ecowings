@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { IcoPlane, IcoGlobe, IcoNetwork, IcoExport, IcoUp, IcoSearch } from '../components/Icons';
+import { IcoPlane, IcoGlobe, IcoNetwork, IcoUp, IcoSearch } from '../components/Icons';
 import { getAllAirlines, getAllAirports } from '../services/adminApi';
 
 const PAGE_SIZE = 15;
@@ -98,13 +98,11 @@ export default function NetworkPage() {
             {airlines.length} airlines · {airports.length} airports · {totalCountries} countries in the EcoWings network.
           </p>
         </div>
-        <div className="admin-page-actions">
-          <button className="admin-btn admin-btn-ghost"><IcoExport size={14} /> Export</button>
-        </div>
+        <div className="admin-page-actions" />
       </div>
 
       {/* KPI cards */}
-      <div className="admin-kpis" style={{ marginBottom: 16 }}>
+      <div className="admin-kpis">
         {[
           { label: "Airlines",          IconC: IcoPlane,   value: airlines.length, cmp: `${new Set(airlines.map(a => a.country).filter(Boolean)).size} countries` },
           { label: "Airports",          IconC: IcoNetwork, value: airports.length, cmp: `${new Set(airports.map(a => a.country).filter(Boolean)).size} countries` },

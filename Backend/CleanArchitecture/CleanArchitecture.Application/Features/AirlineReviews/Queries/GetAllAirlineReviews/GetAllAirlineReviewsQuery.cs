@@ -21,7 +21,7 @@ namespace CleanArchitecture.Core.Features.AirlineReviews.Queries.GetAllAirlineRe
 
             public async Task<List<AirlineReview>> Handle(GetAllAirlineReviewsQuery request, CancellationToken cancellationToken)
             {
-                var reviews = await _airlineReviewRepository.GetAllAsync();
+                var reviews = await _airlineReviewRepository.GetWithIncludeAsync(r => true, r => r.User);
                 return reviews.ToList();
             }
         }

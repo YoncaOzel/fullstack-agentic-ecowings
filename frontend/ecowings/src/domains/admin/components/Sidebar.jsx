@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../shared/context/AuthContext';
 import {
-  IcoDashboard, IcoOrders, IcoUsers, IcoChart, IcoSettings, IcoLeafBrand, IcoNetwork
+  IcoDashboard, IcoOrders, IcoUsers, IcoChart, IcoLeafBrand, IcoNetwork
 } from './Icons';
 
 const NAV_ITEMS = [
@@ -10,16 +10,16 @@ const NAV_ITEMS = [
   { key: "users",     label: "User Management",     Icon: IcoUsers,     count: 42,    section: "operations" },
   { key: "network",   label: "Airlines & Airports", Icon: IcoNetwork,   count: null,  section: "operations" },
   { key: "analytics", label: "Analytics & Reports", Icon: IcoChart,     count: null,  section: "insights" },
-  { key: "settings",  label: "Settings",            Icon: IcoSettings,  count: null,  section: "insights" },
 ];
 
 export default function Sidebar({ active, onNav }) {
-  const { logout } = useAuth();
+  const { logout, clearAdminSession } = useAuth();
   const navigate = useNavigate();
   const sections = ["overview", "operations", "insights"];
   const sectionLabels = { overview: "Overview", operations: "Operations", insights: "Insights" };
 
   const handleLogout = () => {
+    clearAdminSession();
     logout();
     navigate('/admin/login');
   };

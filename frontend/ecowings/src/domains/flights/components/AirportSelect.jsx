@@ -182,7 +182,11 @@ export default function AirportSelect({
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
           }}>
-            {selected ? `${selected.city} (${selected.code})` : placeholder}
+            {selected
+              ? (selected.city && selected.city !== 'Unknown'
+                  ? `${selected.city} (${selected.code})`
+                  : selected.code)
+              : placeholder}
           </span>
         )}
 
@@ -270,7 +274,7 @@ export default function AirportSelect({
                 {/* City + Name */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: '14px', fontWeight: 600, color: '#1c2b22', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {airport.city}
+                    {airport.city && airport.city !== 'Unknown' ? airport.city : airport.code}
                   </div>
                   <div style={{ fontSize: '11px', color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {airport.name} · {airport.country}

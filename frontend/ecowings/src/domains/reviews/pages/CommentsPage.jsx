@@ -274,11 +274,13 @@ export default function CommentsPage() {
           {isAuthenticated && showForm && !loading && (
             <div style={{
               margin: '32px 0',
-              background: 'linear-gradient(180deg, #ffffff 0%, #fbfdff 100%)',
-              border: '1px solid #e2e8f0',
-              borderRadius: '16px',
-              padding: '28px',
-              boxShadow: '0 14px 34px rgba(15,23,42,0.06)',
+              background: '#ffffff',
+              border: '1px solid rgba(77,124,95,0.16)',
+              borderTop: '3px solid #4d7c5f',
+              borderRadius: '20px',
+              padding: '0',
+              boxShadow: '0 4px 24px rgba(77,124,95,0.10), 0 1px 4px rgba(0,0,0,0.04)',
+              overflow: 'hidden',
             }}>
               <ReviewForm airlines={airlines} onSuccess={handleNewReview} />
             </div>

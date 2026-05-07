@@ -14,7 +14,6 @@ namespace CleanArchitecture.Infrastructure.Services
     {
         private readonly InferenceSession _session;
         private readonly BertUncasedBaseTokenizer _tokenizer;
-        // The new model format exported from Python
         private readonly string _modelPath = Path.Combine(AppContext.BaseDirectory, "model.onnx");
 
         public MLService()
@@ -26,18 +25,35 @@ namespace CleanArchitecture.Infrastructure.Services
                 Console.WriteLine($"[SİSTEM KONTROLÜ] OKUNAN MODEL YOLU: {fileInfo.FullName}");
                 Console.WriteLine($"[SİSTEM KONTROLÜ] MODEL BOYUTU: {fileInfo.Length / (1024 * 1024)} MB");
                 Console.WriteLine($"===============================================\n");
+
+                try
+                {
+                    _session = new InferenceSession(_modelPath);
+                    _tokenizer = new BertUncasedBaseTokenizer();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"\n[HATA] Model yüklenemedi: {ex.Message}\n");
+                    _session = null;
+                    _tokenizer = null;
+                }
             }
             else
             {
                 Console.WriteLine($"\n[HATA] DİKKAT! Model bulunamadı: {_modelPath}\n");
+                _session = null;
+                _tokenizer = null;
             }
-
-            _session = new InferenceSession(_modelPath);
-            _tokenizer = new BertUncasedBaseTokenizer();
         }
 
         public Task<int> PredictRatingAsync(string comment)
         {
+            if (_session == null || _tokenizer == null)
+            {
+                Console.WriteLine("[UYARI] ML modeli mevcut değil, varsayılan puan (3) kullanılıyor.");
+                return Task.FromResult(3);
+            }
+
             var allTokens = _tokenizer.Encode(512, comment);
             var validTokens = allTokens.Where(t => t.InputIds != 0).ToList();
 

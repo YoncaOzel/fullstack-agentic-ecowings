@@ -411,8 +411,6 @@
 /* ===== Page ===== */
 .admin-page {
   padding: 28px 32px 40px;
-  max-width: 1440px;
-  margin: 0 auto;
 }
 
 .admin-page-head {

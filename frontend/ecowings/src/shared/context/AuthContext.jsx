@@ -10,6 +10,9 @@ export function AuthProvider({ children }) {
   const [refreshToken, setRefreshToken] = useState(null);
   const [roles, setRoles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [adminSessionActive, setAdminSessionActive] = useState(
+    () => sessionStorage.getItem('adminSession') === 'true'
+  );
 
   const fetchAndMergeProfile = async () => {
     try {
@@ -83,14 +86,26 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const activateAdminSession = () => {
+    sessionStorage.setItem('adminSession', 'true');
+    setAdminSessionActive(true);
+  };
+
+  const clearAdminSession = () => {
+    sessionStorage.removeItem('adminSession');
+    setAdminSessionActive(false);
+  };
+
   const logout = () => {
     localStorage.removeItem('jwToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
+    sessionStorage.removeItem('adminSession');
     setUser(null);
     setJwToken(null);
     setRefreshToken(null);
     setRoles([]);
+    setAdminSessionActive(false);
   };
 
   const updateUser = (patch) => {
@@ -105,7 +120,7 @@ export function AuthProvider({ children }) {
   const isAdmin = roles.some(r => r === 'Admin' || r === 'SuperAdmin');
 
   return (
-    <AuthContext.Provider value={{ user, jwToken, refreshToken, roles, isLoading, isAuthenticated, isAdmin, login, logout, register, updateUser }}>
+    <AuthContext.Provider value={{ user, jwToken, refreshToken, roles, isLoading, isAuthenticated, isAdmin, adminSessionActive, login, logout, register, updateUser, activateAdminSession, clearAdminSession }}>
       {children}
     </AuthContext.Provider>
   );
