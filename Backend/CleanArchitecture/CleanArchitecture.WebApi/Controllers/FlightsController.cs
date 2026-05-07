@@ -102,7 +102,7 @@ namespace CleanArchitecture.WebAPI.Controllers
             var ticketId = await _mediator.Send(command);
 
             // 2. Ödeme bağlantısı oluştur
-            var frontendUrl = _configuration["FrontendURL"]?.TrimEnd('/') ?? "http://localhost:5173";
+            var frontendUrl = ResolveFrontendUrl();
             var successUrl = $"{frontendUrl}/payment-success";
             var cancelUrl = $"{frontendUrl}/payment-fail";
 
@@ -117,6 +117,35 @@ namespace CleanArchitecture.WebAPI.Controllers
                 ticketId, 
                 paymentUrl 
             });
+        }
+
+        private string ResolveFrontendUrl()
+        {
+            var configuredUrl = _configuration["FrontendURL"];
+            if (!string.IsNullOrWhiteSpace(configuredUrl))
+            {
+                return configuredUrl.TrimEnd('/');
+            }
+
+            var environment = _configuration["ASPNETCORE_ENVIRONMENT"];
+            if (string.Equals(environment, "Development", StringComparison.OrdinalIgnoreCase))
+            {
+                var origin = Request.Headers.Origin.ToString();
+                if (!string.IsNullOrWhiteSpace(origin))
+                {
+                    return origin.TrimEnd('/');
+                }
+
+                var referer = Request.Headers.Referer.ToString();
+                if (Uri.TryCreate(referer, UriKind.Absolute, out var refererUri))
+                {
+                    return $"{refererUri.Scheme}://{refererUri.Authority}";
+                }
+
+                return "http://localhost:5173";
+            }
+
+            throw new InvalidOperationException("FrontendURL is not configured.");
         }
     }
 }
