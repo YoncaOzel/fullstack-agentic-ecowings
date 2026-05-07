@@ -12,7 +12,8 @@ COPY . ./
 RUN dotnet publish CleanArchitecture/CleanArchitecture.WebApi/CleanArchitecture.WebApi.csproj \
     -c Release \
     -o /app/publish \
-    --no-restore
+    --no-restore \
+    /p:ErrorOnDuplicatePublishOutputFiles=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
