@@ -56,24 +56,29 @@ app = FastAPI(
     lifespan=lifespan,   # Yukarıdaki startup/shutdown yöneticisini bağla
 )
 
-# CORS ayarları: frontend geliştirme portlarından gelen isteklere izin ver
+# CORS ayarlari: deployed frontend ve local development origin'lerine izin ver.
+def normalize_origin(origin):
+    return origin.strip().rstrip("/") if origin and origin.strip() else None
+
+
 def get_allowed_origins():
     origins = [
         "http://localhost:3000",   # Create React App
         "http://localhost:3001",   # Alternatif React portu
         "http://localhost:5173",   # Vite / SvelteKit
+        "http://127.0.0.1:5173",   # Vite with explicit loopback host
     ]
 
-    frontend_url = os.getenv("FRONTEND_URL")
+    frontend_url = normalize_origin(os.getenv("FRONTEND_URL"))
     if frontend_url:
-        origins.append(frontend_url.rstrip("/"))
+        origins.append(frontend_url)
 
     extra_origins = os.getenv("CORS_ORIGINS")
     if extra_origins:
         origins.extend(
-            origin.strip().rstrip("/")
-            for origin in extra_origins.split(",")
-            if origin.strip()
+            normalized
+            for normalized in (normalize_origin(origin) for origin in extra_origins.split(","))
+            if normalized
         )
 
     return list(dict.fromkeys(origins))
