@@ -84,9 +84,18 @@ def get_allowed_origins():
     return list(dict.fromkeys(origins))
 
 
+def get_allow_origin_regex() -> str:
+    patterns = [r"https://.*\.vercel\.app"]
+    extra = os.getenv("CORS_ORIGIN_REGEX")
+    if extra:
+        patterns.append(extra.strip())
+    return "|".join(patterns)
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=get_allowed_origins(),
+    allow_origin_regex=get_allow_origin_regex(),
     allow_methods=["*"],
     allow_headers=["*"],
 )
